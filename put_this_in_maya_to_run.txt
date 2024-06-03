@@ -1,0 +1,10 @@
+#import sys
+#sys.path.append("E:\YR2\Maya")
+#sys.path.append('E:\YR2\Maya\Modular_AutoRigger_SSD\systems/utils')
+
+import importlib
+from Modular_AutoRigger_SCRIPT import main
+
+importlib.reload(main)
+
+main.run_ui()
