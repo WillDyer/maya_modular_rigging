@@ -1,7 +1,0 @@
-#these lines of code link when something happens with a button etc to a function.
-#self.ui.qt_button_name.clicked.connect(self.button_function)
-#self.ui.qt_button_name.clicked.connect(self.button_function) #button
-#self.ui.qt_button_name.stateChanged.connect(self.button_function) #checkbox
-#self.ui.qt_button_name.valueChanged.connect(self.button_function) #combo box
-#self.ui.qt_button_name.textEdited.connect(self.button_function) #line edit
-#self.ui.qt_button_name.currentIndexChanged.connect(self.button_function) #combobox
