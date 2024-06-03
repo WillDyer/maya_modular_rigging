@@ -9,3 +9,5 @@ ui_useful_lines.txt
 >>>>>>> Stashed changes
 *.pyc
 *.pyc
+/systems/utils/__pycache__
+/systems/utils/__pycache__
