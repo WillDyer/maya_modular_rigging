@@ -1,2 +1,10 @@
+<<<<<<< Updated upstream
 
 /__pycache__
+=======
+collect_loc.txt
+put_this_in_maya_to_run.txt
+ui_useful_lines.txt
+*.pyc
+>>>>>>> Stashed changes
+*.pyc
