@@ -1,0 +1,111 @@
+import maya.cmds as cmds
+import importlib
+import sys
+import os
+from systems.utils import (cube_crv, connect_modules, utils)
+importlib.reload(connect_modules)
+importlib.reload(utils)
+
+scale = 1
+
+def guides(accessed_module, offset,side):
+    selection = cmds.ls(sl=1)
+    master_guide = creation(accessed_module,offset,side)
+    if not selection:
+        print("no selection making module")
+    else:
+        connect_modules.attach(master_guide, selection)
+        connect_modules.prep_attach_joints(master_guide, selection)
+        print("Attaching to module.")
+    return master_guide
+
+
+def creation(accessed_module,offset,side):
+    connector_list = []
+    module = importlib.import_module(f"systems.modules.{accessed_module}")
+    importlib.reload(module)
+    ABC_FILE = f"{os.path.dirname(os.path.abspath(__file__))}\imports\guide_shape.abc"
+    COLOR_CONFIG = {'l': 6, 'r': 13, 'default': 22}
+
+    # create master guide for module
+    if "root" in module.system:
+        master_guide = "root"
+    else:
+        master_guide = cube_crv.create_cube(f"master_{accessed_module}",scale=[5,5,5])
+        pos = module.system_pos[module.system[0]]
+        rot = module.system_rot[module.system[0]]
+        cmds.xform(master_guide,ws=1,t=[pos[0]+offset[0],pos[1]+offset[1],pos[2]+offset[2]])
+        cmds.xform(master_guide,ws=1,ro=[rot[0],rot[1],rot[2]])
+
+
+    for x in module.system:
+        # Import custom guide crv if fails use locator
+        try:
+            if "root" in x:
+                imported = cmds.circle(r=50,nr=[0,1,0])
+            else:
+                imported = cmds.file(ABC_FILE, i=1,namespace="test",rnn=1)
+            cmds.rename(imported[0], x)
+            for shape in imported[1:]:
+                shape = shape.split("|")[-1]
+                cmds.rename(shape, f"{x}_shape_#")
+
+            cmds.setAttr(f"{x}.overrideEnabled",1)
+            cmds.setAttr(f"{x}.overrideColor",COLOR_CONFIG["default"])
+        except RuntimeError:
+            print("Couldnt load file using basic shapes instead")
+            cmds.spaceLocator(n=x)
+
+        # set location of guide crvs then OPM
+        pos = module.system_pos[x]
+        rot = module.system_rot[x]
+        cmds.xform(x,ws=1,t=[pos[0]+offset[0],pos[1]+offset[1],pos[2]+offset[2]])
+        cmds.xform(x,ws=1,ro=[rot[0],rot[1],rot[2]])
+
+    # parent together
+    module.system.reverse()
+    module.system.append(master_guide)
+    for x in range(len(module.system)):
+        try:
+            cmds.parent(module.system[x],module.system[x+1])
+            connector = utils.connector(module.system[x],module.system[x+1])
+            connector_list.append(connector)
+            
+        except:
+            pass # end of list
+
+    if "grp_connector_clusters" in cmds.ls("grp_connector_clusters"):
+        cmds.parent(connector_list,"grp_connector_clusters")
+    else:
+        cmds.group(connector_list,n="grp_connector_clusters",w=1)
+
+    add_custom_attr(module.system, master_guide)
+    cmds.addAttr(master_guide, ln="is_master",at="enum",en="True",k=0) # adding master group attr
+    cmds.addAttr(master_guide, ln="base_module",at="enum",en=accessed_module,k=0) # module attr
+    cmds.addAttr(master_guide, ln="module_side",at="enum",en=side,k=0) # module side
+    for item in ["is_master","base_module","module_side"]:
+        cmds.addAttr(module.system[:-1],ln=f"{item}", proxy=f"{module.system[-1]}.{item}")
+    return master_guide
+
+def add_custom_attr(system, master_guide):
+    custom_attrs = {"module_dvdr": ["enum","------------","MODULE",True],
+                    "skeleton_dvdr": ["enum","------------", "SKELETON",True],
+                    "mirror_jnts": ["enum","Mirror Joints", "Yes:No",False],
+                    "twist_jnts": ["enum","Twist Joints", "Yes:No",False],
+                    "twist_amount": ["float","Twist Amount", "UPDATE",False],
+                    "rig_dvdr": ["enum","------------","RIG",True],
+                    "rig_type": ["enum","Rig Type","FK:IK:FKIK",False],
+                    "squash_stretch": ["enum","Squash Stech","No:Yes",False]
+                    }
+
+    #for x in system:
+    for i in custom_attrs:
+        if custom_attrs[i][0] == "enum":
+            cmds.addAttr(master_guide,ln=f"{system[-1]}_{i}",nn=custom_attrs[i][1],at="enum",en=custom_attrs[i][2],k=1)
+        elif custom_attrs[i][0] == "float":
+            cmds.addAttr(master_guide,ln=f"{system[-1]}_{i}",nn=custom_attrs[i][1],at="float",min=0,k=1)
+        if custom_attrs[i][3] == True:
+            cmds.setAttr(f"{master_guide}.{system[-1]}_{i}", l=1)
+
+    for item in custom_attrs:
+        cmds.addAttr(system[:-1],ln=f"{system[-1]}_{item}", proxy=f"{system[-1]}.{system[-1]}_{item}")
