@@ -9,9 +9,6 @@ modules_to_connect = {}
 
 
 def attach(master_guide, selection):
-    print(selection)
-    print(master_guide)
-
     connector_list = utils.connector(master_guide, selection[0])
 
     if "grp_connector_clusters" in cmds.ls("grp_connector_clusters"):
@@ -22,7 +19,6 @@ def attach(master_guide, selection):
     temp_group = [master_guide]
     modules_to_connect.update({f"{master_guide}_2_{selection[0]}": temp_group})
 
-    print(modules_to_connect)
     return modules_to_connect
 
 joints_to_parent = []

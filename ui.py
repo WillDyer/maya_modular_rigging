@@ -78,7 +78,10 @@ class QtSampler(QWidget):
 
     def update_dropdown(self):
         files = [".".join(f.split(".")[:-1]) for f in os.listdir(f"{os.path.dirname(os.path.abspath(__file__))}\systems\modules")]
-        files.remove("")
+        try:
+            files.remove("")
+        except ValueError:
+            pass
         files.remove("__init__")
         self.ui.available_modules.addItems(files)
         index = files.index("basic_root")

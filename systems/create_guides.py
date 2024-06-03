@@ -78,7 +78,6 @@ def creation(accessed_module,offset,side):
     # parent together
     guide_list.reverse()
     guide_list.append(master_guide)
-    print(guide_list)
     for x in range(len(guide_list)):
         try:
             cmds.parent(guide_list[x],guide_list[x+1])
