@@ -37,13 +37,13 @@ def joint(orientation,top_skeleton_joint, system):
     cmds.select(clear=1)
     for locator in list_ctrls:
         loc = cmds.xform(locator, r=True, ws=True, q=True, t=True) # Gather locator location
-        jnt_name = cmds.joint(n=f"{joint_tag}{locator}{side}", p=loc) # create joint based off the location
+        jnt_name = cmds.joint(n=f"{joint_tag}{locator}", p=loc) # create joint based off the location
         jnt_names.append(jnt_name)
 
     # Orient joint
-    cmds.joint(f"{joint_tag}{list_ctrls[0]}{side}", edit=True, zso=1, oj=orientation, sao="xup", ch=True)
+    cmds.joint(f"{joint_tag}{list_ctrls[0]}", edit=True, zso=1, oj=orientation, sao="xup", ch=True)
     # Orient end joint to world
-    cmds.joint(f"{joint_tag}{list_ctrls[-1]}{side}", e=True, oj="none" ,ch=True, zso=True)
+    cmds.joint(f"{joint_tag}{list_ctrls[-1]}", e=True, oj="none" ,ch=True, zso=True)
     return jnt_names
 
 def create_joint_variation( top_locator_list):

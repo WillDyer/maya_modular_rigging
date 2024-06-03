@@ -117,13 +117,12 @@ class QtSampler(QWidget):
         #orientation = self.ui.oritentation.currentText()
 
         jnt_list = joints.get_joint_list(self.ui.oritentation.currentText(),self.created_guides, system="rig")
-
-        connect_modules.attach_joints()
-        self.ui.polish_rig.setEnabled(True)
         num = 0
         for dict in self.systems_to_be_made.values():
             dict["joints"] = jnt_list[num]
             num = num+1
+        connect_modules.attach_joints()
+        self.ui.polish_rig.setEnabled(True)
 
         mirror = mirror_rig.collect_mirror_data(self.systems_to_be_made)
 

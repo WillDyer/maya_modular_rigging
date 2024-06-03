@@ -28,21 +28,10 @@ def attach(master_guide, selection):
 joints_to_parent = []
 
 def prep_attach_joints(child_joint, parent_joint):
-    #print(f"parent_joint: {parent_joint}")
-    #print(f"child_joint: {child_joint}")
-    child_side = cmds.getAttr(f"{child_joint}.module_side",asString=1)
     child_joint = cmds.listRelatives(child_joint, c=1, typ="transform")[0]
 
-    parent_side = cmds.getAttr(f"{parent_joint[0]}.module_side",asString=1)
-
-    if child_side == "None":
-        child_side = ""
-    if parent_side == "None":
-        parent_side = ""
-
-    temp_group = [f"jnt_rig_{child_joint}{child_side}", f"jnt_rig_{parent_joint[0]}{parent_side}"]
+    temp_group = [f"jnt_rig_{child_joint}", f"jnt_rig_{parent_joint[0]}"]
     joints_to_parent.append(temp_group)
-    #print(joints_to_parent)
 
 def attach_joints():
     for x in joints_to_parent:
