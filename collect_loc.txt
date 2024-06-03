@@ -1,6 +1,0 @@
-sel = cmds.ls(sl=1)
-
-pos = cmds.xform(sel[0], q=1, t=True, ws=True)
-rot = cmds.xform(sel[0], q=1, ro=True, ws=True)
-print(pos)
-print(rot)
