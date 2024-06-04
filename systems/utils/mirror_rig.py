@@ -14,10 +14,10 @@ def collect_mirror_data(systems_to_be_made):
 
             if key["side"] == "_l":
                 side = "_r"
-                simple_side = "r"
+                simple_side = "_r_"
             elif key["side"] == "_r":
                 side = "_l"
-                simple_side = "l"
+                simple_side = "_l_"
             else:
                 side = ""
 
@@ -39,7 +39,7 @@ def collect_mirror_data(systems_to_be_made):
 
             # Create master guide
             split_master_guide = key["master_guide"].split("_")
-            master_guide = key["master_guide"].replace(f"_{split_master_guide[-2]}_",f"_{simple_side}_")
+            master_guide = key["master_guide"].replace(f"_{split_master_guide[-2]}_",simple_side)
             cmds.spaceLocator(n=master_guide)
             cmds.matchTransform(master_guide,joint_list[0])
             cmds.parent(locator_list[-1],master_guide)
@@ -49,7 +49,7 @@ def collect_mirror_data(systems_to_be_made):
                 try:
                     if not attr in ['visibility', 'translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']:
                         try:
-                            new_attr_name = attr.replace("_l_","_r_",1)
+                            new_attr_name = attr.replace(f"{key['side']}_",simple_side,1)
                         except:
                             pass
                         cmds.addAttr(master_guide,ln=f"{new_attr_name}", proxy=f"{key['master_guide']}.{attr}")
