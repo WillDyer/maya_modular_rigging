@@ -128,6 +128,10 @@ class QtSampler(QWidget):
         self.ui.polish_rig.setEnabled(True)
 
         mirror = mirror_rig.collect_mirror_data(self.systems_to_be_made)
+        print("MIRROR RESULT")
+        print(mirror)
+
+        self.systems_to_be_made = mirror
 
     def edit_blueprint(self):
         subprocess.Popen(f'explorer "{os.path.dirname(os.path.abspath(__file__))}\systems\modules"')
