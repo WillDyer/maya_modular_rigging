@@ -151,22 +151,27 @@ class QtSampler(QWidget):
             if rig_type == 0:
                 fk_joint_list = joints.joint(orientation, master_guide, system="fk")
                 fk.create_fk(fk_joint_list,delete_end=False)
-                utils.constraint_from_lists(fk_joint_list, key["joints"],maintain_offset=1)
+                utils.constraint_from_lists_1to1(fk_joint_list, key["joints"],maintain_offset=1)
                 print("fk")
             elif rig_type == 1:
                 ik_joint_list = joints.joint(orientation, master_guide, system="ik")
                 ik.create_ik(ik_joint_list, module.ik_joints)
-                utils.constraint_from_lists(ik_joint_list, key["joints"],maintain_offset=1)
+                utils.constraint_from_lists_1to1(ik_joint_list, key["joints"],maintain_offset=1)
                 print("ik")
             elif rig_type == 2:
                 fk_joint_list = joints.joint(orientation, master_guide, system="fk")
                 fk.create_fk(fk_joint_list, delete_end=False)
                 ik_joint_list = joints.joint(orientation, master_guide, system="ik")
                 ik.create_ik(ik_joint_list, module.ik_joints)
+                utils.constraint_from_lists_2to1(ik_joint_list, fk_joint_list, key["joints"],maintain_offset=1)
+
                 print("ikfk")
             else:
                 cmds.error("ERROR: rig_type attribute cannot be found or attribute value cannot be found.")
-        
+
+            ctrl_list = cmds.ls("ctrl_*",type="transform")
+            utils.colour_controls(ctrl_list)
+
         # delete guides CHANGE TO AFTER MADE SKELETON
         self.delete_guides()
 

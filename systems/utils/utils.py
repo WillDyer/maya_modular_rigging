@@ -35,10 +35,39 @@ def connector(first_jnt, second_jnt):
     cluster_list = f"connector_curve_{first_jnt}"
     return cluster_list
 
-def constraint_from_lists(list_1, list_2, maintain_offset):
+def constraint_from_lists_1to1(list_1, list_2, maintain_offset):
     list_2.reverse()
     for x in range(len(list_1)):
         if "root" in list_2[x]:
             pass
         else:
             cmds.parentConstraint(list_1[x], list_2[x],mo=maintain_offset, n=f"pConst_{list_1[x]}")
+
+def constraint_from_lists_2to1(list_1, list_2, base_list, maintain_offset):
+    list_2.reverse()
+    for x in range(len(list_1)):
+        if "root" in list_2[x]:
+            pass
+        else:
+            cmds.parentConstraint(list_1[x], list_2[x], base_list[x], mo=maintain_offset, n=f"pConst_{list_1[x]}")
+
+def colour_controls(ctrl_list):
+    COLOR_CONFIG = {'l': 6, 'r': 13, 'default': 22}
+    for ctrl in ctrl_list:
+        try:
+            cmds.setAttr(f"{ctrl}.overrideEnabled", 1)
+            if ctrl == "ctrl_root*":
+                cmds.setAttr(f"{ctrl}.overrideColor", 18)
+            elif ctrl[:4] == "ctrl":
+                side = ctrl.split("_")[-2]
+                try:
+                    cmds.setAttr(f"{ctrl}.overrideColor",
+                                COLOR_CONFIG[side])
+                except KeyError:
+                    cmds.setAttr(f"{ctrl}.overrideColor",
+                                COLOR_CONFIG['default'])
+                    pass
+            else:
+                pass
+        except:
+            pass
