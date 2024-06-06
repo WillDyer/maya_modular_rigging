@@ -49,6 +49,7 @@ class QtSampler(QWidget):
         self.initUI()
         
         self.update_dropdown()
+        #self.ui.image.setPixmap("D:\Desktop\1.1-Logo-1.png")
         self.module_created = 0
         self.created_guides = []
         self.systems_to_be_made = {}
