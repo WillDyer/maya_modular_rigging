@@ -49,11 +49,11 @@ class QtSampler(QWidget):
         self.initUI()
         
         self.update_dropdown()
-        #self.ui.image.setPixmap("D:/Desktop/1.1-Logo-1.png")
         self.module_created = 0
         self.created_guides = []
         self.systems_to_be_made = {}
 
+        self.ui.image.setPixmap(f"{os.path.dirname(os.path.abspath(__file__))}/interface/UI_Logo.png")
         self.ui.add_module.clicked.connect(self.add_module)
         self.ui.scale_box.valueChanged.connect(self.rig_global_scale)
         self.ui.create_skeleton.clicked.connect(self.create_joints)
