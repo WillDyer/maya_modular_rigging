@@ -36,7 +36,6 @@ def connector(first_jnt, second_jnt):
     return cluster_list
 
 def constraint_from_lists_1to1(list_1, list_2, maintain_offset):
-    list_2.reverse()
     for x in range(len(list_1)):
         if "root" in list_2[x]:
             pass
@@ -44,7 +43,6 @@ def constraint_from_lists_1to1(list_1, list_2, maintain_offset):
             cmds.parentConstraint(list_1[x], list_2[x],mo=maintain_offset, n=f"pConst_{list_1[x]}")
 
 def constraint_from_lists_2to1(list_1, list_2, base_list, maintain_offset):
-    list_2.reverse()
     for x in range(len(list_1)):
         if "root" in list_2[x]:
             pass

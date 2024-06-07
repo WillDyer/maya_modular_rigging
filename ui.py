@@ -4,8 +4,6 @@ import importlib
 
 from PySide2.QtCore import *
 from PySide2.QtGui import *
-#suggested fix from PySide2.QtWidgets import QWidget, QUiLoader, QApplication, QPushButton, QVBoxLayout, QFileDialog, QLabel, QSpinBox
-#class main_ui(QWidget):
 from PySide2.QtWidgets import QWidget
 from PySide2.QtWidgets import *
 from PySide2.QtUiTools import *
@@ -149,7 +147,7 @@ class QtSampler(QWidget):
             sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules"))
             module = importlib.import_module(key["module"])
             importlib.reload(module)
-            print(f"systems_to_be_made: {key}")
+            print(f"systems_to_be_made: {key['joints']}")
             if rig_type == 0:
                 fk_joint_list = joints.joint(orientation, master_guide, system="fk")
                 fk.create_fk(fk_joint_list,delete_end=False)

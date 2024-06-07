@@ -8,7 +8,7 @@ def get_joint_list(orientation,skeleton_roots,system):
         # NEEDING TO IMPLEMENT NAME CHECK FOR UNIQUE NAMING THEN ADDING A VERSION UP SCHEME DO THIS ASAP
         jnt_list = joint(orientation, top_skeleton_joint, system)
         jnts_list.append(jnt_list)
-    
+
     return jnts_list
 
 def joint(orientation,top_skeleton_joint, system):
@@ -45,9 +45,3 @@ def joint(orientation,top_skeleton_joint, system):
     # Orient end joint to world
     cmds.joint(f"{joint_tag}{list_ctrls[-1]}", e=True, oj="none" ,ch=True, zso=True)
     return jnt_names
-
-def create_joint_variation( top_locator_list):
-    types = ["rig","skn","ik","fk"]
-    
-    for system in types:
-        joint(top_locator_list, system)

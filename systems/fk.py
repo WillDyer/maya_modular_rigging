@@ -35,6 +35,7 @@ class create_fk():
             OPM.offsetParentMatrix(ctrl)
 
         self.fk_system_to_joint(ctrls_fk, jnt_ctrls_fk)
+        fk_joint_list.reverse() #debug
 
     def fk_system_to_joint(self, ctrls_fk, jnt_ctrls_fk):
         for item in range(len(ctrls_fk)):
