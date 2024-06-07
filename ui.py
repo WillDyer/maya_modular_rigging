@@ -53,7 +53,7 @@ class QtSampler(QWidget):
         self.created_guides = []
         self.systems_to_be_made = {}
 
-        self.ui.image.setPixmap(f"{os.path.dirname(os.path.abspath(__file__))}/interface/UI_Logo.png")
+        self.ui.image.setPixmap(os.path.join(os.path.dirname(os.path.abspath(__file__)),"interface","UI_Logo.png"))
         self.ui.add_module.clicked.connect(self.add_module)
         self.ui.scale_box.valueChanged.connect(self.rig_global_scale)
         self.ui.create_skeleton.clicked.connect(self.create_joints)
@@ -63,7 +63,8 @@ class QtSampler(QWidget):
 
     def initUI(self): # this loads the ui
         loader = QUiLoader()
-        UI_FILE = UI_FILE = f"{os.path.dirname(os.path.abspath(__file__))}/interface/WD_Rig_Builder.ui" # path to ui
+        #UI_FILE = f"{os.path.dirname(os.path.abspath(__file__))}/interface/WD_Rig_Builder.ui" # path to ui
+        UI_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "interface", "WD_Rig_Builder.ui")
         file = QFile(UI_FILE)
         file.open(QFile.ReadOnly)
         self.ui = loader.load(file, parentWidget=self)
@@ -78,7 +79,7 @@ class QtSampler(QWidget):
             pass
 
     def update_dropdown(self):
-        files = [".".join(f.split(".")[:-1]) for f in os.listdir(f"{os.path.dirname(os.path.abspath(__file__))}/systems/modules")]
+        files = [".".join(f.split(".")[:-1]) for f in os.listdir(os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules"))]
         try:
             files.remove("")
         except ValueError:
@@ -91,7 +92,7 @@ class QtSampler(QWidget):
 
     def add_module(self):
         module = self.ui.available_modules.currentText()
-        sys.path.append(f"{os.path.dirname(os.path.abspath(__file__))}/systems/modules")
+        sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules"))
         module_path = importlib.import_module(module)
         importlib.reload(module_path)
         offset = [
@@ -134,8 +135,9 @@ class QtSampler(QWidget):
 
         self.systems_to_be_made = mirror
 
-    def edit_blueprint(self):
-        subprocess.Popen(f'explorer "{os.path.dirname(os.path.abspath(__file__))}/systems/modules"')
+    def edit_blueprint(self): #currently broke working for windows only.
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules")
+        subprocess.Popen(f'explorer "{os.path.dirname(os.path.abspath(__file__))}/systems/modules/"')
 
     def polish_rig(self):
         
@@ -144,7 +146,7 @@ class QtSampler(QWidget):
             rig_type = cmds.getAttr(f"{master_guide}.{master_guide}_rig_type")
             orientation = self.ui.oritentation.currentText()
 
-            sys.path.append(f"{os.path.dirname(os.path.abspath(__file__))}/systems/modules")
+            sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules"))
             module = importlib.import_module(key["module"])
             importlib.reload(module)
             print(f"systems_to_be_made: {key}")
