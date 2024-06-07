@@ -54,8 +54,8 @@ def colour_controls(ctrl_list):
     for ctrl in ctrl_list:
         try:
             cmds.setAttr(f"{ctrl}.overrideEnabled", 1)
-            if ctrl == "ctrl_root*":
-                cmds.setAttr(f"{ctrl}.overrideColor", 18)
+            if ctrl == "ctrl_root":
+                cmds.setAttr(f"{ctrl}.overrideColor", 14)
             elif ctrl[:4] == "ctrl":
                 side = ctrl.split("_")[-2]
                 try:

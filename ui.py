@@ -23,7 +23,8 @@ from systems.utils import (
     connect_modules,
     utils,
     mirror_rig,
-    ikfk_switch
+    ikfk_switch,
+    system_group
 )
 
 # debug
@@ -35,6 +36,7 @@ importlib.reload(connect_modules)
 importlib.reload(utils)
 importlib.reload(mirror_rig)
 importlib.reload(ikfk_switch)
+importlib.reload(system_group)
 
 mayaMainWindowPtr = omui.MQtUtil.mainWindow()
 mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QWidget)
@@ -171,16 +173,18 @@ class QtSampler(QWidget):
                 ik_ctrls = ik_module.get_ctrls()
 
                 utils.constraint_from_lists_2to1(ik_joint_list, fk_joint_list, key["joints"],maintain_offset=1)
-                ikfk_switch.create_ikfk(key["joints"], fk_ctrls, ik_ctrls,ik_joint_list,fk_joint_list)
+                ikfk_switch.create_ikfk(key["joints"], fk_ctrls, ik_ctrls,ik_joint_list,fk_joint_list,master_guide)
                 print("ikfk")
             else:
                 cmds.error("ERROR: rig_type attribute cannot be found or attribute value cannot be found.")
 
-            ctrl_list = cmds.ls("ctrl_*",type="transform")
-            utils.colour_controls(ctrl_list)
-
         # delete guides CHANGE TO AFTER MADE SKELETON
         self.delete_guides()
+
+        system_group.grpSetup()
+        
+        ctrl_list = cmds.ls("ctrl_*",type="transform")
+        utils.colour_controls(ctrl_list)
 
     def delete_guides(self):
         for key in self.systems_to_be_made.values():

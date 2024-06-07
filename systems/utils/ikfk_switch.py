@@ -3,14 +3,16 @@ import maya.cmds as cmds
 collected_ctrls = []
 collected_joints = []
 
-def create_ikfk(rig_joints, fk_ctrls, ik_ctrls,fk_joint_list,ik_joint_list):
+def create_ikfk(rig_joints, fk_ctrls, ik_ctrls,fk_joint_list,ik_joint_list,master_guide):
     collected_ctrls = fk_ctrls + ik_ctrls
     for x in collected_ctrls:
         cmds.addAttr(x,ln=f"{x}_dvdr",nn="------------",at="enum",en="IKFK Switch",k=1) # dvdr
         cmds.setAttr(f"{x}.{x}_dvdr",l=True)
     
     attr_name = f"{collected_ctrls[-1][8:]}_switch"
-    display_name = f"IKFK {collected_ctrls[-1][8:]}"
+    if "master_" in master_guide:
+        master_guide = master_guide.replace("master_","")
+    display_name = f"IKFK {master_guide}"
     proxy_attr = collected_ctrls[-1]
     cmds.addAttr(proxy_attr,ln=attr_name,nn=display_name,at="float",min=0,max=1,k=1) # eventually change name to a system name from ui
 
