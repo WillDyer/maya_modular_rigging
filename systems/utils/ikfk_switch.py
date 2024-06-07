@@ -3,24 +3,8 @@ import maya.cmds as cmds
 collected_ctrls = []
 collected_joints = []
 
-def collect_ctrls(imported_ctrls):
-    for x in imported_ctrls:
-        if x not in collected_ctrls: 
-            collected_ctrls.append(x)
-        else:
-            pass
-
-def collect_joints(imported_joints):
-    for x in imported_joints:
-        if x not in collected_joints: 
-            collected_joints.append(x)
-        else:
-            pass
-
-def create_ikfk():
-    print("collected ctrls")
-    print(collected_ctrls)
-    print(collected_joints)
+def create_ikfk(rig_joints, fk_ctrls, ik_ctrls,fk_joint_list,ik_joint_list):
+    collected_ctrls = fk_ctrls + ik_ctrls
     for x in collected_ctrls:
         cmds.addAttr(x,ln=f"{x}_dvdr",nn="------------",at="enum",en="IKFK Switch",k=1) # dvdr
         cmds.setAttr(f"{x}.{x}_dvdr",l=True)
@@ -41,6 +25,7 @@ def create_ikfk():
     
     # create ctrl crv connections
     for ctrl in collected_ctrls:
+        print(ctrl)
         if "ctrl_ik" in ctrl or "ctrl_pv" in ctrl:
             cmds.connectAttr(f"{reverse_node}.outputX",f"{ctrl}.visibility")
         elif "ctrl_fk" in ctrl:
@@ -49,11 +34,13 @@ def create_ikfk():
             cmds.warning(f"{ctrl} does not meet connection requirement therefore wont be connected to either {reverse_node} or visibility attr")
 
     # create rig joint connections
-    for joint in collected_joints:
-        rig_jnt_pconst = cmds.listRelatives(f"jnt_rig_{joint[7:]}",c=1,type="parentConstraint")
-        if "jnt_ik" in joint:
-            cmds.connectAttr(f"{reverse_node}.outputX",f"{rig_jnt_pconst[0]}.{joint}W0")
-        elif "jnt_fk" in joint:
-            cmds.connectAttr(f"{proxy_attr}.{attr_name}",f"{rig_jnt_pconst[0]}.{joint}W1")
+    for x in range(len(rig_joints)):
+        rig_jnt_pconst = cmds.listRelatives(rig_joints[x],c=1,type="parentConstraint")
+        if "jnt_ik" in fk_joint_list[x]:
+            cmds.connectAttr(f"{reverse_node}.outputX",f"{rig_jnt_pconst[0]}.{fk_joint_list[x]}W0")
         else:
-            cmds.warning(f"{joint} does not meet connection requirement therefore wont be connected to either {reverse_node} or constraint weights")
+            cmds.warning(f"{fk_joint_list[x]} does not meet connection requirement therefore wont be connected to either {reverse_node} or constraint weights")
+        if "jnt_fk" in ik_joint_list[x]:
+            cmds.connectAttr(f"{proxy_attr}.{attr_name}",f"{rig_jnt_pconst[0]}.{ik_joint_list[x]}W1")
+        else:
+            cmds.warning(f"{ik_joint_list[x]} does not meet connection requirement therefore wont be connected to either {reverse_node} or constraint weights")

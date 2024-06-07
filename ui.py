@@ -22,9 +22,11 @@ from systems import (
 from systems.utils import (
     connect_modules,
     utils,
-    mirror_rig
+    mirror_rig,
+    ikfk_switch
 )
 
+# debug
 importlib.reload(joints)
 importlib.reload(fk)
 importlib.reload(ik)
@@ -32,6 +34,7 @@ importlib.reload(create_guides)
 importlib.reload(connect_modules)
 importlib.reload(utils)
 importlib.reload(mirror_rig)
+importlib.reload(ikfk_switch)
 
 mayaMainWindowPtr = omui.MQtUtil.mainWindow()
 mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QWidget)
@@ -160,11 +163,15 @@ class QtSampler(QWidget):
                 print("ik")
             elif rig_type == 2:
                 fk_joint_list = joints.joint(orientation, master_guide, system="fk")
-                fk.create_fk(fk_joint_list, delete_end=False)
-                ik_joint_list = joints.joint(orientation, master_guide, system="ik")
-                ik.create_ik(ik_joint_list, module.ik_joints)
-                utils.constraint_from_lists_2to1(ik_joint_list, fk_joint_list, key["joints"],maintain_offset=1)
+                fk_module = fk.create_fk(fk_joint_list, delete_end=False)
+                fk_ctrls = fk_module.get_ctrls()
 
+                ik_joint_list = joints.joint(orientation, master_guide, system="ik")
+                ik_module = ik.create_ik(ik_joint_list, module.ik_joints)
+                ik_ctrls = ik_module.get_ctrls()
+
+                utils.constraint_from_lists_2to1(ik_joint_list, fk_joint_list, key["joints"],maintain_offset=1)
+                ikfk_switch.create_ikfk(key["joints"], fk_ctrls, ik_ctrls,ik_joint_list,fk_joint_list)
                 print("ikfk")
             else:
                 cmds.error("ERROR: rig_type attribute cannot be found or attribute value cannot be found.")
