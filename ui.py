@@ -125,11 +125,11 @@ class QtSampler(QWidget):
     def remove_module(self):
         print("Run")
         module = cmds.ls(sl=1)
-        print(module)
-        print(self.systems_to_be_made)
-        for key in self.systems_to_be_made:
-            if module in key['master_guide']:
-                self.systems_to_be_made.pop(module)
+        for key in self.systems_to_be_made.values():
+            print(key)
+            print(key["master_guide"])
+            if module[0] in key['master_guide']:
+                self.systems_to_be_made.pop(module[0])
 
         print(self.systems_to_be_made)
 
