@@ -58,6 +58,7 @@ class QtSampler(QWidget):
 
         self.ui.image.setPixmap(os.path.join(os.path.dirname(os.path.abspath(__file__)),"interface","UI_Logo.png"))
         self.ui.add_module.clicked.connect(self.add_module)
+        self.ui.remove_module.clicked.connect(self.remove_module)
         self.ui.scale_box.valueChanged.connect(self.rig_global_scale)
         self.ui.create_skeleton.clicked.connect(self.create_joints)
         self.ui.edit_blueprint.clicked.connect(self.edit_blueprint)
@@ -120,6 +121,17 @@ class QtSampler(QWidget):
         }
         self.systems_to_be_made[master_guide] = temp_dict
         cmds.select(clear=1)
+
+    def remove_module(self):
+        print("Run")
+        module = cmds.ls(sl=1)
+        print(module)
+        print(self.systems_to_be_made)
+        for key in self.systems_to_be_made:
+            if module in key['master_guide']:
+                self.systems_to_be_made.pop(module)
+
+        print(self.systems_to_be_made)
 
     def create_joints(self):
         #orientation = self.ui.oritentation.currentText()
