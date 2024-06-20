@@ -123,13 +123,13 @@ class QtSampler(QWidget):
         cmds.select(clear=1)
 
     def remove_module(self):
-        print("Run")
         module = cmds.ls(sl=1)
-        for key in self.systems_to_be_made.values(): # this works but needs fixing due to list changing during iteration
+        for key in list(self.systems_to_be_made.values()):
             if module[0] in key['master_guide']:
                 self.systems_to_be_made.pop(module[0])
+                self.created_guides.remove(module[0])
 
-        print(self.systems_to_be_made)
+        # to do: remove module name for joint connection within the connect_modules file.
 
     def create_joints(self):
         #orientation = self.ui.oritentation.currentText()
