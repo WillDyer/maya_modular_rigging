@@ -128,6 +128,8 @@ class QtSampler(QWidget):
             if module[0] in key['master_guide']:
                 self.systems_to_be_made.pop(module[0])
                 self.created_guides.remove(module[0])
+                cmds.delete(module[0])
+                # add deletion for connectors, might need to add connectors into groups for easier deletion rather than creating a list
 
         # to do: remove module name for joint connection within the connect_modules file.
 
