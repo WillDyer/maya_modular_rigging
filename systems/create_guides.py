@@ -10,14 +10,15 @@ scale = 1
 
 def guides(accessed_module, offset,side):
     selection = cmds.ls(sl=1)
-    master_guide = creation(accessed_module,offset,side)
+    guide = creation(accessed_module,offset,side)
+    master_guide = guide[0]
     if not selection:
         print("no selection making module")
     else:
         connect_modules.attach(master_guide, selection)
         connect_modules.prep_attach_joints(master_guide, selection)
         print("Attaching to module.")
-    return master_guide
+    return guide
 
 
 def creation(accessed_module,offset,side):
@@ -98,7 +99,7 @@ def creation(accessed_module,offset,side):
     cmds.addAttr(master_guide, ln="module_side",at="enum",en=side,k=0) # module side
     for item in ["is_master","base_module","module_side"]:
         cmds.addAttr(guide_list[:-1],ln=f"{item}", proxy=f"{guide_list[-1]}.{item}")
-    return master_guide
+    return [master_guide, connector_list]
 
 def add_custom_attr(system, master_guide):
     custom_attrs = {"module_dvdr": ["enum","------------","MODULE",True],

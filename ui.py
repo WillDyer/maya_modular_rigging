@@ -105,7 +105,10 @@ class QtSampler(QWidget):
             self.ui.offset_z.value()
         ]
 
-        master_guide = create_guides.guides(module,offset,module_path.side)
+
+        guide = create_guides.guides(module,offset,module_path.side)
+        master_guide = guide[0]
+        guide_connector_list = guide[1]
         self.created_guides.append(master_guide)
         self.ui.skeleton_box.setEnabled(True)
 
@@ -117,7 +120,8 @@ class QtSampler(QWidget):
             "module": module,
             "master_guide": master_guide,
             "joints": [],
-            "side": module_path.side
+            "side": module_path.side,
+            "connectors": guide_connector_list
         }
         self.systems_to_be_made[master_guide] = temp_dict
         cmds.select(clear=1)
@@ -128,8 +132,7 @@ class QtSampler(QWidget):
             if module[0] in key['master_guide']:
                 self.systems_to_be_made.pop(module[0])
                 self.created_guides.remove(module[0])
-                cmds.delete(module[0])
-                # add deletion for connectors, might need to add connectors into groups for easier deletion rather than creating a list
+                cmds.delete(module[0], key['connectors'])
 
         # to do: remove module name for joint connection within the connect_modules file.
 
