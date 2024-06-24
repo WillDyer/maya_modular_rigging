@@ -134,11 +134,7 @@ class QtSampler(QWidget):
                 self.created_guides.remove(module[0])
                 cmds.delete(module[0], key['connectors'])
 
-        # to do: remove module name for joint connection within the connect_modules file.
-
     def create_joints(self):
-        #orientation = self.ui.oritentation.currentText()
-
         jnt_list = joints.get_joint_list(self.ui.oritentation.currentText(),self.created_guides, system="rig")
         num = 0
         for dict in self.systems_to_be_made.values():
