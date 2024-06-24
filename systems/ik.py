@@ -7,9 +7,11 @@ importlib.reload(pole_vector)
 importlib.reload(cube_crv)
 
 class create_ik():
-    def __init__(self, ik_joint_list, validation_joints):
+    def __init__(self, ik_joint_list,master_guide,validation_joints):
         self.validation_joints = validation_joints
         self.ik_system(ik_joint_list)
+        cmds.group(self.ik_ctrls,n=f"grp_ik_ctrls_{master_guide}",w=1)
+        cmds.group(ik_joint_list[0],n=f"grp_ik_jnts_{master_guide}",w=1)
 
     def ik_system(self, ik_joint_list):
         #print(self.validation_joints)

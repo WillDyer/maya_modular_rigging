@@ -67,7 +67,6 @@ class QtSampler(QWidget):
 
     def initUI(self): # this loads the ui
         loader = QUiLoader()
-        #UI_FILE = f"{os.path.dirname(os.path.abspath(__file__))}/interface/WD_Rig_Builder.ui" # path to ui
         UI_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "interface", "WD_Rig_Builder.ui")
         file = QFile(UI_FILE)
         file.open(QFile.ReadOnly)
@@ -166,21 +165,21 @@ class QtSampler(QWidget):
             print(f"systems_to_be_made: {key['joints']}")
             if rig_type == 0:
                 fk_joint_list = joints.joint(orientation, master_guide, system="fk")
-                fk.create_fk(fk_joint_list,delete_end=False)
+                fk.create_fk(fk_joint_list,master_guide,delete_end=False)
                 utils.constraint_from_lists_1to1(fk_joint_list, key["joints"],maintain_offset=1)
                 print("fk")
             elif rig_type == 1:
                 ik_joint_list = joints.joint(orientation, master_guide, system="ik")
-                ik.create_ik(ik_joint_list, module.ik_joints)
+                ik.create_ik(ik_joint_list,master_guide,module.ik_joints)
                 utils.constraint_from_lists_1to1(ik_joint_list, key["joints"],maintain_offset=1)
                 print("ik")
             elif rig_type == 2:
                 fk_joint_list = joints.joint(orientation, master_guide, system="fk")
-                fk_module = fk.create_fk(fk_joint_list, delete_end=False)
+                fk_module = fk.create_fk(fk_joint_list,master_guide,delete_end=False)
                 fk_ctrls = fk_module.get_ctrls()
 
                 ik_joint_list = joints.joint(orientation, master_guide, system="ik")
-                ik_module = ik.create_ik(ik_joint_list, module.ik_joints)
+                ik_module = ik.create_ik(ik_joint_list,master_guide,module.ik_joints)
                 ik_ctrls = ik_module.get_ctrls()
 
                 utils.constraint_from_lists_2to1(ik_joint_list, fk_joint_list, key["joints"],maintain_offset=1)

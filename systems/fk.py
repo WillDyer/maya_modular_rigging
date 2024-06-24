@@ -2,11 +2,12 @@ import maya.cmds as cmds
 from systems.utils import OPM
 
 class create_fk():
-    def __init__(self, joint_list,delete_end):
-        self.fk_system(joint_list,delete_end)
+    def __init__(self, joint_list,master_guide,delete_end):
+        self.fk_system(joint_list,master_guide,delete_end)
+        cmds.group(self.ctrls_fk[-1], n=f"grp_fk_ctrls_{master_guide}",w=1)
+        cmds.group(joint_list[0],n=f"grp_fk_jnts_{master_guide}",w=1)
 
-
-    def fk_system(self, fk_joint_list,delete_end):
+    def fk_system(self, fk_joint_list,master_guide,delete_end):
         #delete_end = False
         self.ctrls_fk = []
         jnt_ctrls_fk = []
