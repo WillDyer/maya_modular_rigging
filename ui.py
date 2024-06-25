@@ -106,23 +106,24 @@ class QtSampler(QWidget):
 
 
         guide = create_guides.guides(module,offset,module_path.side)
-        master_guide = guide[0]
-        guide_connector_list = guide[1]
-        self.created_guides.append(master_guide)
-        self.ui.skeleton_box.setEnabled(True)
+        if guide:
+            master_guide = guide[0]
+            guide_connector_list = guide[1]
+            self.created_guides.append(master_guide)
+            self.ui.skeleton_box.setEnabled(True)
 
-        print(f"Module: {module}")
-        print(f"Master Guide: {master_guide}")
-        print(f"Created Guides: {self.created_guides}")
+            print(f"Module: {module}")
+            print(f"Master Guide: {master_guide}")
+            print(f"Created Guides: {self.created_guides}")
 
-        temp_dict = {
-            "module": module,
-            "master_guide": master_guide,
-            "joints": [],
-            "side": module_path.side,
-            "connectors": guide_connector_list
-        }
-        self.systems_to_be_made[master_guide] = temp_dict
+            temp_dict = {
+                "module": module,
+                "master_guide": master_guide,
+                "joints": [],
+                "side": module_path.side,
+                "connectors": guide_connector_list
+            }
+            self.systems_to_be_made[master_guide] = temp_dict
         cmds.select(clear=1)
 
     def remove_module(self):
@@ -147,7 +148,7 @@ class QtSampler(QWidget):
         print(mirror)
 
         self.systems_to_be_made = mirror
-
+        self.hide_guides()
         cmds.select(cl=1)
 
     def edit_blueprint(self): #currently broke working for windows only.
@@ -193,7 +194,6 @@ class QtSampler(QWidget):
                 else:
                     cmds.error("ERROR: rig_type attribute cannot be found or attribute value cannot be found.")
 
-        # delete guides CHANGE TO AFTER MADE SKELETON
         self.delete_guides()
 
         system_group.grpSetup()
@@ -207,6 +207,9 @@ class QtSampler(QWidget):
         for key in self.systems_to_be_made.values():
             cmds.delete(key["master_guide"])
         cmds.delete("grp_connector_clusters")
+    def hide_guides(self):
+        for key in self.systems_to_be_made.values():
+            cmds.hide(key["master_guide"])
 
 def main():
     ui = QtSampler()

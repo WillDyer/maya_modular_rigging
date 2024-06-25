@@ -10,15 +10,19 @@ scale = 1
 
 def guides(accessed_module, offset,side):
     selection = cmds.ls(sl=1)
-    guide = creation(accessed_module,offset,side)
-    master_guide = guide[0]
-    if not selection:
-        print("no selection making module")
+    if selection:
+        if "master" in selection[0]:
+            cmds.warning("Cant attach a new module to a master control please select a guide.")
+        elif "master" not in selection[0]:
+            guide = creation(accessed_module,offset,side)
+            master_guide = guide[0]
+            connect_modules.attach(master_guide, selection)
+            connect_modules.prep_attach_joints(master_guide, selection)
+            print("Attaching to module.")
+            return guide
     else:
-        connect_modules.attach(master_guide, selection)
-        connect_modules.prep_attach_joints(master_guide, selection)
-        print("Attaching to module.")
-    return guide
+        guide = creation(accessed_module,offset,side)
+        return guide
 
 
 def creation(accessed_module,offset,side):
