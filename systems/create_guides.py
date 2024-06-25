@@ -28,7 +28,6 @@ def guides(accessed_module, offset,side):
 
 
 def creation(accessed_module,offset,side,connector_list):
-    #connector_list = []
     module = importlib.import_module(f"systems.modules.{accessed_module}")
     importlib.reload(module)
     ABC_FILE = f"{os.path.dirname(os.path.abspath(__file__))}\imports\guide_shape.abc"
