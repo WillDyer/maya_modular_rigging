@@ -148,6 +148,8 @@ class QtSampler(QWidget):
 
         self.systems_to_be_made = mirror
 
+        cmds.select(cl=1)
+
     def edit_blueprint(self): #currently broke working for windows only.
         path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules")
         subprocess.Popen(f'explorer "{os.path.dirname(os.path.abspath(__file__))}/systems/modules/"')
@@ -195,6 +197,8 @@ class QtSampler(QWidget):
         
         ctrl_list = cmds.ls("ctrl_*",type="transform")
         utils.colour_controls(ctrl_list)
+
+        cmds.select(cl=1)
 
     def delete_guides(self):
         for key in self.systems_to_be_made.values():

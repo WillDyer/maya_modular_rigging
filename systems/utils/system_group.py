@@ -75,6 +75,7 @@ def grpSetup():
 
         sys_attr()
 
+        # place systems & joints into heirachy
         for type_sys in ["ik","fk"]:
             grp_list = cmds.ls(f"grp_{type_sys}_jnts_*")
             try:
@@ -91,5 +92,12 @@ def grpSetup():
             cmds.parent(hdl_list,"grp_ik_handles")
         except RuntimeError:
             pass
+        
+        root_jnt = [item for item in cmds.ls("jnt_rig*") if "root" in item]
+        if len(root_jnt) > 1:
+            cmds.error("ERROR: More than one root object found please rename")
+        else:
+            cmds.parent(root_jnt, "grp_rig_jnts")
+
     #except RuntimeError:
     #    cmds.error("Groups exists already that matches name, grps might be missing in file structure")
