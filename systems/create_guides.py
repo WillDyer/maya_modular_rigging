@@ -9,24 +9,26 @@ importlib.reload(utils)
 scale = 1
 
 def guides(accessed_module, offset,side):
+    connector_list = []
     selection = cmds.ls(sl=1)
     if selection:
         if "master" in selection[0]:
             cmds.warning("Cant attach a new module to a master control please select a guide.")
         elif "master" not in selection[0]:
-            guide = creation(accessed_module,offset,side)
+            guide = creation(accessed_module,offset,side,connector_list)
             master_guide = guide[0]
-            connect_modules.attach(master_guide, selection)
+            connector = connect_modules.attach(master_guide, selection)
+            connector_list.append(connector[1])
             connect_modules.prep_attach_joints(master_guide, selection)
             print("Attaching to module.")
             return guide
     else:
-        guide = creation(accessed_module,offset,side)
+        guide = creation(accessed_module,offset,side,connector_list)
         return guide
 
 
-def creation(accessed_module,offset,side):
-    connector_list = []
+def creation(accessed_module,offset,side,connector_list):
+    #connector_list = []
     module = importlib.import_module(f"systems.modules.{accessed_module}")
     importlib.reload(module)
     ABC_FILE = f"{os.path.dirname(os.path.abspath(__file__))}\imports\guide_shape.abc"
@@ -88,7 +90,7 @@ def creation(accessed_module,offset,side):
             cmds.parent(guide_list[x],guide_list[x+1])
             connector = utils.connector(guide_list[x],guide_list[x+1])
             connector_list.append(connector)
-            
+            print(connector_list)
         except:
             pass # end of list
 

@@ -21,9 +21,9 @@ def create_cube():
     return ctrlCV
 
 def connector(first_jnt, second_jnt):
-    pv_joint_loc = cmds.xform(first_jnt,q=1,ws=1,rp=1)
-    ctrl_pv_loc = cmds.xform(second_jnt,q=1,ws=1,rp=1)
-    cmds.curve( d=1, p=[pv_joint_loc, ctrl_pv_loc], n="connector_curve_" + first_jnt)
+    first_point_loc = cmds.xform(first_jnt,q=1,ws=1,rp=1)
+    second_point_loc = cmds.xform(second_jnt,q=1,ws=1,rp=1)
+    cmds.curve( d=1, p=[first_point_loc, second_point_loc], n="connector_curve_" + first_jnt)
     cluster_1 = cmds.cluster(f"connector_curve_{first_jnt}.cv[0]", n="cluster_" + first_jnt + "_cv0")
     cluster_2 = cmds.cluster(f"connector_curve_{first_jnt}.cv[1]", n="cluster_" + second_jnt + "_cv1")
     cmds.parent(cluster_1[1], first_jnt)
@@ -32,8 +32,8 @@ def connector(first_jnt, second_jnt):
         cmds.hide(x+"Handle")
     cmds.setAttr(f"connector_curve_{first_jnt}.template", 1)
 
-    cluster_list = f"connector_curve_{first_jnt}"
-    return cluster_list
+    curve = f"connector_curve_{first_jnt}"
+    return curve
 
 def constraint_from_lists_1to1(list_1, list_2, maintain_offset):
     for x in range(len(list_1)):

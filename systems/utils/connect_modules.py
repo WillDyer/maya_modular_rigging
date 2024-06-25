@@ -19,7 +19,7 @@ def attach(master_guide, selection):
     temp_group = [master_guide]
     modules_to_connect.update({f"{master_guide}_2_{selection[0]}": temp_group})
 
-    return modules_to_connect
+    return [modules_to_connect, connector_list]
 
 joints_to_parent = []
 
