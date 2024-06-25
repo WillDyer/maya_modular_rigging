@@ -4,8 +4,11 @@ from systems.utils import OPM
 class create_fk():
     def __init__(self, joint_list,master_guide,delete_end):
         self.fk_system(joint_list,master_guide,delete_end)
-        cmds.group(self.ctrls_fk[-1], n=f"grp_fk_ctrls_{master_guide}",w=1)
-        cmds.group(joint_list[0],n=f"grp_fk_jnts_{master_guide}",w=1)
+        try:
+            cmds.group(self.ctrls_fk[-1], n=f"grp_fk_ctrls_{master_guide}",w=1)
+            cmds.group(joint_list[0],n=f"grp_fk_jnts_{master_guide}",w=1)
+        except IndexError:
+            pass
 
     def fk_system(self, fk_joint_list,master_guide,delete_end):
         #delete_end = False
@@ -37,6 +40,7 @@ class create_fk():
 
         self.fk_system_to_joint(jnt_ctrls_fk)
         fk_joint_list.reverse() #debug
+        print("fk ctrls made")
 
     def fk_system_to_joint(self, jnt_ctrls_fk):
         for item in range(len(self.ctrls_fk)):
