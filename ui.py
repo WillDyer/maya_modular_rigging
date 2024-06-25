@@ -151,6 +151,8 @@ class QtSampler(QWidget):
         self.hide_guides()
         cmds.select(cl=1)
 
+        self.ui.skeleton_box.setEnabled(False)
+
     def edit_blueprint(self): #currently broke working for windows only.
         path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules")
         subprocess.Popen(f'explorer "{os.path.dirname(os.path.abspath(__file__))}/systems/modules/"')
@@ -207,6 +209,7 @@ class QtSampler(QWidget):
         for key in self.systems_to_be_made.values():
             cmds.delete(key["master_guide"])
         cmds.delete("grp_connector_clusters")
+
     def hide_guides(self):
         for key in self.systems_to_be_made.values():
             cmds.hide(key["master_guide"])
