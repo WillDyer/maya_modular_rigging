@@ -112,7 +112,6 @@ def add_custom_attr(system, master_guide):
                     "squash_stretch": ["enum","Squash Stech","No:Yes",False]
                     }
 
-    #for x in system:
     for i in custom_attrs:
         if custom_attrs[i][0] == "enum":
             cmds.addAttr(master_guide,k=1,ln=f"{system[-1]}_{i}",nn=custom_attrs[i][1],at="enum",en=custom_attrs[i][2])
