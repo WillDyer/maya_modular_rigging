@@ -40,7 +40,6 @@ class create_fk():
 
         self.fk_system_to_joint(jnt_ctrls_fk)
         fk_joint_list.reverse() #debug
-        print("fk ctrls made")
 
     def fk_system_to_joint(self, jnt_ctrls_fk):
         for item in range(len(self.ctrls_fk)):

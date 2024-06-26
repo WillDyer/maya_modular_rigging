@@ -1,12 +1,12 @@
 import maya.cmds as cmds
 import importlib
-from systems.utils import (OPM, cube_crv, pole_vector)
+from systems.utils import (OPM, utils, pole_vector)
 
 importlib.reload(OPM)
 importlib.reload(pole_vector)
-importlib.reload(cube_crv)
+importlib.reload(utils)
 
-# NOTE FOR SELF: clean up code in this file
+# CLEAN THIS FILE UP
 
 class create_ik():
     def __init__(self, ik_joint_list,master_guide,validation_joints):
@@ -19,9 +19,7 @@ class create_ik():
 
     def ik_system(self, ik_joint_list):
         self.other_joints = []
-        #print(self.validation_joints)
         for joint in ik_joint_list:
-            print(joint)
             if self.validation_joints["start_joint"] in joint:
                 self.start_joint = joint
             elif self.validation_joints["pv_joint"] in joint:
@@ -31,6 +29,7 @@ class create_ik():
             else:
                 self.other_joints.append(joint)
                 pass
+
         self.collect_other_controls(ik_joint_list)
         pv_ctrl = self.create_pv()
         hdl_ctrl = self.create_handle()
@@ -48,7 +47,7 @@ class create_ik():
         return f"ctrl_pv_{self.pv_joint[7:]}"
 
     def create_handle(self):
-        ctrl_crv = cube_crv.create_cube(f"ctrl_ik_{self.end_joint[7:]}",scale=[5,5,5])
+        ctrl_crv = utils.create_cube(f"ctrl_ik_{self.end_joint[7:]}",scale=[5,5,5])
         cmds.ikHandle(n=f"hdl_ik_{self.end_joint[7:]}", solver="ikRPsolver", sj=self.start_joint, ee=self.end_joint)
         cmds.poleVectorConstraint(f"ctrl_pv_{self.pv_joint[7:]}", f"hdl_ik_{self.end_joint[7:]}", n=f"pvConst_{self.pv_joint[7:]}")
         if self.validation_joints["world_orientation"] == True:
@@ -81,7 +80,6 @@ class create_ik():
         above_root_control_list = []
         if self.above_root_joints:
             for joint in self.above_root_joints:
-                print(joint)
                 ctrl_crv_tmp = cmds.circle(n=f"ctrl_ik_{joint[7:]}",r=10,nr=(1, 0, 0))[0]
                 cmds.matchTransform(ctrl_crv_tmp,joint)
                 cmds.parentConstraint(ctrl_crv_tmp, joint,mo=1,n=f"pConst_{joint[7:]}")

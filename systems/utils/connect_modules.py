@@ -3,10 +3,7 @@ from systems.utils import utils
 import importlib
 importlib.reload(utils)
 
-
-
 modules_to_connect = {}
-
 
 def attach(master_guide, selection):
     connector_list = utils.connector(master_guide, selection[0])

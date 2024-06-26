@@ -144,8 +144,6 @@ class QtSampler(QWidget):
         self.ui.polish_rig.setEnabled(True)
 
         mirror = mirror_rig.collect_mirror_data(self.systems_to_be_made)
-        print("MIRROR RESULT")
-        print(mirror)
 
         self.systems_to_be_made = mirror
         self.hide_guides()
@@ -213,6 +211,7 @@ class QtSampler(QWidget):
     def hide_guides(self):
         for key in self.systems_to_be_made.values():
             cmds.hide(key["master_guide"])
+        cmds.hide("grp_connector_clusters")
 
 def main():
     ui = QtSampler()

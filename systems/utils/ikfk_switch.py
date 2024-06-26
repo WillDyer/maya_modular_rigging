@@ -27,7 +27,6 @@ def create_ikfk(rig_joints, fk_ctrls, ik_ctrls,fk_joint_list,ik_joint_list,maste
     
     # create ctrl crv connections
     for ctrl in collected_ctrls:
-        print(ctrl)
         if "ctrl_ik" in ctrl or "ctrl_pv" in ctrl:
             cmds.connectAttr(f"{reverse_node}.outputX",f"{ctrl}.visibility")
         elif "ctrl_fk" in ctrl:

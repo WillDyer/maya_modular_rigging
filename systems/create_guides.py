@@ -2,7 +2,7 @@ import maya.cmds as cmds
 import importlib
 import sys
 import os
-from systems.utils import (cube_crv, connect_modules, utils)
+from systems.utils import (connect_modules, utils)
 importlib.reload(connect_modules)
 importlib.reload(utils)
 
@@ -30,7 +30,7 @@ def guides(accessed_module, offset,side):
 def creation(accessed_module,offset,side,connector_list):
     module = importlib.import_module(f"systems.modules.{accessed_module}")
     importlib.reload(module)
-    ABC_FILE = f"{os.path.dirname(os.path.abspath(__file__))}\imports\guide_shape.abc"
+    ABC_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),"imports","guide_shape.abc")
     COLOR_CONFIG = {'l': 6, 'r': 13, 'default': 22}
     guide_list = []
     root_exists = False
@@ -44,7 +44,7 @@ def creation(accessed_module,offset,side,connector_list):
     if "root" in module.system:
         master_guide = "root"
     else:
-        master_guide = cube_crv.create_cube(f"master_{accessed_module}{side}_#",scale=[5,5,5])
+        master_guide = utils.create_cube(f"master_{accessed_module}{side}_#",scale=[5,5,5])
         pos = module.system_pos[module.system[0]]
         rot = module.system_rot[module.system[0]]
         cmds.xform(master_guide,ws=1,t=[pos[0]+offset[0],pos[1]+offset[1],pos[2]+offset[2]])
@@ -89,7 +89,6 @@ def creation(accessed_module,offset,side,connector_list):
             cmds.parent(guide_list[x],guide_list[x+1])
             connector = utils.connector(guide_list[x],guide_list[x+1])
             connector_list.append(connector)
-            print(connector_list)
         except:
             pass # end of list
 
