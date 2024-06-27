@@ -6,6 +6,7 @@ def collect_mirror_data(systems_to_be_made):
     for key in systems_to_be_made.values():
         locator_list = []
         mirror_attribute = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_mirror_jnts", asString=1)
+        print(key)
         if mirror_attribute == "Yes": # YES
             cmds.select(key["joints"][0])
             joint_list = cmds.mirrorJoint(mirrorYZ=True,mirrorBehavior=True,searchReplace=('_l_', '_r_'))
@@ -18,6 +19,10 @@ def collect_mirror_data(systems_to_be_made):
                 simple_side = "_l_"
             else:
                 side = ""
+
+            # Mirrored system to connect
+            system_to_connect = key["system_to_connect"]
+            mirrored_system_to_connect = [item.replace(f"{key['side']}_", simple_side) if f"{key['side']}_" in item else item for item in system_to_connect]
 
             # Create guide locators
             for jnt in joint_list:
@@ -60,7 +65,8 @@ def collect_mirror_data(systems_to_be_made):
                 "module": key["module"],
                 "master_guide": master_guide,
                 "joints": joint_list,
-                "side": side
+                "side": side,
+                "system_to_connect": mirrored_system_to_connect
             }
             temp_systems_to_be_made[master_guide] = temp_dict
 
