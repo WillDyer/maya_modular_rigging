@@ -109,6 +109,7 @@ class QtSampler(QWidget):
         if guide:
             master_guide = guide[0]
             guide_connector_list = guide[1]
+            system_to_connect = guide[2]
             self.created_guides.append(master_guide)
             self.ui.skeleton_box.setEnabled(True)
 
@@ -121,7 +122,8 @@ class QtSampler(QWidget):
                 "master_guide": master_guide,
                 "joints": [],
                 "side": module_path.side,
-                "connectors": guide_connector_list
+                "connectors": guide_connector_list,
+                "system_to_connect": system_to_connect
             }
             self.systems_to_be_made[master_guide] = temp_dict
         cmds.select(clear=1)
@@ -191,9 +193,14 @@ class QtSampler(QWidget):
                 else:
                     cmds.error("ERROR: rig_type attribute cannot be found or attribute value cannot be found.")
 
-        self.delete_guides()
-
         system_group.grpSetup()
+
+        for key in self.systems_to_be_made.values(): # seperate loop to be sure systems are made before connecting
+            if key['system_to_connect']:
+                systems_to_connect = key['system_to_connect']
+                connect_modules.connect_polished(systems_to_connect)
+
+        self.delete_guides()
         
         ctrl_list = cmds.ls("ctrl_*",type="transform")
         utils.colour_controls(ctrl_list)

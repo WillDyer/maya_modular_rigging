@@ -49,6 +49,12 @@ def constraint_from_lists_2to1(list_1, list_2, base_list, maintain_offset):
         else:
             cmds.parentConstraint(list_1[x], list_2[x], base_list[x], mo=maintain_offset, n=f"pConst_{list_1[x]}")
 
+def find_substring_in_list(string, substrings):
+    for substring in substrings:
+        if substring in string:
+            return substring
+    return None
+
 def colour_controls(ctrl_list):
     COLOR_CONFIG = {'l': 6, 'r': 13, 'default': 22}
     for ctrl in ctrl_list:

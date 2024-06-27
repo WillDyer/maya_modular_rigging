@@ -4,6 +4,7 @@ import importlib
 importlib.reload(utils)
 
 modules_to_connect = {}
+joints_to_parent = []
 
 def attach(master_guide, selection):
     connector_list = utils.connector(master_guide, selection[0])
@@ -18,16 +19,53 @@ def attach(master_guide, selection):
 
     return [modules_to_connect, connector_list]
 
-joints_to_parent = []
-
 def prep_attach_joints(child_joint, parent_joint):
     child_joint = cmds.listRelatives(child_joint, c=1, typ="transform")[0]
 
     temp_group = [f"jnt_rig_{child_joint}", f"jnt_rig_{parent_joint[0]}"]
     joints_to_parent.append(temp_group)
 
+    return [child_joint, parent_joint[0]]
+
 def attach_joints():
     for x in joints_to_parent:
         cmds.parent(x[0],x[1])
 
+def connect_polished(systems_to_connect):
+    ikfk_mapping = {
+        "IK": "ctrl_ik",
+        "FK": "ctrl_fk",
+        "IKFK": ["ctrl_ik", "ctrl_fk"]
+    }
     
+    systems_ikfk = []
+    
+    for system in systems_to_connect:
+        master_guide = cmds.getAttr(f"{system}.master_guide", asString=1)
+        ikfk = cmds.getAttr(f"{system}.{master_guide}_rig_type", asString=1)
+        mapped_value = ikfk_mapping.get(ikfk, ikfk)
+        
+        if isinstance(mapped_value, list):
+            system_values = [f"{value}_{system}" for value in mapped_value]
+        else:
+            system_values = [f"{mapped_value}_{system}"]
+        
+        systems_ikfk.append(system_values)
+    
+    system_1, system_2 = systems_ikfk
+    
+    # Check for "COG" or "root" in the system
+    substrings_to_check = ["COG", "root"]
+    found = False
+    for system in systems_to_connect:
+        found_substring = utils.find_substring_in_list(system, substrings_to_check)
+        if found_substring:
+            print(f"{found_substring} is in {system}")
+            found = True
+            break
+        else:
+            print(f"Neither 'COG' nor 'root' is in {system}")
+     
+    if found == False:
+        print(f"connecting: {system_1} to {system_2}")
+        cmds.parentConstraint(system_2, system_1, mo=1)

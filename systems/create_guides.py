@@ -10,6 +10,7 @@ scale = 1
 
 def guides(accessed_module, offset,side):
     connector_list = []
+    system_to_connect = []
     selection = cmds.ls(sl=1)
     if selection:
         if "master" in selection[0]:
@@ -19,11 +20,13 @@ def guides(accessed_module, offset,side):
             master_guide = guide[0]
             connector = connect_modules.attach(master_guide, selection)
             connector_list.append(connector[1])
-            connect_modules.prep_attach_joints(master_guide, selection)
+            system_to_connect = connect_modules.prep_attach_joints(master_guide, selection)
             print("Attaching to module.")
+            guide.append(system_to_connect)
             return guide
     else:
         guide = creation(accessed_module,offset,side,connector_list)
+        guide.append(system_to_connect)
         return guide
 
 
@@ -101,8 +104,11 @@ def creation(accessed_module,offset,side,connector_list):
     cmds.addAttr(master_guide, ln="is_master",at="enum",en="True",k=0) # adding master group attr
     cmds.addAttr(master_guide, ln="base_module",at="enum",en=accessed_module,k=0) # module attr
     cmds.addAttr(master_guide, ln="module_side",at="enum",en=side,k=0) # module side
-    for item in ["is_master","base_module","module_side"]:
+    cmds.addAttr(master_guide, ln="master_guide",at="enum",en=master_guide,k=0) # master guide
+    for item in ["is_master","base_module","module_side","master_guide"]:
         cmds.addAttr(guide_list[:-1],ln=f"{item}", proxy=f"{guide_list[-1]}.{item}")
+        for guide in guide_list[:-1]:
+            cmds.setAttr(f"{guide}.{item}",k=0)
     return [master_guide, connector_list]
 
 def add_custom_attr(system, master_guide):
