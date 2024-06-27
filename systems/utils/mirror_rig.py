@@ -5,9 +5,8 @@ def collect_mirror_data(systems_to_be_made):
     temp_systems_to_be_made = {}
     for key in systems_to_be_made.values():
         locator_list = []
-        mirror_attribute = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_mirror_jnts")
-        
-        if mirror_attribute == 1: # YES
+        mirror_attribute = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_mirror_jnts", asString=1)
+        if mirror_attribute == "Yes": # YES
             cmds.select(key["joints"][0])
             joint_list = cmds.mirrorJoint(mirrorYZ=True,mirrorBehavior=True,searchReplace=('_l_', '_r_'))
 
