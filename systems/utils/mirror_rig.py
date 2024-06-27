@@ -47,15 +47,21 @@ def collect_mirror_data(systems_to_be_made):
             cmds.matchTransform(master_guide,joint_list[0])
             cmds.parent(locator_list[-1],master_guide)
 
+            proxy_obj_list = locator_list + [master_guide]
+
             # Copy attrs accross
             for attr in cmds.listAttr(key["master_guide"], r=1,ud=1):
                 try:
-                    if not attr in ['visibility', 'translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']:
+                    if attr == "master_guide":
+                        attr_value = cmds.getAttr(f"{key['master_guide']}.master_guide", asString=1)
+                        new_attr_value = attr_value.replace(f"{key['side']}_",simple_side,1)
+                        cmds.addAttr(proxy_obj_list, ln="master_guide",at="enum",en=new_attr_value,k=0)
+                    elif not attr in ['visibility', 'translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']:
                         try:
                             new_attr_name = attr.replace(f"{key['side']}_",simple_side,1)
                         except:
                             pass
-                        cmds.addAttr(master_guide,ln=f"{new_attr_name}", proxy=f"{key['master_guide']}.{attr}")
+                        cmds.addAttr(proxy_obj_list,ln=f"{new_attr_name}", proxy=f"{key['master_guide']}.{attr}")
                     else:
                         pass
                 except:
