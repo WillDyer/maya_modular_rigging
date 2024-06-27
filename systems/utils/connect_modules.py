@@ -35,7 +35,7 @@ def connect_polished(systems_to_connect):
     ikfk_mapping = {
         "IK": "ctrl_ik",
         "FK": "ctrl_fk",
-        "IKFK": ["ctrl_ik", "ctrl_fk"]
+        "FKIK": ["ctrl_ik", "ctrl_fk"]
     }
     
     systems_ikfk = []
@@ -52,9 +52,8 @@ def connect_polished(systems_to_connect):
         
         systems_ikfk.append(system_values)
     
-    system_1, system_2 = systems_ikfk
-    
-    # Check for "COG" or "root" in the system
+    target, p_object = systems_ikfk
+
     substrings_to_check = ["COG", "root"]
     found = False
     for system in systems_to_connect:
@@ -63,9 +62,11 @@ def connect_polished(systems_to_connect):
             print(f"{found_substring} is in {system}")
             found = True
             break
-        else:
-            print(f"Neither 'COG' nor 'root' is in {system}")
      
     if found == False:
-        print(f"connecting: {system_1} to {system_2}")
-        cmds.parentConstraint(system_2, system_1, mo=1)
+        print(f"connecting: {target} to {p_object}")
+        if len(target) == 2:
+            cmds.parentConstraint(p_object, target[0], mo=1, n=f"pConst_{p_object}")
+            cmds.parentConstraint(p_object, target[1], mo=1, n=f"pConst_{p_object}")
+        elif len(target) == 1:
+            cmds.parentConstraint(p_object, target, mo=1, n=f"pConst_{p_object}")
