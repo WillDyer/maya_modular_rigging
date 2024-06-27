@@ -53,9 +53,7 @@ def collect_mirror_data(systems_to_be_made):
             for attr in cmds.listAttr(key["master_guide"], r=1,ud=1):
                 try:
                     if attr == "master_guide":
-                        attr_value = cmds.getAttr(f"{key['master_guide']}.master_guide", asString=1)
-                        new_attr_value = attr_value.replace(f"{key['side']}_",simple_side,1)
-                        cmds.addAttr(proxy_obj_list, ln="master_guide",at="enum",en=new_attr_value,k=0)
+                        cmds.addAttr(proxy_obj_list, ln="master_guide",at="enum",en=master_guide,k=0)
                     elif not attr in ['visibility', 'translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']:
                         try:
                             new_attr_name = attr.replace(f"{key['side']}_",simple_side,1)
