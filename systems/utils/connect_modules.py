@@ -59,14 +59,12 @@ def connect_polished(systems_to_connect):
     for system in systems_to_connect:
         found_substring = utils.find_substring_in_list(system, substrings_to_check)
         if found_substring:
-            # print(f"{found_substring} is in {system}") # debug
             found = True
             break
      
     if found == False:
-        # print(f"connecting: {target} to {p_object}") # debug
         if len(target) == 2:
-            cmds.parentConstraint(p_object, target[0], mo=1, n=f"pConst_{p_object}")
-            cmds.parentConstraint(p_object, target[1], mo=1, n=f"pConst_{p_object}")
+            cmds.parentConstraint(p_object, target[0], mo=1, n=f"pConst_{p_object[0]}")
+            cmds.parentConstraint(p_object, target[1], mo=1, n=f"pConst_{p_object[0]}")
         elif len(target) == 1:
-            cmds.parentConstraint(p_object, target, mo=1, n=f"pConst_{p_object}")
+            cmds.parentConstraint(p_object, target, mo=1, n=f"pConst_{p_object[0]}")
