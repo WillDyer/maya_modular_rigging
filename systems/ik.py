@@ -35,8 +35,9 @@ class create_ik():
         hdl_ctrl = self.create_handle()
         root_ctrl = self.create_top_hdl_ctrl()
         above_ctrls = self.above_root_ctrl()
+        print(f"ABOVE CTRL {above_ctrls}")
         if above_ctrls:
-            self.ik_ctrls = [pv_ctrl,hdl_ctrl,above_ctrls[-1]]
+            self.ik_ctrls = [pv_ctrl,hdl_ctrl,above_ctrls[-1], root_ctrl]
         else:
             self.ik_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl]
         OPM.offsetParentMatrix(self.ik_ctrls)

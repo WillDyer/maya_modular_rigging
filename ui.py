@@ -114,7 +114,7 @@ class QtSampler(QWidget):
             master_guide = guide["master_guide"]
             guide_connector_list = guide["connector_list"]
             system_to_connect = guide["system_to_connect"]
-            #guide_list = guide[3]
+            guide_list = guide["ui_guide_list"]
             self.created_guides.append(master_guide)
             self.ui.skeleton_box.setEnabled(True)
 
@@ -125,12 +125,16 @@ class QtSampler(QWidget):
             temp_dict = {
                 "module": module,
                 "master_guide": master_guide,
-                #"guide_list": guide_list,
+                "guide_list": guide_list,
                 "joints": [],
                 "side": module_path.side,
                 "connectors": guide_connector_list,
                 "system_to_connect": system_to_connect,
-                "space_swap": module_path.space_swapping
+                "space_swap": module_path.space_swapping,
+                "ik_ctrl_list": [],
+                "fk_ctrl_list": [],
+                "ik_joint_list": [],
+                "fk_joint_list": []
             }
             self.systems_to_be_made[master_guide] = temp_dict
         cmds.select(clear=1)
@@ -199,6 +203,7 @@ class QtSampler(QWidget):
                     ik_joint_list = joints.joint(orientation, master_guide, system="ik")
                     ik_module = ik.create_ik(ik_joint_list,master_guide,module.ik_joints)
                     ik_ctrls = ik_module.get_ctrls()
+                    print(f"IKCTRLS {ik_ctrls}")
                     key.update({"ik_joint_list": ik_joint_list, "ik_ctrl_list": ik_ctrls})
 
                     utils.constraint_from_lists_2to1(ik_joint_list, fk_joint_list, key["joints"],maintain_offset=1)
@@ -213,6 +218,7 @@ class QtSampler(QWidget):
                 systems_to_connect = key['system_to_connect']
                 connect_modules.connect_polished(systems_to_connect)
             rig_type = cmds.getAttr(f"{master_guide}.{master_guide}_rig_type",asString=1)
+            print(key)
             if rig_type == "FKIK":
                 space_swap_module = space_swap.SpaceSwapping(key)
 
