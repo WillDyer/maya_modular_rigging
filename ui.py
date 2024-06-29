@@ -38,6 +38,7 @@ importlib.reload(utils)
 importlib.reload(mirror_rig)
 importlib.reload(ikfk_switch)
 importlib.reload(system_group)
+importlib.reload(space_swap)
 
 mayaMainWindowPtr = omui.MQtUtil.mainWindow()
 mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QWidget)
@@ -201,9 +202,9 @@ class QtSampler(QWidget):
             if key['system_to_connect']:
                 systems_to_connect = key['system_to_connect']
                 connect_modules.connect_polished(systems_to_connect)
-            rig_type = cmds.getAttr(f"{master_guide}.{master_guide}_rig_type")
-            if rig_type:
-                space_swap.space_swapping(key)
+            rig_type = cmds.getAttr(f"{master_guide}.{master_guide}_rig_type",asString=1)
+            if rig_type == "FKIK":
+                space_swap_module = space_swap.SpaceSwapping(key)
 
         self.delete_guides()
         
