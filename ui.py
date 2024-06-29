@@ -24,7 +24,8 @@ from systems.utils import (
     utils,
     mirror_rig,
     ikfk_switch,
-    system_group
+    system_group,
+    space_swap
 )
 
 # debug
@@ -123,7 +124,8 @@ class QtSampler(QWidget):
                 "joints": [],
                 "side": module_path.side,
                 "connectors": guide_connector_list,
-                "system_to_connect": system_to_connect
+                "system_to_connect": system_to_connect,
+                "space_swap": module_path.space_swapping
             }
             self.systems_to_be_made[master_guide] = temp_dict
         cmds.select(clear=1)
@@ -161,7 +163,7 @@ class QtSampler(QWidget):
         
         for key in self.systems_to_be_made.values():
             master_guide = key['master_guide']
-            rig_type = cmds.getAttr(f"{master_guide}.{master_guide}_rig_type")
+            rig_type = cmds.getAttr(f"{master_guide}.{master_guide}_rig_type", asString=1)
             orientation = self.ui.oritentation.currentText()
 
             sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules"))
@@ -171,15 +173,15 @@ class QtSampler(QWidget):
                 pass
             else:
                 print(f"systems_to_be_made: {key}")
-                if rig_type == 0: #fk
+                if rig_type == "FK": #fk
                     fk_joint_list = joints.joint(orientation, master_guide, system="fk")
                     fk.create_fk(fk_joint_list,master_guide,delete_end=False)
                     utils.constraint_from_lists_1to1(fk_joint_list, key["joints"],maintain_offset=1)
-                elif rig_type == 1: #ik
+                elif rig_type == "IK": #ik
                     ik_joint_list = joints.joint(orientation, master_guide, system="ik")
                     ik.create_ik(ik_joint_list,master_guide,module.ik_joints)
                     utils.constraint_from_lists_1to1(ik_joint_list, key["joints"],maintain_offset=1)
-                elif rig_type == 2: #ikfk
+                elif rig_type == "FKIK": #ikfk
                     fk_joint_list = joints.joint(orientation, master_guide, system="fk")
                     fk_module = fk.create_fk(fk_joint_list,master_guide,delete_end=False)
                     fk_ctrls = fk_module.get_ctrls()
@@ -199,6 +201,9 @@ class QtSampler(QWidget):
             if key['system_to_connect']:
                 systems_to_connect = key['system_to_connect']
                 connect_modules.connect_polished(systems_to_connect)
+            rig_type = cmds.getAttr(f"{master_guide}.{master_guide}_rig_type")
+            if rig_type:
+                space_swap.space_swapping(key)
 
         self.delete_guides()
         

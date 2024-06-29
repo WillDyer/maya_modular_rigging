@@ -8,3 +8,4 @@ ik_joints = {
     "world_orientation": True
 }
 side = "_l"
+space_swapping = ["hip","root","COG","Custom"]
