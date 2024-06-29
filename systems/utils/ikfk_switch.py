@@ -45,3 +45,10 @@ def create_ikfk(rig_joints, fk_ctrls, ik_ctrls,fk_joint_list,ik_joint_list,maste
             cmds.connectAttr(f"{proxy_attr}.{attr_name}",f"{rig_jnt_pconst[0]}.{ik_joint_list[x]}W1")
         else:
             cmds.warning(f"{ik_joint_list[x]} does not meet connection requirement therefore wont be connected to either {reverse_node} or constraint weights")
+
+    ikfk_switch_dict = {
+        "ikfk_switch_name": attr_name,
+        "reverse_node": reverse_node
+    }
+
+    return ikfk_switch_dict

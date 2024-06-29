@@ -64,7 +64,12 @@ def connect_polished(systems_to_connect):
      
     if found == False:
         if len(target) == 2:
-            cmds.parentConstraint(p_object, target[0], mo=1, n=f"pConst_{p_object[0]}")
-            cmds.parentConstraint(p_object, target[1], mo=1, n=f"pConst_{p_object[0]}")
+            constraint_1 = cmds.parentConstraint(p_object, target[0], mo=1, n=f"pConst_{p_object[0]}")
+            constraint_2 = cmds.parentConstraint(p_object, target[1], mo=1, n=f"pConst_{p_object[0]}")
         elif len(target) == 1:
-            cmds.parentConstraint(p_object, target, mo=1, n=f"pConst_{p_object[0]}")
+            constraint_1 = cmds.parentConstraint(p_object, target, mo=1, n=f"pConst_{p_object[0]}")
+
+    if constraint_1 and constraint_2:
+        return [constraint_1, constraint_2]
+    else:
+        return [constraint_1]
