@@ -107,11 +107,14 @@ class QtSampler(QWidget):
         ]
 
 
-        guide = create_guides.guides(module,offset,module_path.side)
+        guides = create_guides.Guides(module,offset,module_path.side)
+        guide = guides.collect_guides()
+        print(guide)
         if guide:
-            master_guide = guide[0]
-            guide_connector_list = guide[1]
-            system_to_connect = guide[2]
+            master_guide = guide["master_guide"]
+            guide_connector_list = guide["connector_list"]
+            system_to_connect = guide["system_to_connect"]
+            #guide_list = guide[3]
             self.created_guides.append(master_guide)
             self.ui.skeleton_box.setEnabled(True)
 
@@ -122,6 +125,7 @@ class QtSampler(QWidget):
             temp_dict = {
                 "module": module,
                 "master_guide": master_guide,
+                #"guide_list": guide_list,
                 "joints": [],
                 "side": module_path.side,
                 "connectors": guide_connector_list,
@@ -176,20 +180,26 @@ class QtSampler(QWidget):
                 print(f"systems_to_be_made: {key}")
                 if rig_type == "FK": #fk
                     fk_joint_list = joints.joint(orientation, master_guide, system="fk")
-                    fk.create_fk(fk_joint_list,master_guide,delete_end=False)
+                    fk_module = fk.create_fk(fk_joint_list,master_guide,delete_end=False)
+                    fk_ctrls = fk_module.get_ctrls()
                     utils.constraint_from_lists_1to1(fk_joint_list, key["joints"],maintain_offset=1)
+                    key.update({"fk_joint_list": fk_joint_list, "fk_ctrl_list": fk_ctrls})
                 elif rig_type == "IK": #ik
                     ik_joint_list = joints.joint(orientation, master_guide, system="ik")
-                    ik.create_ik(ik_joint_list,master_guide,module.ik_joints)
+                    ik_module = ik.create_ik(ik_joint_list,master_guide,module.ik_joints)
+                    ik_ctrls = ik_module.get_ctrls()
                     utils.constraint_from_lists_1to1(ik_joint_list, key["joints"],maintain_offset=1)
+                    key.update({"ik_joint_list": ik_joint_list, "ik_ctrl_list": ik_ctrls})
                 elif rig_type == "FKIK": #ikfk
                     fk_joint_list = joints.joint(orientation, master_guide, system="fk")
                     fk_module = fk.create_fk(fk_joint_list,master_guide,delete_end=False)
                     fk_ctrls = fk_module.get_ctrls()
+                    key.update({"fk_joint_list": fk_joint_list, "fk_ctrl_list": fk_ctrls})
 
                     ik_joint_list = joints.joint(orientation, master_guide, system="ik")
                     ik_module = ik.create_ik(ik_joint_list,master_guide,module.ik_joints)
                     ik_ctrls = ik_module.get_ctrls()
+                    key.update({"ik_joint_list": ik_joint_list, "ik_ctrl_list": ik_ctrls})
 
                     utils.constraint_from_lists_2to1(ik_joint_list, fk_joint_list, key["joints"],maintain_offset=1)
                     ikfk_switch.create_ikfk(key["joints"], fk_ctrls, ik_ctrls,ik_joint_list,fk_joint_list,master_guide)

@@ -8,5 +8,5 @@ class SpaceSwapping():
 
     def create_locators(self):
         created_locator_list = [cmds.spaceLocator(n=f"loc_space_{x}")[0] for x in self.locator_list]
-        print(created_locator_list)
+
 
