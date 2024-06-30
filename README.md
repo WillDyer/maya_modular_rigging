@@ -15,9 +15,6 @@ A assortment of tools I've integrated into a modular auto limb/rigging tool to s
 - NOTE: As I have switched to linux recently you might need to check the pathing if you are running a windows based machine.
 
 ```python
-import sys
-sys.path.append("C:\Docs\maya\2024\scripts") # change this to your path or a relative path
-
 from maya_modular_rigging import main
 
 main.run_ui()
