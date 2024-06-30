@@ -213,6 +213,7 @@ class QtSampler(QWidget):
         system_group.grpSetup()
 
         for key in self.systems_to_be_made.values(): # seperate loop to be sure systems are made before connecting
+            print(key["system_to_connect"])
             if key['system_to_connect']:
                 systems_to_connect = key['system_to_connect']
                 connect_modules.connect_polished(systems_to_connect)

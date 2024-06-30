@@ -28,10 +28,12 @@ class Guides():
                 connector = connect_modules.attach(master_guide, selection)
                 connector_list.append(connector[1])
                 self.system_to_connect = connect_modules.prep_attach_joints(master_guide, selection)
+                guide.update({"system_to_connect": self.system_to_connect})
                 print("Attaching to module.")
                 return guide
         else:
             guide = self.creation(accessed_module,offset,side,connector_list)
+            guide.update({"system_to_connect": []})
             return guide
 
 
@@ -119,7 +121,6 @@ class Guides():
         ui_dict = {
             "master_guide": master_guide,
             "connector_list": connector_list,
-            "system_to_connect": self.system_to_connect,
             "ui_guide_list": ui_guide_list
         }
         return ui_dict #[master_guide, connector_list, ui_guide_list]
