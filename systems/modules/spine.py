@@ -7,5 +7,5 @@ ik_joints = {
     "pv_joint": None,
     "world_orientation": True
 }
-ide = "None"
+side = "None"
 space_swapping = []

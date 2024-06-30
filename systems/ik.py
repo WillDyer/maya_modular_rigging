@@ -35,11 +35,11 @@ class create_ik():
         hdl_ctrl = self.create_handle()
         root_ctrl = self.create_top_hdl_ctrl()
         above_ctrls = self.above_root_ctrl()
-        print(f"ABOVE CTRL {above_ctrls}")
         if above_ctrls:
             self.ik_ctrls = [pv_ctrl,hdl_ctrl,above_ctrls[-1], root_ctrl]
         else:
             self.ik_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl]
+        print(f"OPMING: {self.ik_ctrls}")
         OPM.offsetParentMatrix(self.ik_ctrls)
 
     def create_pv(self):
@@ -56,6 +56,7 @@ class create_ik():
         else:
             cmds.matchTransform(ctrl_crv, self.end_joint)
         cmds.parentConstraint(ctrl_crv, f"hdl_ik_{self.end_joint[7:]}",mo=1,n=f"pConst_hdl_ik_{self.end_joint[7:]}")
+        cmds.addAttr(ctrl_crv, ln="handle",at="enum",en="True",k=0)
         return ctrl_crv
 
     def create_top_hdl_ctrl(self):

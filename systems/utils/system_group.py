@@ -68,6 +68,7 @@ def grpSetup():
         cmds.group(n=x,p=grpList[2],em=True)
     
     cmds.group(n='grp_root',p='grp_controls',em=True)
+    cmds.group(n='grp_offset_ik_hdls',p='grp_controls',em=True)
     cmds.parent('ctrl_root','grp_root')
     cmds.group(n='grp_COG',p='ctrl_root',em=True)
     if "jnt_rig_COG" in cmds.ls("jnt_rig_COG"):

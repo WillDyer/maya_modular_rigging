@@ -203,7 +203,6 @@ class QtSampler(QWidget):
                     ik_joint_list = joints.joint(orientation, master_guide, system="ik")
                     ik_module = ik.create_ik(ik_joint_list,master_guide,module.ik_joints)
                     ik_ctrls = ik_module.get_ctrls()
-                    print(f"IKCTRLS {ik_ctrls}")
                     key.update({"ik_joint_list": ik_joint_list, "ik_ctrl_list": ik_ctrls})
 
                     utils.constraint_from_lists_2to1(ik_joint_list, fk_joint_list, key["joints"],maintain_offset=1)
@@ -218,7 +217,6 @@ class QtSampler(QWidget):
                 systems_to_connect = key['system_to_connect']
                 connect_modules.connect_polished(systems_to_connect)
             rig_type = cmds.getAttr(f"{master_guide}.{master_guide}_rig_type",asString=1)
-            print(key)
             if rig_type == "FKIK":
                 space_swap_module = space_swap.SpaceSwapping(key)
 
