@@ -15,6 +15,7 @@ class create_ik():
         self.validation_joints = validation_joints
         self.ik_system(ik_joint_list)
         cmds.group(self.ik_ctrls,n=f"grp_ik_ctrls_{master_guide}",w=1)
+        cmds.parent(self.start_ctrl_crv,self.to_be_parented)
         cmds.group(ik_joint_list[0],n=f"grp_ik_jnts_{master_guide}",w=1)
 
     def ik_system(self, ik_joint_list):
@@ -39,7 +40,6 @@ class create_ik():
             self.ik_ctrls = [pv_ctrl,hdl_ctrl,above_ctrls[-1], root_ctrl]
         else:
             self.ik_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl]
-        print(f"OPMING: {self.ik_ctrls}")
         OPM.offsetParentMatrix(self.ik_ctrls)
 
     def create_pv(self):
@@ -80,12 +80,13 @@ class create_ik():
 
     def above_root_ctrl(self):
         above_root_control_list = []
+        self.to_be_parented = []
         if self.above_root_joints:
             for joint in self.above_root_joints:
                 ctrl_crv_tmp = cmds.circle(n=f"ctrl_ik_{joint[7:]}",r=10,nr=(1, 0, 0))[0]
                 cmds.matchTransform(ctrl_crv_tmp,joint)
                 cmds.parentConstraint(ctrl_crv_tmp, joint,mo=1,n=f"pConst_{joint[7:]}")
                 above_root_control_list.append(ctrl_crv_tmp)
-            cmds.parent(self.start_ctrl_crv,above_root_control_list[0])
+            self.to_be_parented.append(above_root_control_list[0])
         return above_root_control_list
 

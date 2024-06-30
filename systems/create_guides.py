@@ -29,7 +29,6 @@ class Guides():
                 connector_list.append(connector[1])
                 self.system_to_connect = connect_modules.prep_attach_joints(master_guide, selection)
                 guide.update({"system_to_connect": self.system_to_connect})
-                print("Attaching to module.")
                 return guide
         else:
             guide = self.creation(accessed_module,offset,side,connector_list)
