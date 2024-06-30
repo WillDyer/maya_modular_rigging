@@ -62,8 +62,7 @@ class SpaceSwapping():
         cmds.addAttr(self.ik_ctrls[:-1],ln="Space_Swap", proxy=f"{self.ik_ctrls[-1]}.Space_Swap")
         for x in range(len(self.space_swap_locators)):
             condition_node = cmds.shadingNode("condition",n=f"condition_{self.space_swap_locators[x]}",au=1)
-            for y in ["colorIfFalseR","colorIfFalseG","colorIfFalseG","colorIfTrueR","colorIfTrueG","colorIfTrueB"]:
-                cmds.setAttr(f"{condition_node}.{y}",0)
+            for y in ["colorIfFalseR","colorIfFalseG","colorIfFalseG","colorIfTrueR","colorIfTrueG","colorIfTrueB"]: cmds.setAttr(f"{condition_node}.{y}",0)
             cmds.setAttr(f"{condition_node}.colorIfTrueR",1)
             cmds.setAttr(f"{condition_node}.secondTerm",x)
             cmds.connectAttr(f"{self.handle_ctrl[0]}.Space_Swap",f"{condition_node}.firstTerm")

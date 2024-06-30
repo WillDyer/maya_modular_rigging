@@ -164,9 +164,9 @@ class QtSampler(QWidget):
 
         self.ui.skeleton_box.setEnabled(False)
 
-    def edit_blueprint(self): #currently broke working for windows only.
+    def edit_blueprint(self):
         path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules")
-        subprocess.Popen(f'explorer "{os.path.dirname(os.path.abspath(__file__))}/systems/modules/"')
+        subprocess.Popen(f'explorer "{path}"')
 
     def polish_rig(self):
         
