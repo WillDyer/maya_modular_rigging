@@ -55,20 +55,19 @@ def find_substring_in_list(string, substrings):
             return substring
     return None
 
-def set_drawing_override_color(nurbs_curve, rgb_colour,side):
-    if side == "None": colour = rgb_colour["root"]
-    elif side == "l": colour = rgb_colour["colour_left"]
-    elif side == "r": colour = rgb_colour["colour_right"]
-    elif side == "default": colour = rgb_colour["colour_middle"]
-    else: colour = rgb_colour["colour_middle"]
-    colour = [c / 255.0 for c in colour]
-    cmds.setAttr(f"{nurbs_curve}.overrideEnabled", 1)
-    cmds.setAttr(f"{nurbs_curve}.overrideRGBColors", 1)
-    cmds.setAttr(f"{nurbs_curve}.overrideColorR", colour[0])
-    cmds.setAttr(f"{nurbs_curve}.overrideColorG", colour[1])
-    cmds.setAttr(f"{nurbs_curve}.overrideColorB", colour[2])
-
 def colour_controls(ctrl_list,colour_dict):
+    def set_drawing_override_color(nurbs_curve, rgb_colour,side):
+        if side == "None": colour = rgb_colour["root"]
+        elif side == "l": colour = rgb_colour["colour_left"]
+        elif side == "r": colour = rgb_colour["colour_right"]
+        elif side == "default": colour = rgb_colour["colour_middle"]
+        else: colour = rgb_colour["colour_middle"]
+        colour = [c / 255.0 for c in colour]
+        cmds.setAttr(f"{nurbs_curve}.overrideEnabled", 1)
+        cmds.setAttr(f"{nurbs_curve}.overrideRGBColors", 1)
+        cmds.setAttr(f"{nurbs_curve}.overrideColorR", colour[0])
+        cmds.setAttr(f"{nurbs_curve}.overrideColorG", colour[1])
+        cmds.setAttr(f"{nurbs_curve}.overrideColorB", colour[2])
     #COLOR_CONFIG = {'l': 6, 'r': 13, 'default': 22}
     for ctrl in ctrl_list:
         try:
