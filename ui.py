@@ -49,8 +49,8 @@ class QtSampler(QWidget):
         self.setParent(mayaMainWindow)
         self.setWindowFlags(Qt.Window)
         self.setWindowTitle("AutoRigger")
-        self.setFixedWidth(300)
-        self.setFixedHeight(450)
+        self.setFixedWidth(301)
+        self.setFixedHeight(471)
         self.initUI()
         
         self.update_dropdown()
@@ -58,6 +58,7 @@ class QtSampler(QWidget):
         self.created_guides = []
         self.systems_to_be_made = {}
 
+        #page 1
         self.ui.image.setPixmap(os.path.join(os.path.dirname(os.path.abspath(__file__)),"interface","UI_Logo.png"))
         self.ui.add_module.clicked.connect(self.add_module)
         self.ui.remove_module.clicked.connect(self.remove_module)
@@ -66,14 +67,35 @@ class QtSampler(QWidget):
         self.ui.edit_blueprint.clicked.connect(self.edit_blueprint)
         self.ui.polish_rig.clicked.connect(self.polish_rig)
 
+        #page 2
+
+        #page 3
+        self.ui.colour_left.clicked.connect(lambda: self.colour_button(button="colour_left"))
+        self.ui.colour_middle.clicked.connect(lambda: self.colour_button(button="colour_middle"))
+        self.ui.colour_right.clicked.connect(lambda: self.colour_button(button="colour_right"))
 
     def initUI(self): # this loads the ui
         loader = QUiLoader()
-        UI_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "interface", "WD_Rig_Builder.ui")
+        UI_VERSION = "02"
+        UI_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "interface", f"WD_Rig_Builder_{UI_VERSION}.ui")
         file = QFile(UI_FILE)
         file.open(QFile.ReadOnly)
         self.ui = loader.load(file, parentWidget=self)
         file.close()
+
+    def get_colour(self):
+        colour = QColorDialog.getColor()
+        if colour.isValid():
+            red = colour.red()
+            green = colour.green()
+            blue = colour.blue()
+            return {"red":red, "green":green, "blue":blue}
+        else: return None
+
+    def colour_button(self,button):
+        colour = self.get_colour()
+        button_name = getattr(self.ui, button)
+        if colour: button_name.setStyleSheet(f"background-color: rgb({colour['red']}, {colour['green']}, {colour['blue']});")
 
     def rig_global_scale(self):
         global_scale = self.ui.scale_box.value()
@@ -223,8 +245,20 @@ class QtSampler(QWidget):
 
         self.delete_guides()
         
+
+        button_names = ["colour_left","colour_middle","colour_right"]
+        button_colour_dict ={"colour_left":[],"colour_middle":[],"colour_right":[]}
+        for x in button_names:
+            button_name = getattr(self.ui, x)
+            palette = button_name.palette()
+            button_colour = palette.color(button_name.backgroundRole())
+            button_rgb = button_colour.getRgb()
+            button_colour_dict[x] = list(button_rgb)
+            #print(f"button colour {button_rgb}")
+        button_colour_dict.update({"root": [0,255,0]})
+
         ctrl_list = cmds.ls("ctrl_*",type="transform")
-        utils.colour_controls(ctrl_list)
+        utils.colour_controls(ctrl_list,button_colour_dict)
 
         cmds.select(cl=1)
 
