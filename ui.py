@@ -131,7 +131,6 @@ class QtSampler(QWidget):
 
         guides = create_guides.Guides(module,offset,module_path.side)
         guide = guides.collect_guides()
-        print(guide)
         if guide:
             master_guide = guide["master_guide"]
             guide_connector_list = guide["connector_list"]
@@ -185,6 +184,8 @@ class QtSampler(QWidget):
         cmds.select(cl=1)
 
         self.ui.skeleton_box.setEnabled(False)
+        for system in self.systems_to_be_made.values():
+            print(system)
 
     def edit_blueprint(self):
         path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules")

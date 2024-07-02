@@ -67,9 +67,16 @@ def collect_mirror_data(systems_to_be_made):
             temp_dict = {
                 "module": key["module"],
                 "master_guide": master_guide,
+                "guide_list": locator_list,
                 "joints": joint_list,
                 "side": side,
-                "system_to_connect": mirrored_system_to_connect
+                "connectors": [],
+                "system_to_connect": mirrored_system_to_connect,
+                "space_swap": key["space_swap"],
+                "ik_ctrl_list": [],
+                "fk_ctrl_list": [],
+                "ik_joint_list": [],
+                "fk_joint_list": []
             }
             temp_systems_to_be_made[master_guide] = temp_dict
 
