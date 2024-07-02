@@ -72,15 +72,12 @@ def colour_controls(ctrl_list,colour_dict):
     for ctrl in ctrl_list:
         try:
             if ctrl == "ctrl_root":
-                print("ctrl is root")
                 set_drawing_override_color(ctrl, colour_dict,side="None")
             elif ctrl[:4] == "ctrl":
                 side = ctrl.split("_")[-2]
                 try:
-                    print(f"ctrl is {ctrl} and side is {side}")
                     set_drawing_override_color(ctrl, colour_dict, side)
                 except KeyError:
-                    print(f"ctrl is {ctrl} side is default")
                     set_drawing_override_color(ctrl, colour_dict, side="default")
                     pass
             else:
