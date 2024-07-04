@@ -68,6 +68,7 @@ def collect_mirror_data(systems_to_be_made):
                 "module": key["module"],
                 "master_guide": master_guide,
                 "guide_list": locator_list,
+                "scale": key["scale"],
                 "joints": joint_list,
                 "side": side,
                 "connectors": [],
