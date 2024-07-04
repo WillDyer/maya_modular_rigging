@@ -10,3 +10,4 @@ ik_joints = {
 side = "None"
 space_swapping = []
 guide_scale = 1
+available_rig_types = ["FK","IK","FKIK"]

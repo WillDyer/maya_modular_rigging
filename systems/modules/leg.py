@@ -10,3 +10,4 @@ ik_joints = {
 side = "_l"
 space_swapping = ["hip","root","COG","Custom"]
 guide_scale = 1
+available_rig_types = ["FK","IK","FKIK"]

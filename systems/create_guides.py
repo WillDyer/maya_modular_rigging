@@ -75,6 +75,7 @@ class Guides():
                     guide = cmds.rename(imported[0], f"{x}{side}")
                 else:
                     imported = cmds.file(ABC_FILE, i=1,namespace="test",rnn=1)
+                    cmds.scale(module.guide_scale,module.guide_scale, module.guide_scale, imported)
                     guide = cmds.rename(imported[0], f"{x}{side}_#")
                 if "root" in x and root_exists == True:
                     master_guide = guide
@@ -115,7 +116,8 @@ class Guides():
         else:
             cmds.group(connector_list,n="grp_connector_clusters",w=1)
 
-        custom_attr = self.add_custom_attr(guide_list, master_guide)
+        self.available_rig_types = ":".join(module.available_rig_types)
+        custom_attr = self.add_custom_attr(guide_list, master_guide, module)
         cmds.addAttr(master_guide, ln="is_master",at="enum",en="True",k=0) # adding master group attr
         cmds.addAttr(master_guide, ln="base_module",at="enum",en=accessed_module,k=0) # module attr
         cmds.addAttr(master_guide, ln="module_side",at="enum",en=side,k=0) # module side
@@ -132,14 +134,14 @@ class Guides():
         }
         return ui_dict #[master_guide, connector_list, ui_guide_list]
 
-    def add_custom_attr(self,system, master_guide):
+    def add_custom_attr(self,system, master_guide, module):
         custom_attrs = {"module_dvdr": ["enum","------------","MODULE",True],
                         "skeleton_dvdr": ["enum","------------", "SKELETON",True],
                         "mirror_jnts": ["enum","Mirror Joints", "No:Yes",False],
                         "twist_jnts": ["enum","Twist Joints", "Yes:No",False],
                         "twist_amount": ["float","Twist Amount", "UPDATE",False],
                         "rig_dvdr": ["enum","------------","RIG",True],
-                        "rig_type": ["enum","Rig Type","FK:IK:FKIK",False],
+                        "rig_type": ["enum","Rig Type",self.available_rig_types,False],
                         "squash_stretch": ["enum","Squash Stech","No:Yes",False]
                         }
 

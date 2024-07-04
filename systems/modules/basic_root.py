@@ -4,3 +4,4 @@ system_rot = {"root": [0,0,0],"COG": [0, 0, 0]}
 side = "None"
 space_swapping = []
 guide_scale = 1
+available_rig_types = ["FK"]
