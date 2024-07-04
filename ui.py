@@ -16,7 +16,8 @@ from systems import (
     joints,
     fk,
     ik,
-    create_guides
+    create_guides,
+    hands
 )
 
 from systems.utils import (
@@ -39,6 +40,7 @@ importlib.reload(mirror_rig)
 importlib.reload(ikfk_switch)
 importlib.reload(system_group)
 importlib.reload(space_swap)
+importlib.reload(hands)
 
 mayaMainWindowPtr = omui.MQtUtil.mainWindow()
 mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QWidget)
@@ -112,6 +114,7 @@ class QtSampler(QWidget):
         except ValueError:
             pass
         files.remove("__init__")
+        files.remove("hand")
         self.ui.available_modules.addItems(files)
         index = files.index("basic_root")
         self.ui.available_modules.setCurrentIndex(index)
@@ -158,6 +161,10 @@ class QtSampler(QWidget):
                 "fk_joint_list": []
             }
             self.systems_to_be_made[master_guide] = temp_dict
+            print(temp_dict["guide_list"])
+
+            if self.ui.add_hand.isChecked():
+                hand_temp_dict = hands.create_hands()
         cmds.select(clear=1)
 
     def remove_module(self):

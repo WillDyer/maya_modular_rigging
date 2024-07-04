@@ -10,7 +10,11 @@ scale = 1
 
 class Guides():
     def __init__(self,accessed_module, offset,side):
-        self.create_guide = self.guides(accessed_module, offset,side)
+        if accessed_module == "hand":
+            connector_list = []
+            self.create_guide = self.creation(accessed_module,offset,side,connector_list)
+        else:
+            self.create_guide = self.guides(accessed_module, offset,side)
 
     def collect_guides(self):
         return self.create_guide
@@ -52,6 +56,8 @@ class Guides():
         # create master guide for module
         if "root" in module.system:
             master_guide = "root"
+        elif "proximal" in module.system:
+            master_guide = "proximal"
         else:
             master_guide = utils.create_cube(f"master_{accessed_module}{side}_#",scale=[5,5,5])
             pos = module.system_pos[module.system[0]]
@@ -71,6 +77,8 @@ class Guides():
                     imported = cmds.file(ABC_FILE, i=1,namespace="test",rnn=1)
                     guide = cmds.rename(imported[0], f"{x}{side}_#")
                 if "root" in x and root_exists == True:
+                    master_guide = guide
+                elif "proximal" in x:
                     master_guide = guide
                 else:
                     guide_list.append(guide)
