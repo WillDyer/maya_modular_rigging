@@ -68,7 +68,7 @@ class create_hands():
         centre_z = centre_pos[0]
 
         # Calculate the spacing between the curves
-        spacing = 1
+        spacing = 2
         total_width = (num_curves - 1) * spacing  # Adjust 1.0 to your desired spacing
         start_z = - (total_width / 2.0)
 
