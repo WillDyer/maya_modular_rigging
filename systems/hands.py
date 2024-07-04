@@ -64,9 +64,6 @@ class create_hands():
         num_curves = len(self.hand_master_guides)
         initial_positions = [cmds.xform(curve, query=True, worldSpace=True, translation=True) for curve in self.hand_master_guides]
 
-        centre_pos = cmds.xform(self.to_connect_to, query=True, worldSpace=True, translation=True)
-        centre_z = centre_pos[0]
-
         # Calculate the spacing between the curves
         spacing = 2
         total_width = (num_curves - 1) * spacing  # Adjust 1.0 to your desired spacing
