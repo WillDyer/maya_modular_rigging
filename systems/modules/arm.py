@@ -9,3 +9,4 @@ ik_joints = {
 }
 side = "_l"
 space_swapping = ["shoulder","root","COG","Custom"]
+guide_scale = 1
