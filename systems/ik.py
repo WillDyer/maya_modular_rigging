@@ -14,7 +14,7 @@ class create_ik():
         self.below_root_joints = []
         self.validation_joints = validation_joints
         self.ik_system(ik_joint_list)
-        cmds.group(self.ik_ctrls,n=f"grp_ik_ctrls_{master_guide}",w=1)
+        cmds.group(self.grouped_ctrls,n=f"grp_ik_ctrls_{master_guide}",w=1)
         cmds.group(ik_joint_list[0],n=f"grp_ik_jnts_{master_guide}",w=1)
 
     def ik_system(self, ik_joint_list):
@@ -35,12 +35,12 @@ class create_ik():
         hdl_ctrl = self.create_handle()
         root_ctrl = self.create_top_hdl_ctrl()
         above_ctrls = self.above_root_ctrl()
-        print(f"above_ctrls: {above_ctrls}")
         if above_ctrls:
-            self.ik_ctrls = [pv_ctrl,hdl_ctrl,above_ctrls[-1]]
+            self.ik_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl] + above_ctrls
+            self.grouped_ctrls = [pv_ctrl, hdl_ctrl, above_ctrls[0]]
         else:
             self.ik_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl]
-        print(f"self.ik_Ctrls: {self.ik_ctrls}")
+            self.grouped_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl]
         OPM.offsetParentMatrix(self.ik_ctrls)
 
     def create_pv(self):
