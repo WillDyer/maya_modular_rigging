@@ -32,6 +32,19 @@ def attach_joints():
     for x in joints_to_parent:
         cmds.parent(x[0],x[1])
 
+def connect_to_ikfk_switch(p_object, constraint):
+    for x in p_object:
+        attr_exists = cmds.attributeQuery('ikfk_switch_name', node=x, exists=True)
+        if attr_exists:
+            ikfk_switch_name = cmds.getAttr(f"{x}.ikfk_switch_name",asString=1)
+            try:
+                reverse_node = cmds.createNode('reverse', n=f"{ikfk_switch_name}_Reverse_#")
+                cmds.connectAttr(f"{x}.{ikfk_switch_name}",f"{reverse_node}.inputX")
+                cmds.connectAttr(f"{reverse_node}.outputX",f"{constraint[0]}.{x}W0")
+            except:pass
+            try: cmds.connectAttr(f"{x}.{ikfk_switch_name}",f"{constraint[0]}.{x}W1")
+            except: pass
+
 def connect_polished(systems_to_connect):
     ikfk_mapping = {
         "IK": "ctrl_ik",
@@ -66,20 +79,12 @@ def connect_polished(systems_to_connect):
     if found == False:
         if len(target) == 2:
             constraint_1 = cmds.parentConstraint(p_object, target[0], mo=1, n=f"pConst_{p_object[0]}")
+            connect_to_ikfk_switch(p_object, constraint_1)
             constraint_2 = cmds.parentConstraint(p_object, target[1], mo=1, n=f"pConst_{p_object[0]}")
+            connect_to_ikfk_switch(p_object, constraint_2)
             return [constraint_1, constraint_2]
         elif len(target) == 1:
             constraint_1 = cmds.parentConstraint(p_object, target, mo=1, n=f"pConst_{p_object[0]}")
-            for x in p_object:
-                attr_exists = cmds.attributeQuery('ikfk_switch_name', node=x, exists=True)
-                if attr_exists:
-                    ikfk_switch_name = cmds.getAttr(f"{x}.ikfk_switch_name",asString=1)
-                    try:
-                        reverse_node = cmds.createNode('reverse', n=f"{ikfk_switch_name}_Reverse_#")
-                        cmds.connectAttr(f"{x}.{ikfk_switch_name}",f"{reverse_node}.inputX")
-                        cmds.connectAttr(f"{reverse_node}.outputX",f"{constraint_1[0]}.{x}W0")
-                    except:pass
-                    try: cmds.connectAttr(f"{x}.{ikfk_switch_name}",f"{constraint_1[0]}.{x}W1")
-                    except: pass
+            connect_to_ikfk_switch(p_object, constraint_1)
             return [constraint_1]
 
