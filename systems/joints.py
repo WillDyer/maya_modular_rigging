@@ -22,6 +22,8 @@ def joint(orientation,top_skeleton_joint, system):
     list = cmds.listRelatives(top_skeleton_joint, ad=True, type="transform")
     if top_skeleton_joint == "root":
         list.append(top_skeleton_joint)
+    elif "proximal" in top_skeleton_joint:
+        list.append(top_skeleton_joint)
     list.reverse()
 
     side = cmds.getAttr(f"{top_skeleton_joint}.module_side",asString=1)

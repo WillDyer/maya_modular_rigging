@@ -27,7 +27,14 @@ def prep_attach_joints(child_joint, parent_joint):
 
     return [child_joint, parent_joint[0]]
 
+def prep_hand_joints(child_joint, parent_joint):
+    temp_group = [f"jnt_rig_{child_joint}", f"jnt_rig_{parent_joint[0]}"]
+    joints_to_parent.append(temp_group)
+
+    return [child_joint, parent_joint[0]]
+
 def attach_joints():
+    print(joints_to_parent)
     for x in joints_to_parent:
         cmds.parent(x[0],x[1])
 

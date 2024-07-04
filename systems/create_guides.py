@@ -9,12 +9,11 @@ importlib.reload(utils)
 scale = 1
 
 class Guides():
-    def __init__(self,accessed_module, offset,side):
+    def __init__(self,accessed_module, offset,side, to_connect_to):
         if accessed_module == "hand":
-            connector_list = []
-            self.create_guide = self.creation(accessed_module,offset,side,connector_list)
+            self.create_guide = self.guides_hand(accessed_module,offset,side,to_connect_to)
         else:
-            self.create_guide = self.guides(accessed_module, offset,side)
+            self.create_guide = self.guides(accessed_module,offset,side)
 
     def collect_guides(self):
         return self.create_guide
@@ -37,6 +36,17 @@ class Guides():
         else:
             guide = self.creation(accessed_module,offset,side,connector_list)
             guide.update({"system_to_connect": []})
+            return guide
+        
+    def guides_hand(self, accessed_module, offset,side, to_connect_to):
+        connector_list = []
+        if accessed_module == "hand":
+            guide = self.creation(accessed_module,offset,side,connector_list)
+            master_guide = guide["master_guide"]
+            connector = connect_modules.attach(master_guide, to_connect_to)
+            connector_list.append(connector[1])
+            self.system_to_connect = connect_modules.prep_hand_joints(master_guide, to_connect_to)
+            guide.update({"system_to_connect": self.system_to_connect})
             return guide
 
 

@@ -132,7 +132,7 @@ class QtSampler(QWidget):
         ]
 
 
-        guides = create_guides.Guides(module,offset,module_path.side)
+        guides = create_guides.Guides(module,offset,module_path.side,to_connect_to=[])
         guide = guides.collect_guides()
         if guide:
             master_guide = guide["master_guide"]
@@ -161,10 +161,16 @@ class QtSampler(QWidget):
                 "fk_joint_list": []
             }
             self.systems_to_be_made[master_guide] = temp_dict
-            print(temp_dict["guide_list"])
 
             if self.ui.add_hand.isChecked():
-                hand_temp_dict = hands.create_hands()
+                hand_module = hands.create_hands(guide_list[0],self.systems_to_be_made, self.created_guides)
+                self.systems_to_be_made = hand_module.get_dict()
+                self.created_guides = hand_module.get_created_guides()
+                self.ui.add_hand.setChecked(False)
+
+            for value in self.systems_to_be_made.values():
+                print(value)
+
         cmds.select(clear=1)
 
     def remove_module(self):
