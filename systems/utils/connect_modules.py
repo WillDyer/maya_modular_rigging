@@ -29,7 +29,6 @@ def prep_attach_joints(child_joint, parent_joint, need_child):
     return [child_joint, parent_joint[0]]
 
 def attach_joints():
-    print(joints_to_parent)
     for x in joints_to_parent:
         cmds.parent(x[0],x[1])
 

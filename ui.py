@@ -59,6 +59,7 @@ class QtSampler(QWidget):
         self.module_created = 0
         self.created_guides = []
         self.systems_to_be_made = {}
+        self.systems_to_be_deleted_polished = []
 
         #page 1
         self.ui.image.setPixmap(os.path.join(os.path.dirname(os.path.abspath(__file__)),"interface","UI_Logo.png"))
@@ -150,6 +151,7 @@ class QtSampler(QWidget):
                 "module": module,
                 "master_guide": master_guide,
                 "guide_list": guide_list,
+                "scale": module_path.guide_scale,
                 "joints": [],
                 "side": module_path.side,
                 "connectors": guide_connector_list,
@@ -167,9 +169,7 @@ class QtSampler(QWidget):
                 self.systems_to_be_made = hand_module.get_dict()
                 self.created_guides = hand_module.get_created_guides()
                 self.ui.add_hand.setChecked(False)
-
-            for value in self.systems_to_be_made.values():
-                print(value)
+                self.systems_to_be_deleted_polished.append(hand_module.get_hand_grp_to_delete())
 
         cmds.select(clear=1)
 
@@ -220,7 +220,7 @@ class QtSampler(QWidget):
                 print(f"systems_to_be_made: {key}")
                 if rig_type == "FK": #fk
                     fk_joint_list = joints.joint(orientation, master_guide, system="fk")
-                    fk_module = fk.create_fk(fk_joint_list,master_guide,delete_end=False)
+                    fk_module = fk.create_fk(fk_joint_list,master_guide,key["scale"],delete_end=False)
                     fk_ctrls = fk_module.get_ctrls()
                     utils.constraint_from_lists_1to1(fk_joint_list, key["joints"],maintain_offset=1)
                     key.update({"fk_joint_list": fk_joint_list, "fk_ctrl_list": fk_ctrls})
@@ -232,7 +232,7 @@ class QtSampler(QWidget):
                     key.update({"ik_joint_list": ik_joint_list, "ik_ctrl_list": ik_ctrls})
                 elif rig_type == "FKIK": #ikfk
                     fk_joint_list = joints.joint(orientation, master_guide, system="fk")
-                    fk_module = fk.create_fk(fk_joint_list,master_guide,delete_end=False)
+                    fk_module = fk.create_fk(fk_joint_list,master_guide,key["scale"],delete_end=False)
                     fk_ctrls = fk_module.get_ctrls()
                     key.update({"fk_joint_list": fk_joint_list, "fk_ctrl_list": fk_ctrls})
 
@@ -280,6 +280,7 @@ class QtSampler(QWidget):
         for key in self.systems_to_be_made.values():
             cmds.delete(key["master_guide"])
         cmds.delete("grp_connector_clusters")
+        cmds.delete(self.systems_to_be_deleted_polished)
 
     def hide_guides(self):
         for key in self.systems_to_be_made.values():

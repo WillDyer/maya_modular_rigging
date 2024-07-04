@@ -43,6 +43,7 @@ class create_hands():
                     "module": self.module,
                     "master_guide": master_guide,
                     "guide_list": guide_list,
+                    "scale": module.guide_scale,
                     "joints": [],
                     "side": module.side,
                     "connectors": guide_connector_list,
@@ -80,3 +81,6 @@ class create_hands():
 
     def get_created_guides(self):
         return self.created_guides
+    
+    def get_hand_grp_to_delete(self):
+        return self.hand_grp

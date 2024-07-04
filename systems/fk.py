@@ -2,22 +2,24 @@ import maya.cmds as cmds
 from systems.utils import OPM
 
 class create_fk():
-    def __init__(self, joint_list,master_guide,delete_end):
-        self.fk_system(joint_list,master_guide,delete_end)
+    def __init__(self, joint_list,master_guide,scale,delete_end):
+        self.scale = scale
+        self.fk_system(joint_list,delete_end)
         try:
             cmds.group(self.ctrls_fk[-1], n=f"grp_fk_ctrls_{master_guide}",w=1)
             cmds.group(joint_list[0],n=f"grp_fk_jnts_{master_guide}",w=1)
         except IndexError:
             pass
 
-    def fk_system(self, fk_joint_list,master_guide,delete_end):
+    def fk_system(self, fk_joint_list,delete_end):
         #delete_end = False
         self.ctrls_fk = []
         jnt_ctrls_fk = []
         fk_joint_list.reverse()
+        scale = 10 * self.scale
         for i in range(len(fk_joint_list)):
             cmds.circle(n=f"ctrl_fk_{fk_joint_list[i][7:]}",
-                        r=10, nr=(1, 0, 0))
+                        r=scale, nr=(1, 0, 0))
             cmds.matchTransform(f"ctrl_fk_{fk_joint_list[i][7:]}",
                                 fk_joint_list[i])
             if delete_end == True:
