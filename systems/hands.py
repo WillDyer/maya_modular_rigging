@@ -18,7 +18,6 @@ class create_hands():
     def module_hand(self, guide_list):
         self.module = "hand"
         self.to_connect_to = [guide_list]
-        print(f"to_connect_to: {self.to_connect_to}")
         self.offset = [0,0,0]
         #phalanx
 

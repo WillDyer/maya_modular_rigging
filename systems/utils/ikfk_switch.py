@@ -10,6 +10,7 @@ def create_ikfk(rig_joints, fk_ctrls, ik_ctrls,fk_joint_list,ik_joint_list,maste
         cmds.setAttr(f"{x}.{x}_dvdr",l=True)
     
     attr_name = f"{collected_ctrls[-1][8:]}_switch"
+    cmds.addAttr(collected_ctrls, ln="ikfk_switch_name",at="enum",en=attr_name,k=0)
     if "master_" in master_guide:
         master_guide = master_guide.replace("master_","")
     display_name = f"IKFK {master_guide}"

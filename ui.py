@@ -197,8 +197,6 @@ class QtSampler(QWidget):
         cmds.select(cl=1)
 
         self.ui.skeleton_box.setEnabled(False)
-        for system in self.systems_to_be_made.values():
-            print(system)
 
     def edit_blueprint(self):
         path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules")
@@ -217,7 +215,6 @@ class QtSampler(QWidget):
             if key["module"] == "basic_root":
                 pass
             else:
-                print(f"systems_to_be_made: {key}")
                 if rig_type == "FK": #fk
                     fk_joint_list = joints.joint(orientation, master_guide, system="fk")
                     fk_module = fk.create_fk(fk_joint_list,master_guide,key["scale"],delete_end=False)
@@ -249,7 +246,6 @@ class QtSampler(QWidget):
         system_group.grpSetup()
 
         for key in self.systems_to_be_made.values(): # seperate loop to be sure systems are made before connecting
-            print(key["system_to_connect"])
             if key['system_to_connect']:
                 systems_to_connect = key['system_to_connect']
                 connect_modules.connect_polished(systems_to_connect)

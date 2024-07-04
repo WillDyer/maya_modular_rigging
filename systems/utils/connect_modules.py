@@ -70,5 +70,16 @@ def connect_polished(systems_to_connect):
             return [constraint_1, constraint_2]
         elif len(target) == 1:
             constraint_1 = cmds.parentConstraint(p_object, target, mo=1, n=f"pConst_{p_object[0]}")
+            for x in p_object:
+                attr_exists = cmds.attributeQuery('ikfk_switch_name', node=x, exists=True)
+                if attr_exists:
+                    ikfk_switch_name = cmds.getAttr(f"{x}.ikfk_switch_name",asString=1)
+                    try:
+                        reverse_node = cmds.createNode('reverse', n=f"{ikfk_switch_name}_Reverse_#")
+                        cmds.connectAttr(f"{x}.{ikfk_switch_name}",f"{reverse_node}.inputX")
+                        cmds.connectAttr(f"{reverse_node}.outputX",f"{constraint_1[0]}.{x}W0")
+                    except:pass
+                    try: cmds.connectAttr(f"{x}.{ikfk_switch_name}",f"{constraint_1[0]}.{x}W1")
+                    except: pass
             return [constraint_1]
 
