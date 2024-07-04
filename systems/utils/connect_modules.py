@@ -19,15 +19,10 @@ def attach(master_guide, selection):
 
     return [modules_to_connect, connector_list]
 
-def prep_attach_joints(child_joint, parent_joint):
-    child_joint = cmds.listRelatives(child_joint, c=1, typ="transform")[0]
+def prep_attach_joints(child_joint, parent_joint, need_child):
+    if need_child:
+        child_joint = cmds.listRelatives(child_joint, c=1, typ="transform")[0]
 
-    temp_group = [f"jnt_rig_{child_joint}", f"jnt_rig_{parent_joint[0]}"]
-    joints_to_parent.append(temp_group)
-
-    return [child_joint, parent_joint[0]]
-
-def prep_hand_joints(child_joint, parent_joint):
     temp_group = [f"jnt_rig_{child_joint}", f"jnt_rig_{parent_joint[0]}"]
     joints_to_parent.append(temp_group)
 

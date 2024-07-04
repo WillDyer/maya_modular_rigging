@@ -30,7 +30,7 @@ class Guides():
                 master_guide = guide["master_guide"]
                 connector = connect_modules.attach(master_guide, selection)
                 connector_list.append(connector[1])
-                self.system_to_connect = connect_modules.prep_attach_joints(master_guide, selection)
+                self.system_to_connect = connect_modules.prep_attach_joints(master_guide, selection, need_child=True)
                 guide.update({"system_to_connect": self.system_to_connect})
                 return guide
         else:
@@ -45,7 +45,7 @@ class Guides():
             master_guide = guide["master_guide"]
             connector = connect_modules.attach(master_guide, to_connect_to)
             connector_list.append(connector[1])
-            self.system_to_connect = connect_modules.prep_hand_joints(master_guide, to_connect_to)
+            self.system_to_connect = connect_modules.prep_attach_joints(master_guide, to_connect_to, need_child=False)
             guide.update({"system_to_connect": self.system_to_connect})
             return guide
 
