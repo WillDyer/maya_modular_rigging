@@ -35,10 +35,12 @@ class create_ik():
         hdl_ctrl = self.create_handle()
         root_ctrl = self.create_top_hdl_ctrl()
         above_ctrls = self.above_root_ctrl()
+        print(f"above_ctrls: {above_ctrls}")
         if above_ctrls:
-            self.ik_ctrls = [pv_ctrl,hdl_ctrl,above_ctrls[-1], root_ctrl]
+            self.ik_ctrls = [pv_ctrl,hdl_ctrl,above_ctrls[-1]]
         else:
             self.ik_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl]
+        print(f"self.ik_Ctrls: {self.ik_ctrls}")
         OPM.offsetParentMatrix(self.ik_ctrls)
 
     def create_pv(self):
@@ -78,12 +80,18 @@ class create_ik():
                 self.below_root_joints.append(joint)
 
     def above_root_ctrl(self):
-        above_root_control_list = []
         self.to_be_parented = []
         if self.above_root_joints:
             for joint in self.above_root_joints:
                 ctrl_crv_tmp = cmds.circle(n=f"ctrl_ik_{joint[7:]}",r=10,nr=(1, 0, 0))[0]
+                self.to_be_parented.append(ctrl_crv_tmp)
                 cmds.matchTransform(ctrl_crv_tmp,joint)
                 cmds.parentConstraint(ctrl_crv_tmp, joint,mo=1,n=f"pConst_{joint[7:]}")
-                cmds.parent(self.start_ctrl_crv,self.to_be_parented)
-        return above_root_control_list
+            cmds.parent(self.start_ctrl_crv,self.to_be_parented[0])
+            for ctrl in range(len(self.to_be_parented)):
+                if ctrl == 0:
+                    pass
+                else:
+                    try: cmds.parent(self.to_be_parented[ctrl],self.to_be_parented[ctrl+1])
+                    except: pass
+        return self.to_be_parented
