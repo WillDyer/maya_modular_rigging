@@ -11,6 +11,9 @@ class create_hands():
         self.created_guides = created_guides
         self.module_hand(guide_list)
         self.make_guides()
+        self.space_out()
+        cmds.parent(self.hand_master_guides, self.hand_grp)
+        cmds.matchTransform(self.hand_grp,self.to_connect_to)
     
     def module_hand(self, guide_list):
         self.module = "hand"
@@ -21,7 +24,7 @@ class create_hands():
 
     def make_guides(self):
         self.hand_dict = {}
-        hand_master_guides = []
+        self.hand_master_guides = []
         module = importlib.import_module(f"systems.modules.{self.module}")
         importlib.reload(module)
         cmds.select(clear=1)
@@ -52,13 +55,29 @@ class create_hands():
                 }
                 self.systems_to_be_made[master_guide] = temp_dict
                 self.created_guides.append(temp_dict["master_guide"])
-                hand_master_guides.append(temp_dict["master_guide"])
+                self.hand_master_guides.append(temp_dict["master_guide"])
 
-        hand_grp = cmds.group(n=f"grp_{self.module}{module.side}_#",em=1,w=1)
-        cmds.parent(hand_master_guides, hand_grp)
-        cmds.matchTransform(hand_grp,self.to_connect_to)
+        self.hand_grp = cmds.group(n=f"grp_{self.module}{module.side}_#",em=1,w=1)
         return self.systems_to_be_made
     
+    def space_out(self):
+        num_curves = len(self.hand_master_guides)
+        initial_positions = [cmds.xform(curve, query=True, worldSpace=True, translation=True) for curve in self.hand_master_guides]
+
+        centre_pos = cmds.xform(self.to_connect_to, query=True, worldSpace=True, translation=True)
+        centre_z = centre_pos[0]
+
+        # Calculate the spacing between the curves
+        spacing = 1
+        total_width = (num_curves - 1) * spacing  # Adjust 1.0 to your desired spacing
+        start_z = - (total_width / 2.0)
+
+        # Distribute the curves along the X-axis
+        for i, curve in enumerate(self.hand_master_guides):
+            initial_x, initial_y, initial_z = initial_positions[i]
+            new_z = start_z + i * spacing
+            cmds.xform(curve, worldSpace=True, translation=[initial_x, initial_y, new_z])
+
     def get_dict(self):
         return self.systems_to_be_made
 
