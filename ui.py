@@ -79,7 +79,7 @@ class QtSampler(QWidget):
 
     def initUI(self): # this loads the ui
         loader = QUiLoader()
-        UI_VERSION = "02"
+        UI_VERSION = "03"
         UI_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "interface", f"WD_Rig_Builder_{UI_VERSION}.ui")
         file = QFile(UI_FILE)
         file.open(QFile.ReadOnly)
