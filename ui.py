@@ -165,7 +165,7 @@ class QtSampler(QWidget):
             self.systems_to_be_made[master_guide] = temp_dict
 
             if self.ui.add_hand.isChecked():
-                hand_module = hands.create_hands(guide_list[0],self.systems_to_be_made, self.created_guides)
+                hand_module = hands.create_hands(guide_list[0],self.systems_to_be_made, self.created_guides, self.ui.fingers_amount.value())
                 self.systems_to_be_made = hand_module.get_dict()
                 self.created_guides = hand_module.get_created_guides()
                 self.ui.add_hand.setChecked(False)
@@ -243,7 +243,7 @@ class QtSampler(QWidget):
                 else:
                     cmds.error("ERROR: rig_type attribute cannot be found or attribute value cannot be found.")
 
-        system_group.grpSetup()
+        system_group.grpSetup(self.ui.rig_master_name.text())
 
         for key in self.systems_to_be_made.values(): # seperate loop to be sure systems are made before connecting
             if key['system_to_connect']:

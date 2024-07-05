@@ -37,7 +37,7 @@ def sys_attr():
 grp_controls = ['ctrl_root','ctrl_COG','ctrl_root_world']
 
 
-def grpSetup():
+def grpSetup(rig_name):
     selection = cmds.ls(sl=True, typ='joint')
     ABC_FILE = "./imports/curve_import.abc"
     try:
@@ -57,10 +57,10 @@ def grpSetup():
     jntList = ['grp_ik_handles','grp_ik_jnts','grp_fk_jnts','grp_rig_jnts','grp_skn_jnts']
     # ctrlList = ['grp_ctrls_head','grp_ctrls_spine','grp_ctrls_arms','grp_ctrls_legs']
 
-    cmds.group(n='WD_Rig_Master',w=True,em=True)
+    cmds.group(n=rig_name,w=True,em=True)
 
-    cmds.group(n="grp_rig", p="WD_Rig_Master",em=True)
-    cmds.group(n='DO_NOT_TOUCH',p='WD_Rig_Master',em=True)
+    cmds.group(n="grp_rig", p=rig_name,em=True)
+    cmds.group(n='DO_NOT_TOUCH',p=rig_name,em=True)
 
     for x in grpList:
         cmds.group(n=x,p="grp_rig",em=True)

@@ -6,9 +6,10 @@ importlib.reload(create_guides)
 
 
 class create_hands():
-    def __init__(self, guide_list,systems_to_be_made, created_guides):
+    def __init__(self, guide_list,systems_to_be_made, created_guides, finger_amount):
         self.systems_to_be_made = systems_to_be_made
         self.created_guides = created_guides
+        self.finger_amount = finger_amount
         self.module_hand(guide_list)
         self.make_guides()
         self.space_out()
@@ -27,9 +28,8 @@ class create_hands():
         module = importlib.import_module(f"systems.modules.{self.module}")
         importlib.reload(module)
         cmds.select(clear=1)
-        amount = 5
 
-        for x in range(amount):
+        for x in range(int(self.finger_amount)):
             guides = create_guides.Guides(self.module,self.offset,module.side,self.to_connect_to)
             guide = guides.collect_guides()
             if guide:
