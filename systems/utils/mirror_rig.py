@@ -42,11 +42,13 @@ def collect_mirror_data(systems_to_be_made):
             # Create master guide
             split_master_guide = key["master_guide"].split("_")
             master_guide = key["master_guide"].replace(f"_{split_master_guide[-2]}_",simple_side)
-            cmds.spaceLocator(n=master_guide)
-            cmds.matchTransform(master_guide,joint_list[0])
-            cmds.parent(locator_list[-1],master_guide)
+            proxy_obj_list = locator_list
+            if "master" in master_guide:
+                cmds.spaceLocator(n=master_guide)
+                cmds.matchTransform(master_guide,joint_list[0])
+                cmds.parent(locator_list[-1],master_guide)
 
-            proxy_obj_list = locator_list + [master_guide]
+                proxy_obj_list.append(master_guide)
 
             # Copy attrs accross
             for attr in cmds.listAttr(key["master_guide"], r=1,ud=1):

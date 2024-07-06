@@ -9,16 +9,16 @@ importlib.reload(utils)
 scale = 1
 
 class Guides():
-    def __init__(self,accessed_module, offset,side, to_connect_to):
+    def __init__(self,accessed_module, offset,side, to_connect_to,use_existing_attr):
         if accessed_module == "hand":
-            self.create_guide = self.guides_hand(accessed_module,offset,side,to_connect_to)
+            self.create_guide = self.guides_hand(accessed_module,offset,side,to_connect_to,use_existing_attr)
         else:
-            self.create_guide = self.guides(accessed_module,offset,side)
+            self.create_guide = self.guides(accessed_module,offset,side,use_existing_attr)
 
     def collect_guides(self):
         return self.create_guide
 
-    def guides(self,accessed_module, offset,side):
+    def guides(self,accessed_module, offset,side,use_existing_attr):
         connector_list = []
         self.system_to_connect = []
         selection = cmds.ls(sl=1)
@@ -26,7 +26,7 @@ class Guides():
             if "master" in selection[0]:
                 cmds.warning("Cant attach a new module to a master control please select a guide.")
             elif "master" not in selection[0]:
-                guide = self.creation(accessed_module,offset,side,connector_list)
+                guide = self.creation(accessed_module,offset,side,connector_list,use_existing_attr)
                 master_guide = guide["master_guide"]
                 connector = connect_modules.attach(master_guide, selection)
                 connector_list.append(connector[1])
@@ -34,14 +34,14 @@ class Guides():
                 guide.update({"system_to_connect": self.system_to_connect})
                 return guide
         else:
-            guide = self.creation(accessed_module,offset,side,connector_list)
+            guide = self.creation(accessed_module,offset,side,connector_list,use_existing_attr)
             guide.update({"system_to_connect": []})
             return guide
         
-    def guides_hand(self, accessed_module, offset,side, to_connect_to):
+    def guides_hand(self, accessed_module, offset,side, to_connect_to,use_existing_attr):
         connector_list = []
         if accessed_module == "hand":
-            guide = self.creation(accessed_module,offset,side,connector_list)
+            guide = self.creation(accessed_module,offset,side,connector_list,use_existing_attr)
             master_guide = guide["master_guide"]
             connector = connect_modules.attach(master_guide, to_connect_to)
             connector_list.append(connector[1])
@@ -50,7 +50,7 @@ class Guides():
             return guide
 
 
-    def creation(self,accessed_module,offset,side,connector_list):
+    def creation(self,accessed_module,offset,side,connector_list,use_existing_attr):
         module = importlib.import_module(f"systems.modules.{accessed_module}")
         importlib.reload(module)
         ABC_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),"imports","guide_shape.abc")
@@ -127,7 +127,7 @@ class Guides():
             cmds.group(connector_list,n="grp_connector_clusters",w=1)
 
         self.available_rig_types = ":".join(module.available_rig_types)
-        custom_attr = self.add_custom_attr(guide_list, master_guide, module)
+        custom_attr = self.add_custom_attr(guide_list, master_guide, module,use_existing_attr)
         cmds.addAttr(master_guide, ln="is_master",at="enum",en="True",k=0) # adding master group attr
         cmds.addAttr(master_guide, ln="base_module",at="enum",en=accessed_module,k=0) # module attr
         cmds.addAttr(master_guide, ln="module_side",at="enum",en=side,k=0) # module side
@@ -144,7 +144,7 @@ class Guides():
         }
         return ui_dict #[master_guide, connector_list, ui_guide_list]
 
-    def add_custom_attr(self,system, master_guide, module):
+    def add_custom_attr(self,system, master_guide, module,use_existing_attr):
         custom_attrs = {"module_dvdr": ["enum","------------","MODULE",True],
                         "skeleton_dvdr": ["enum","------------", "SKELETON",True],
                         "mirror_jnts": ["enum","Mirror Joints", "No:Yes",False],
@@ -154,8 +154,7 @@ class Guides():
                         "rig_type": ["enum","Rig Type",self.available_rig_types,False],
                         "squash_stretch": ["enum","Squash Stech","No:Yes",False]
                         }
-
-        for i in custom_attrs:
+        def add_new_attr():
             if custom_attrs[i][0] == "enum":
                 cmds.addAttr(master_guide,k=1,ln=f"{system[-1]}_{i}",nn=custom_attrs[i][1],at="enum",en=custom_attrs[i][2])
             elif custom_attrs[i][0] == "float":
@@ -163,5 +162,22 @@ class Guides():
             if custom_attrs[i][3] == True:
                 cmds.setAttr(f"{master_guide}.{system[-1]}_{i}", l=1)
 
-        for item in custom_attrs:
-            cmds.addAttr(system[:-1],ln=f"{system[-1]}_{item}", proxy=f"{system[-1]}.{system[-1]}_{item}")
+        def add_proxy(list,skip_attr,proxy_item,add_missing):
+            if add_missing:
+                for item in skip_attr:
+                    cmds.addAttr(list,ln=f"{list[-1]}_{item}", proxy=f"{proxy_item}.{proxy_item}_{item}")
+            else:
+                for item in custom_attrs:
+                    if item in skip_attr:
+                        pass
+                    else:
+                        cmds.addAttr(list,ln=f"{list[-1]}_{item}", proxy=f"{proxy_item}.{proxy_item}_{item}")
+
+        if use_existing_attr:
+            skip_attr = ["rig_type"]
+            add_proxy(system,skip_attr,proxy_item=use_existing_attr[0],add_missing=False)
+            for i in skip_attr: add_new_attr()
+            add_proxy(system[:-1],skip_attr,proxy_item=system[-1],add_missing=True)
+        else:
+            for i in custom_attrs: add_new_attr()
+            add_proxy(system[:-1],skip_attr=[],proxy_item=system[-1],add_missing=False)

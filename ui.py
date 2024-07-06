@@ -133,7 +133,7 @@ class QtSampler(QWidget):
         ]
 
 
-        guides = create_guides.Guides(module,offset,module_path.side,to_connect_to=[])
+        guides = create_guides.Guides(module,offset,module_path.side,to_connect_to=[],use_existing_attr=[])
         guide = guides.collect_guides()
         if guide:
             master_guide = guide["master_guide"]
@@ -187,10 +187,11 @@ class QtSampler(QWidget):
         for dict in self.systems_to_be_made.values():
             dict["joints"] = jnt_list[num]
             num = num+1
-        connect_modules.attach_joints()
+        #connect_modules.attach_joints()
         self.ui.polish_rig.setEnabled(True)
 
         mirror = mirror_rig.collect_mirror_data(self.systems_to_be_made)
+        connect_modules.attach_joints()
 
         self.systems_to_be_made = mirror
         self.hide_guides()

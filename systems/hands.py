@@ -30,7 +30,9 @@ class create_hands():
         cmds.select(clear=1)
 
         for x in range(int(self.finger_amount)):
-            guides = create_guides.Guides(self.module,self.offset,module.side,self.to_connect_to)
+            use_existing_attr = [cmds.getAttr(f"{self.to_connect_to[0]}.master_guide",asString=1)]
+            print(f"user_existing_attr: {use_existing_attr}")
+            guides = create_guides.Guides(self.module,self.offset,module.side,self.to_connect_to,use_existing_attr)
             guide = guides.collect_guides()
             if guide:
                 master_guide = guide["master_guide"]
