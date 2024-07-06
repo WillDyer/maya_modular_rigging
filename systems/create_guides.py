@@ -165,13 +165,13 @@ class Guides():
         def add_proxy(list,skip_attr,proxy_item,add_missing):
             if add_missing:
                 for item in skip_attr:
-                    cmds.addAttr(list,ln=f"{list[-1]}_{item}", proxy=f"{proxy_item}.{proxy_item}_{item}")
+                    cmds.addAttr(list,ln=f"{master_guide}_{item}", proxy=f"{proxy_item}.{proxy_item}_{item}")
             else:
                 for item in custom_attrs:
                     if item in skip_attr:
                         pass
                     else:
-                        cmds.addAttr(list,ln=f"{list[-1]}_{item}", proxy=f"{proxy_item}.{proxy_item}_{item}")
+                        cmds.addAttr(list,ln=f"{master_guide}_{item}", proxy=f"{proxy_item}.{proxy_item}_{item}")
 
         if use_existing_attr:
             skip_attr = ["rig_type"]
