@@ -191,9 +191,9 @@ class QtSampler(QWidget):
         self.ui.polish_rig.setEnabled(True)
 
         mirror = mirror_rig.collect_mirror_data(self.systems_to_be_made)
-        connect_modules.attach_joints()
-
         self.systems_to_be_made = mirror
+        connect_modules.attach_joints(self.systems_to_be_made)
+
         self.hide_guides()
         cmds.select(cl=1)
 

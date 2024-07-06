@@ -28,9 +28,10 @@ def prep_attach_joints(child_joint, parent_joint, need_child):
 
     return [child_joint, parent_joint[0]]
 
-def attach_joints():
-    for x in joints_to_parent:
-        cmds.parent(x[0],x[1])
+def attach_joints(systems_to_be_made):
+    to_parent = [key["system_to_connect"] for key in systems_to_be_made.values() if key["system_to_connect"]]
+    for x in to_parent:
+        cmds.parent(f"jnt_rig_{x[0]}",f"jnt_rig_{x[1]}")
 
 def connect_to_ikfk_switch(p_object, constraint):
     for x in p_object:
