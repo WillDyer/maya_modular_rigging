@@ -46,7 +46,7 @@ mayaMainWindowPtr = omui.MQtUtil.mainWindow()
 mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QWidget)
 
 class QtSampler(QWidget):
-    def __init__(self, *args, **kwargs): # __init__ is always the first thing to run when a class is made
+    def __init__(self, *args, **kwargs):
         super(QtSampler,self).__init__(*args, **kwargs)
         self.setParent(mayaMainWindow)
         self.setWindowFlags(Qt.Window)
@@ -77,8 +77,7 @@ class QtSampler(QWidget):
         self.ui.colour_middle.clicked.connect(lambda: self.colour_button(button="colour_middle"))
         self.ui.colour_right.clicked.connect(lambda: self.colour_button(button="colour_right"))
 
-    def initUI(self): # this loads the ui
-        loader = QUiLoader()
+    def initUI(self):
         UI_VERSION = "03"
         UI_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "interface", f"WD_Rig_Builder_{UI_VERSION}.ui")
         file = QFile(UI_FILE)
@@ -187,7 +186,6 @@ class QtSampler(QWidget):
         for dict in self.systems_to_be_made.values():
             dict["joints"] = jnt_list[num]
             num = num+1
-        #connect_modules.attach_joints()
         self.ui.polish_rig.setEnabled(True)
 
         mirror = mirror_rig.collect_mirror_data(self.systems_to_be_made)
@@ -216,19 +214,19 @@ class QtSampler(QWidget):
             if key["module"] == "basic_root":
                 pass
             else:
-                if rig_type == "FK": #fk
+                if rig_type == "FK":
                     fk_joint_list = joints.joint(orientation, master_guide, system="fk")
                     fk_module = fk.create_fk(fk_joint_list,master_guide,key["scale"],delete_end=False)
                     fk_ctrls = fk_module.get_ctrls()
                     utils.constraint_from_lists_1to1(fk_joint_list, key["joints"],maintain_offset=1)
                     key.update({"fk_joint_list": fk_joint_list, "fk_ctrl_list": fk_ctrls})
-                elif rig_type == "IK": #ik
+                elif rig_type == "IK":
                     ik_joint_list = joints.joint(orientation, master_guide, system="ik")
                     ik_module = ik.create_ik(ik_joint_list,master_guide,module.ik_joints)
                     ik_ctrls = ik_module.get_ctrls()
                     utils.constraint_from_lists_1to1(ik_joint_list, key["joints"],maintain_offset=1)
                     key.update({"ik_joint_list": ik_joint_list, "ik_ctrl_list": ik_ctrls})
-                elif rig_type == "FKIK": #ikfk
+                elif rig_type == "FKIK":
                     fk_joint_list = joints.joint(orientation, master_guide, system="fk")
                     fk_module = fk.create_fk(fk_joint_list,master_guide,key["scale"],delete_end=False)
                     fk_ctrls = fk_module.get_ctrls()
@@ -265,7 +263,6 @@ class QtSampler(QWidget):
             button_colour = palette.color(button_name.backgroundRole())
             button_rgb = button_colour.getRgb()
             button_colour_dict[x] = list(button_rgb)
-            #print(f"button colour {button_rgb}")
         button_colour_dict.update({"root": [0,255,0]})
 
         ctrl_list = cmds.ls("ctrl_*",type="transform")
