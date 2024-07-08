@@ -101,11 +101,14 @@ def grpSetup(rig_name):
         except RuntimeError:
             pass
     
-    root_jnt = [item for item in cmds.ls("jnt_rig*") if "root" in item]
-    if len(root_jnt) > 1:
-        cmds.error("ERROR: More than one root object found please rename")
-    else:
-        cmds.parent(root_jnt, "grp_rig_jnts")
+    root_jnt = next(item for item in cmds.ls("jnt_rig_*") if "root" in item)
+    cog_jnt = next(item for item in cmds.ls("jnt_rig_*") if "COG" in item)
+
+    cmds.parent(root_jnt, "grp_rig_jnts")
+
+    cmds.parentConstraint("ctrl_root",root_jnt,mo=1)
+    cmds.parentConstraint("ctrl_COG",cog_jnt,mo=1)
+
 
     #except RuntimeError:
     #    cmds.error("Groups exists already that matches name, grps might be missing in file structure")"""
