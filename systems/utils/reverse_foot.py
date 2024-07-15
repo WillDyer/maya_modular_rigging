@@ -247,3 +247,9 @@ class CreateReverseFoot():
         if cmds.listRelatives(self.system["ik_handle"],c=1, type="parentConstraint"):
             cmds.delete(cmds.listRelatives(self.system["ik_handle"],c=1, type="parentConstraint"))
             cmds.parentConstraint(f"jnt{self.reverse_foot_data['loc_ankle'][3:]}",self.system["ik_handle"][0],mo=1,n=f"pConst_{self.system['ik_handle'][0]}")
+
+        cmds.parent(self.reverse_foot_data["loc_heel"],f"grp_ik_ctrls_{self.system['master_guide']}")
+        cmds.setAttr(f"{self.reverse_foot_data['loc_heel']}.overrideEnabled",1)
+
+    def collect_rev_foot(self):
+        return self.reverse_foot_data["loc_heel"]
