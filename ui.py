@@ -1,6 +1,5 @@
 import maya.cmds as cmds
 from maya import OpenMayaUI as omui
-import importlib
 
 from PySide2.QtCore import *
 from PySide2.QtGui import *
@@ -8,9 +7,11 @@ from PySide2.QtWidgets import QWidget
 from PySide2.QtWidgets import *
 from PySide2.QtUiTools import *
 from shiboken2 import wrapInstance
+import importlib
 import os.path
 import sys
 import subprocess
+import platform
 
 from systems import (
     joints,
@@ -110,10 +111,8 @@ class QtSampler(QWidget):
 
     def update_dropdown(self):
         files = [".".join(f.split(".")[:-1]) for f in os.listdir(os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules"))]
-        try:
-            files.remove("")
-        except ValueError:
-            pass
+        try: files.remove("")
+        except ValueError: pass
         files.remove("__init__")
         files.remove("hand")
         self.ui.available_modules.addItems(files)
@@ -200,7 +199,11 @@ class QtSampler(QWidget):
 
     def edit_blueprint(self):
         path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules")
-        subprocess.Popen(f'explorer "{path}"')
+        if platform.system() == "Windows": 
+            subprocess.Popen(f'explorer "{path}"')
+        elif platform.system() == "Linux": 
+            subprocess.Popen(['xdg-open', path])
+        else: cmds.warning(f"OS not found or supported by this tool please use the following: Windows, Linux. Your current OS: {platform.system()}")
 
     def polish_rig(self):
         
@@ -212,8 +215,7 @@ class QtSampler(QWidget):
             sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules"))
             module = importlib.import_module(key["module"])
             importlib.reload(module)
-            if key["module"] == "basic_root":
-                pass
+            if key["module"] == "basic_root": pass
             else:
                 if rig_type == "FK":
                     fk_joint_list = joints.joint(orientation, master_guide, system="fk")
