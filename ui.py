@@ -27,7 +27,8 @@ from systems.utils import (
     mirror_rig,
     ikfk_switch,
     system_group,
-    space_swap
+    space_swap,
+    reverse_foot
 )
 
 # debug
@@ -42,6 +43,7 @@ importlib.reload(ikfk_switch)
 importlib.reload(system_group)
 importlib.reload(space_swap)
 importlib.reload(hands)
+importlib.reload(reverse_foot)
 
 mayaMainWindowPtr = omui.MQtUtil.mainWindow()
 mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QWidget)
@@ -60,6 +62,7 @@ class QtSampler(QWidget):
         self.module_created = 0
         self.created_guides = []
         self.systems_to_be_made = {}
+        self.systems_rev_foot = {}
         self.systems_to_be_deleted_polished = []
 
         #page 1
@@ -139,6 +142,8 @@ class QtSampler(QWidget):
             guide_connector_list = guide["connector_list"]
             system_to_connect = guide["system_to_connect"]
             guide_list = guide["ui_guide_list"]
+            if "rev_locators" in guide: rev_locators = guide["rev_locators"]
+            else: rev_locators = []
             self.created_guides.append(master_guide)
             self.ui.skeleton_box.setEnabled(True)
 
@@ -159,7 +164,8 @@ class QtSampler(QWidget):
                 "ik_ctrl_list": [],
                 "fk_ctrl_list": [],
                 "ik_joint_list": [],
-                "fk_joint_list": []
+                "fk_joint_list": [],
+                "rev_locators": rev_locators
             }
             self.systems_to_be_made[master_guide] = temp_dict
 
@@ -244,6 +250,10 @@ class QtSampler(QWidget):
                     ikfk_switch.create_ikfk(key["joints"], fk_ctrls, ik_ctrls,ik_joint_list,fk_joint_list,master_guide)
                 else:
                     cmds.error("ERROR: rig_type attribute cannot be found or attribute value cannot be found.")
+                if rig_type == "IK" or "FKIK":
+                    if key == "rev_locators":
+                        reverse_foot.CreateReverseFoot(key["module"],key)
+                else: print(f"Didnt find rev_locators in key not making reverse foot for: {key}")
 
         system_group.grpSetup(self.ui.rig_master_name.text())
 

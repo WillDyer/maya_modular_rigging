@@ -19,8 +19,8 @@ class Guides():
             self.create_guide = self.guides(accessed_module,offset,side,use_existing_attr)
         try: 
             self.module.reverse_foot
-            reverse_foot.CreateReverseFoot(self.create_guide, accessed_module).create_loc()
-            print("rev foot existssss")
+            rev_loc_list = reverse_foot.CreateReverseLocators(self.create_guide, accessed_module)
+            self.create_guide.update({"rev_locators": rev_loc_list})
         except AttributeError: pass
 
     def collect_guides(self):

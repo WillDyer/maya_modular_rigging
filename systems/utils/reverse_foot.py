@@ -2,16 +2,12 @@ import maya.cmds as cmds
 from maya import OpenMayaUI as omui
 import importlib
 
-class CreateReverseFoot():
+class CreateReverseLocators():
     def __init__(self, guides,accessed_module):
-        self.attr_list = ["Rev_Foot_Dvdr","Roll","Bank","Heel_Twist","Toe_Twist"]
-        print(f"GUIDES: {guides}")
         self.guides = guides
         self.module = importlib.import_module(f"systems.modules.{accessed_module}")
         importlib.reload(self.module)
-
-        # self.ui.create_locators.clicked.connect(self.create_loc)
-        # self.ui.make_rev_foot.clicked.connect(self.create_system)
+        self.create_loc()
 
     def side(self):
         mirroring = False # tmp
@@ -25,7 +21,7 @@ class CreateReverseFoot():
         print("create loc ran")
         side = self.side()
         rev_locators = self.module.rev_locators
-        jnt_prefix = self.module.rev_locators["prefix"]
+        loc_prefix = "loc_rev"
 
         if f"loc_{rev_locators['ankle']}{side}" in cmds.ls(f"loc_{rev_locators['ankle']}{side}"):
             cmds.error("ERROR: Item with the same name already exists.")
@@ -45,7 +41,7 @@ class CreateReverseFoot():
         bank_out = f"loc_{rev_locators['bank_out']}{side}"
         for x in [bank_in,bank_out]:
             cmds.spaceLocator(n=x)
-            cmds.matchTransform(x, f"loc_rev_{rev_locators['ball']}{side}")
+            cmds.matchTransform(x, f"{loc_prefix}_{rev_locators['ball']}{side}")
         offset = 10
         if bank_out[-2:] and bank_in[-2:] == "_l":
             cmds.move(offset,0,0,bank_out,r=1)
@@ -56,15 +52,42 @@ class CreateReverseFoot():
         else:
             cmds.error("No matching side suffex")
 
-
-        cmds.spaceLocator(n=f"loc_{rev_locators['heel']}{side}")
-        cmds.matchTransform(f"loc_{rev_locators['heel']}{side}",f"loc_rev_{rev_locators['ball']}{side}")
+        loc_heel = cmds.spaceLocator(n=f"loc_{rev_locators['heel']}{side}")[0]
+        cmds.matchTransform(f"loc_{rev_locators['heel']}{side}",f"{loc_prefix}_{rev_locators['ball']}{side}")
         cmds.move(0,0,-offset,f"loc_{rev_locators['heel']}{side}",r=1)
+
+        loc_list = [loc_heel,f"{loc_prefix}_{rev_locators['toe']}{side}",f"{loc_prefix}_{rev_locators['ball']}{side}",f"{loc_prefix}_{rev_locators['ankle']}{side}",bank_in, bank_out]
+        return loc_list
+
+class CreateReverseFoot():
+    def __init__(self, accessed_module, system):
+        self.attr_list = ["Rev_Foot_Dvdr","Roll","Bank","Heel_Twist","Toe_Twist"]
+        self.module = importlib.import_module(f"systems.modules.{accessed_module}")
+        importlib.reload(self.module)
+        self.system = system
+        self.reverse_foot_data = {
+            "loc_heel": self.system["rev_locators"][0],
+            "loc_toe": self.system["rev_locators"][1],
+            "loc_ball": self.system["rev_locators"][2],
+            "loc_ankle": self.system["rev_locators"][3],
+            "bank_in": self.system["rev_locators"][4],
+            "bank_out": self.system["rev_locators"][5],
+        }
+
+        self.create_system()
+
+    def side(self):
+        mirroring = False # tmp
+        if mirroring == True:
+            # side = self.system_to_be_made.side
+            pass
+        else: side = self.module.side
+        return side
     
     def create_rev_jnts(self):
         side = self.side()
-        jnt_list = [f"{self.ui.rev_heel.text()}{side}",f"{self.ui.rev_toe.text()}{side}",f"{self.ui.rev_ball.text()}{side}",f"{self.ui.rev_ankle.text()}{side}"]
-        loc_list = [f"loc{self.ui.rev_heel.text()[3:]}{side}",f"loc{self.ui.rev_toe.text()[3:]}{side}",f"loc{self.ui.rev_ball.text()[3:]}{side}",f"loc{self.ui.rev_ankle.text()[3:]}{side}"]
+        jnt_list = [f"jnt{self.reverse_foot_data['loc_heel'][3:]}",f"jnt{self.reverse_foot_data['loc_toe'][3:]}",f"jnt{self.reverse_foot_data['loc_ball'][3:]}",f"jnt{self.reverse_foot_data['loc_ankle'][3:]}"]
+        loc_list = [self.reverse_foot_data["loc_heel"],self.reverse_foot_data["loc_toe"],self.reverse_foot_data["loc_ball"],self.reverse_foot_data["loc_ankle"]]
 
         cmds.select(cl=1)
         for jnt in range(len(loc_list)):
@@ -79,8 +102,6 @@ class CreateReverseFoot():
         return jnt_list
 
     def foot_attr(self):
-        #attr_list = ["Rev_Foot_Dvdr","Roll","Bank","Heel_Twist","Toe_Twist"]
-
         foot_ctrl = self.ui.foot_ctrl.text()
         if foot_ctrl in cmds.ls(foot_ctrl): # checking for ctrl
             pass
@@ -109,77 +130,76 @@ class CreateReverseFoot():
             cmds.setAttr(f"{name}.colorIfFalse{x}",0)
 
     def create_nodes(self, foot_ctrl):
-        #attr_list = ["Rev_Foot_Dvdr","Roll","Bank","Heel_Twist","Toe_Twist"]
         side = self.side()
-        bank_in = self.ui.rev_bank_in.text()
-        bank_out = self.ui.rev_bank_out.text()
+        bank_in = self.reverse_foot_data["bank_in"]
+        bank_out = self.reverse_foot_data["bank_out"]
 
         # BANK IN OUT
-        self.create_condition_node(f"cond{self.ui.rev_bank_in.text()[3:]}{side}")
-        self.create_condition_node(f"cond{self.ui.rev_bank_out.text()[3:]}{side}")
+        self.create_condition_node(f"cond_{bank_in}")
+        self.create_condition_node(f"cond_{bank_out}")
         for x in [bank_in,bank_out]:
-            cmds.connectAttr(f"{foot_ctrl}.{self.attr_list[2]}",f"cond{x[3:]}{side}.firstTerm")
-            cmds.connectAttr(f"{foot_ctrl}.{self.attr_list[2]}",f"cond{x[3:]}{side}.colorIfTrueR")
+            cmds.connectAttr(f"{foot_ctrl}.{self.attr_list[2]}",f"cond{x}.firstTerm")
+            cmds.connectAttr(f"{foot_ctrl}.{self.attr_list[2]}",f"cond{x}.colorIfTrueR")
 
-            cmds.shadingNode("floatMath",au=1,n=f"math{x[3:]}{side}")
+            cmds.shadingNode("floatMath",au=1,n=f"math{x}")
 
-            cmds.connectAttr(f"cond{x[3:]}{side}.outColorR",f"math{x[3:]}{side}.floatA")
-            cmds.connectAttr(f"math{x[3:]}{side}.outFloat",f"loc{x[3:]}{side}.rotateX")
+            cmds.connectAttr(f"cond{x}.outColorR",f"math{x}.floatA")
+            cmds.connectAttr(f"math{x}.outFloat",f"loc{x}.rotateX")
 
-            cmds.setAttr(f"math{x[3:]}{side}.operation",2)
-            cmds.setAttr(f"math{x[3:]}{side}.floatB",2.5)
+            cmds.setAttr(f"math{x}.operation",2)
+            cmds.setAttr(f"math{x}.floatB",2.5)
 
-        cmds.setAttr(f"cond{self.ui.rev_bank_in.text()[3:]}{side}.operation",2)
-        cmds.setAttr(f"cond{self.ui.rev_bank_out.text()[3:]}{side}.operation",4)
+        cmds.setAttr(f"cond{bank_in}.operation",2)
+        cmds.setAttr(f"cond{bank_out}.operation",4)
 
         # HEEL & TOE TWIST
-        heel_jnt = self.ui.rev_heel.text()
-        toe_jnt = self.ui.rev_toe.text()
+        heel_jnt = f"jnt_{self.reverse_foot_data['loc_heel'][3:]}"
+        toe_jnt = f"jnt_{self.reverse_foot_data['loc_toe'][3:]}"
         for x in [heel_jnt, toe_jnt]:
-            cmds.shadingNode("floatMath",au=1,n=f"math{x[3:]}{side}")
+            cmds.shadingNode("floatMath",au=1,n=f"math{x}")
 
-            cmds.connectAttr(f"math{x[3:]}{side}.outFloat",f"{x}{side}.rotateZ")
+            cmds.connectAttr(f"math_{x}.outFloat",f"{x}.rotateZ")
 
-            cmds.setAttr(f"math{x[3:]}{side}.operation",2)
-            cmds.setAttr(f"math{x[3:]}{side}.floatB",2.5)
+            cmds.setAttr(f"math_{x}.operation",2)
+            cmds.setAttr(f"math_{x}.floatB",2.5)
         
-        cmds.connectAttr(f"{foot_ctrl}.{self.attr_list[3]}",f"math{heel_jnt[3:]}{side}.floatA")
-        cmds.connectAttr(f"{foot_ctrl}.{self.attr_list[4]}",f"math{toe_jnt[3:]}{side}.floatA")
+        cmds.connectAttr(f"{foot_ctrl}.{self.attr_list[3]}",f"math_{heel_jnt}.floatA")
+        cmds.connectAttr(f"{foot_ctrl}.{self.attr_list[4]}",f"math_{toe_jnt}.floatA")
 
         # ROLL
         ball_jnt = self.ui.rev_ball.text()
-        self.create_condition_node(f"cond{ball_jnt[3:]}{side}")
-        cmds.shadingNode("floatMath",au=1,n=f"math_roll{toe_jnt[3:]}{side}")
-        cmds.shadingNode("floatMath",au=1,n=f"math_zeroed{ball_jnt[3:]}{side}")
-        cmds.shadingNode("floatMath",au=1,n=f"math_reversed{ball_jnt[3:]}{side}")
+        self.create_condition_node(f"cond_{ball_jnt}")
+        cmds.shadingNode("floatMath",au=1,n=f"math_roll_{toe_jnt}")
+        cmds.shadingNode("floatMath",au=1,n=f"math_zeroed_{ball_jnt}")
+        cmds.shadingNode("floatMath",au=1,n=f"math_reversed_{ball_jnt}")
 
-        cmds.connectAttr(f"math_zeroed{ball_jnt[3:]}{side}.outFloat",f"cond{ball_jnt[3:]}{side}.colorIfTrueR")
-        cmds.connectAttr(f"{foot_ctrl}.{self.attr_list[1]}",f"cond{ball_jnt[3:]}{side}.firstTerm")
-        cmds.connectAttr(f"cond{ball_jnt[3:]}{side}.outColorR",f"math_reversed{ball_jnt[3:]}{side}.floatA")
+        cmds.connectAttr(f"math_zeroed_{ball_jnt}.outFloat",f"cond_{ball_jnt}.colorIfTrueR")
+        cmds.connectAttr(f"{foot_ctrl}.{self.attr_list[1]}",f"cond_{ball_jnt}.firstTerm")
+        cmds.connectAttr(f"cond_{ball_jnt}.outColorR",f"math_reversed_{ball_jnt}.floatA")
 
-        cmds.connectAttr(f"math_roll{toe_jnt[3:]}{side}.outFloat",f"{toe_jnt}{side}.rotateY")
-        cmds.connectAttr(f"math_reversed{ball_jnt[3:]}{side}.outFloat",f"{ball_jnt}{side}.rotateY")
+        cmds.connectAttr(f"math_roll_{toe_jnt}.outFloat",f"{toe_jnt}.rotateY")
+        cmds.connectAttr(f"math_reversed_{ball_jnt}.outFloat",f"{ball_jnt}.rotateY")
 
-        cmds.setAttr(f"math_roll{toe_jnt[3:]}{side}.operation",2)
-        cmds.setAttr(f"math_roll{toe_jnt[3:]}{side}.floatB",4.5)
-        cmds.setAttr(f"math_zeroed{ball_jnt[3:]}{side}.operation",1)
-        cmds.setAttr(f"math_zeroed{ball_jnt[3:]}{side}.floatB",10)
-        cmds.setAttr(f"math_reversed{ball_jnt[3:]}{side}.operation",2)
-        cmds.setAttr(f"math_reversed{ball_jnt[3:]}{side}.floatB",-2.5)
-        cmds.setAttr(f"cond{ball_jnt[3:]}{side}.operation",3)
-        cmds.setAttr(f"cond{ball_jnt[3:]}{side}.secondTerm",10)
+        cmds.setAttr(f"math_roll_{toe_jnt}.operation",2)
+        cmds.setAttr(f"math_roll_{toe_jnt}.floatB",4.5)
+        cmds.setAttr(f"math_zeroed_{ball_jnt}.operation",1)
+        cmds.setAttr(f"math_zeroed_{ball_jnt}.floatB",10)
+        cmds.setAttr(f"math_reversed_{ball_jnt}.operation",2)
+        cmds.setAttr(f"math_reversed_{ball_jnt}.floatB",-2.5)
+        cmds.setAttr(f"cond_{ball_jnt}.operation",3)
+        cmds.setAttr(f"cond_{ball_jnt}.secondTerm",10)
         
-        cmds.connectAttr(f"{foot_ctrl}.{self.attr_list[1]}",f"math_roll{toe_jnt[3:]}{side}.floatA")
-        cmds.connectAttr(f"{foot_ctrl}.{self.attr_list[1]}",f"math_zeroed{ball_jnt[3:]}{side}.floatA")
+        cmds.connectAttr(f"{foot_ctrl}.{self.attr_list[1]}",f"math_roll_{toe_jnt}.floatA")
+        cmds.connectAttr(f"{foot_ctrl}.{self.attr_list[1]}",f"math_zeroed_{ball_jnt}.floatA")
 
     def create_system(self):
         side = self.side()
-        parent_order = [f"{self.ui.rev_heel.text()}{side}",f"{self.ui.rev_toe.text()}{side}",f"loc{self.ui.rev_bank_in.text()[3:]}{side}",f"loc{self.ui.rev_bank_out.text()[3:]}{side}",f"{self.ui.rev_ball.text()}{side}",f"{self.ui.rev_ankle.text()}{side}"]
+        parent_order = [self.reverse_foot_data["loc_heel"],self.reverse_foot_data["loc_toe"],self.reverse_foot_data["bank_in"],self.reverse_foot_data["bank_out"],self.reverse_foot_data["loc_ball"],self.reverse_foot_data["loc_ankle"]]
         parent_order.reverse()
 
         for loc in range(len(parent_order)):
             try:
-                cmds.parent(f"loc{parent_order[loc][3:]}",f"loc{parent_order[loc+1][3:]}")
+                cmds.parent(parent_order[loc],parent_order[loc+1])
             except:
                 pass
 
@@ -193,11 +213,7 @@ class CreateReverseFoot():
         cmds.ikHandle(n=f"hdl_rev_toe{side}",sj=jnt_list[1],ee=jnt_list[2],sol="ikSCsolver")
         cmds.parent(f"hdl_rev_toe{side}",rev_list[1])
 
-        cmds.parent(rev_list[0],f"loc{self.ui.rev_ankle.text()[3:]}{side}")
+        cmds.parent(rev_list[0],self.reverse_foot_data["loc_ankle"])
 
-        if self.ui.constraint_ankle_2_rev_jnt.isChecked() == True:
-            cmds.parentConstraint(f"{self.ui.rev_ankle.text()}{side}",f"{self.ui.ankle_jnt.text()}{side}",n=f"pConst_{self.ui.foot_ctrl.text()}",mo=1)
-        if self.ui.loc_2_rev_jnt.isChecked() == True:
-            cmds.parent(f"{self.ui.ankle_hdl_jnt.text()}{side}",rev_list[3])
-
-
+        cmds.parentConstraint(f"{self.ui.rev_ankle.text()}{side}",f"{self.ui.ankle_jnt.text()}{side}",n=f"pConst_{self.ui.foot_ctrl.text()}",mo=1)
+        cmds.parent(f"{self.ui.ankle_hdl_jnt.text()}{side}",rev_list[3])
