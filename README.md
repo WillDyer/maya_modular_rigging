@@ -19,3 +19,19 @@ from maya_modular_rigging import main
 
 main.run_ui()
 ```
+### New Module Setup & Parameters
+```python
+system = ["joint_1","joint_2","joint_3"]
+system_pos = {"joint_1": [X, Y, Z],"joint_2": [X, Y, Z],"joint_3": [X, Y, Z]}
+system_rot = {"joint_1": [X, Y, Z],"joint_2": [X, Y, Z],"joint_3": [X, Y, Z]}
+ik_joints = {
+    "start_joint": "joint_1",
+    "end_joint": "joint_2",
+    "pv_joint": "joint_3",
+    "world_orientation": False
+}
+side = "_l"
+space_swapping = ["joint_1","root","COG","Custom"]
+guide_scale = 1
+available_rig_types = ["FK","IK","FKIK"]
+```
