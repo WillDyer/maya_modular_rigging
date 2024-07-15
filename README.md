@@ -20,6 +20,8 @@ from maya_modular_rigging import main
 main.run_ui()
 ```
 ### New Module Setup & Parameters
+
+#### Example Usage:
 ```python
 system = ["joint_1","joint_2","joint_3"]
 system_pos = {"joint_1": [X, Y, Z],"joint_2": [X, Y, Z],"joint_3": [X, Y, Z]}
@@ -34,4 +36,14 @@ side = "_l"
 space_swapping = ["joint_1","root","COG","Custom"]
 guide_scale = 1
 available_rig_types = ["FK","IK","FKIK"]
+reverse_foot = True
+rev_locators = {
+    "foot_ctrl": system[2],
+    "ankle": system[2],
+    "ball": system[3],
+    "toe": system[4],
+    "heel": "heel",
+    "bank_in": "bank_in",
+    "bank_out": "bank_out",
+}
 ```
