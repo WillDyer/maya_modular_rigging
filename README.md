@@ -7,14 +7,14 @@
 
 A assortment of tools I've integrated into a modular auto limb/rigging tool to speed up my workflow
 > [!NOTE]
-> Many of the tools are made for my own hardware, in this repository I've tried my best to make the code work on any machine however there might be some cases where you might have to edit the code slightly.
+> Many of the tools are made for my own hardware, in this repository I've tried my best to make the code work on any machine however there might be some cases where you might have to edit the code slightly.<br>
 > This tool is also still in WIP and in some instances won't work due to me changing things, if you have any questions if you do use it feel free to reach out to me.
 
 ### Running The Tool
 
 > [!WARNING]
-> All tools are designed to be either run through the Maya script editor or a shelf tool and can be ran with a similar code to the below.
-> See each individual sub-folder for the specific run code.
+> All tools are designed to be either run through the Maya script editor or a shelf tool and can be ran with a similar code to the below.<br>
+> See each individual sub-folder for the specific run code.<br>
 > NOTE: As I have switched to linux recently you might need to check the pathing if you are running a windows based machine.
 
 ```python
