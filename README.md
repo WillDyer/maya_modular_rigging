@@ -21,6 +21,9 @@ main.run_ui()
 ```
 ### New Module Setup & Parameters
 
+> [!IMPORTANT]
+> New Modules must be placed within their own .py file within [~/systems/modules](https://github.com/WillDyer/maya_modular_rigging/tree/main/systems/modules)
+
 #### system: a list of the joint names used in module.
 
 ```python
