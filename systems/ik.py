@@ -50,7 +50,7 @@ class create_ik():
 
     def create_handle(self):
         ctrl_crv = utils.create_cube(f"ctrl_ik_{self.end_joint[7:]}",scale=[5,5,5])
-        cmds.ikHandle(n=f"hdl_ik_{self.end_joint[7:]}", solver="ikRPsolver", sj=self.start_joint, ee=self.end_joint)
+        self.handle = cmds.ikHandle(n=f"hdl_ik_{self.end_joint[7:]}", solver="ikRPsolver", sj=self.start_joint, ee=self.end_joint)
         cmds.poleVectorConstraint(f"ctrl_pv_{self.pv_joint[7:]}", f"hdl_ik_{self.end_joint[7:]}", n=f"pvConst_{self.pv_joint[7:]}")
         if self.validation_joints["world_orientation"] == True:
             cmds.matchTransform(ctrl_crv, f"hdl_ik_{self.end_joint[7:]}")
@@ -68,6 +68,9 @@ class create_ik():
     
     def get_ctrls(self):
         return self.ik_ctrls
+    
+    def get_ik_hdl(self):
+        return self.handle
     
     def collect_other_controls(self, ik_joint_list):
         start_index = ik_joint_list.index(self.start_joint)
