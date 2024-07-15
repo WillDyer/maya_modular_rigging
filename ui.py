@@ -233,8 +233,9 @@ class QtSampler(QWidget):
                     ik_joint_list = joints.joint(orientation, master_guide, system="ik")
                     ik_module = ik.create_ik(ik_joint_list,master_guide,module.ik_joints)
                     ik_ctrls = ik_module.get_ctrls()
+                    ik_handle = ik_module.get_ik_hdl()
                     utils.constraint_from_lists_1to1(ik_joint_list, key["joints"],maintain_offset=1)
-                    key.update({"ik_joint_list": ik_joint_list, "ik_ctrl_list": ik_ctrls})
+                    key.update({"ik_joint_list": ik_joint_list, "ik_ctrl_list": ik_ctrls, "ik_handle": ik_handle})
                 elif rig_type == "FKIK":
                     fk_joint_list = joints.joint(orientation, master_guide, system="fk")
                     fk_module = fk.create_fk(fk_joint_list,master_guide,key["scale"],delete_end=False)
@@ -244,16 +245,17 @@ class QtSampler(QWidget):
                     ik_joint_list = joints.joint(orientation, master_guide, system="ik")
                     ik_module = ik.create_ik(ik_joint_list,master_guide,module.ik_joints)
                     ik_ctrls = ik_module.get_ctrls()
-                    key.update({"ik_joint_list": ik_joint_list, "ik_ctrl_list": ik_ctrls})
+                    ik_handle = ik_module.get_ik_hdl()
+                    key.update({"ik_joint_list": ik_joint_list, "ik_ctrl_list": ik_ctrls, "ik_handle": ik_handle})
 
                     utils.constraint_from_lists_2to1(ik_joint_list, fk_joint_list, key["joints"],maintain_offset=1)
                     ikfk_switch.create_ikfk(key["joints"], fk_ctrls, ik_ctrls,ik_joint_list,fk_joint_list,master_guide)
                 else:
                     cmds.error("ERROR: rig_type attribute cannot be found or attribute value cannot be found.")
                 if rig_type == "IK" or "FKIK":
-                    if key == "rev_locators":
-                        reverse_foot.CreateReverseFoot(key["module"],key)
-                else: print(f"Didnt find rev_locators in key not making reverse foot for: {key}")
+                    if "rev_locators" in key:
+                        reverse_foot_module = reverse_foot.CreateReverseFoot(key["module"],key)
+                    else: print(f"Didnt find rev_locators in key not making reverse foot for: {key}")
 
         system_group.grpSetup(self.ui.rig_master_name.text())
 

@@ -13,9 +13,10 @@ guide_scale = 1
 available_rig_types = ["FK","IK","FKIK"]
 reverse_foot = True
 rev_locators = {
-    "ankle": f"{system[2]}",
-    "ball": f"{system[3]}",
-    "toe": f"{system[4]}",
+    "foot_ctrl": system[2],
+    "ankle": system[2],
+    "ball": system[3],
+    "toe": system[4],
     "heel": "heel",
     "bank_in": "bank_in",
     "bank_out": "bank_out",
