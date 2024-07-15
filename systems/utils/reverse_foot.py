@@ -26,22 +26,29 @@ class CreateReverseLocators():
         if f"loc_{rev_locators['ankle']}{side}" in cmds.ls(f"loc_{rev_locators['ankle']}{side}"):
             cmds.error("ERROR: Item with the same name already exists.")
 
-        loc_name = [f"rev_{rev_locators['toe']}{side}",f"rev_{rev_locators['ball']}{side}",f"rev_{rev_locators['ankle']}{side}"]
+        #loc_name = [f"rev_{rev_locators['toe']}{side}",f"rev_{rev_locators['ball']}{side}",f"rev_{rev_locators['ankle']}{side}"]
         locators_keys = rev_locators.values()
         jnt_name = [item for item in self.guides["ui_guide_list"] if any(key in item for key in locators_keys)]
+        loc_name = [f"loc_rev_{item}" for item in self.guides["ui_guide_list"] if any(key in item for key in locators_keys)]
+        # list order needs to be: toe, ball, ankle
+        loc_toe = loc_name[0]
+        loc_ball = loc_name[1]
+        loc_ankle = loc_name[2]
 
-        # jnt_name = [f"{jnt_prefix}_{rev_locators['ankle']}{side}",f"{jnt_prefix}_{rev_locators['ball']}{side}",f"{jnt_prefix}_{rev_locators['toe']}{side}"]
         for x in range(len(loc_name)):
             try:
-                cmds.spaceLocator(n=f"loc_{loc_name[x]}")
-                cmds.matchTransform(f"loc_{loc_name[x]}",jnt_name[x])
+                cmds.spaceLocator(n=loc_name[x])
+                cmds.matchTransform(loc_name[x],jnt_name[x])
             except:
                 cmds.error("Error: jnt_name cant be found check backend.")
-        bank_in = f"loc_{rev_locators['bank_in']}{side}"
-        bank_out = f"loc_{rev_locators['bank_out']}{side}"
+        bank_in = f"loc_{rev_locators['bank_in']}"
+        bank_out = f"loc_{rev_locators['bank_out']}"
         for x in [bank_in,bank_out]:
-            cmds.spaceLocator(n=x)
-            cmds.matchTransform(x, f"{loc_prefix}_{rev_locators['ball']}{side}")
+            tmp = cmds.spaceLocator(n=f"{x}_#")[0]
+            tmp = cmds.rename(tmp, f"{tmp}{side}")
+            cmds.matchTransform(tmp, loc_ball)
+            if x == bank_in: bank_in = tmp
+            elif x == bank_out: bank_out = tmp
         offset = 10
         if bank_out[-2:] and bank_in[-2:] == "_l":
             cmds.move(offset,0,0,bank_out,r=1)
@@ -52,11 +59,12 @@ class CreateReverseLocators():
         else:
             cmds.error("No matching side suffex")
 
-        loc_heel = cmds.spaceLocator(n=f"{loc_prefix}_{rev_locators['heel']}{side}")[0]
-        cmds.matchTransform(f"{loc_prefix}_{rev_locators['heel']}{side}",f"{loc_prefix}_{rev_locators['ball']}{side}")
-        cmds.move(0,0,-offset,f"{loc_prefix}_{rev_locators['heel']}{side}",r=1)
+        loc_heel = cmds.spaceLocator(n=f"{loc_prefix}_{rev_locators['heel']}_#")[0]
+        loc_heel = cmds.rename(loc_heel, f"{loc_heel}{side}")
+        cmds.matchTransform(loc_heel,loc_ball)
+        cmds.move(0,0,-offset,loc_heel,r=1)
 
-        loc_list = [loc_heel,f"{loc_prefix}_{rev_locators['toe']}{side}",f"{loc_prefix}_{rev_locators['ball']}{side}",f"{loc_prefix}_{rev_locators['ankle']}{side}",bank_in, bank_out]
+        loc_list = [loc_heel,loc_toe,loc_ball,loc_ankle,bank_in, bank_out]
         return loc_list
 
     def get_locators(self):
@@ -112,7 +120,6 @@ class CreateReverseFoot():
 
         for attr in self.attr_list:
             attr_exists = cmds.attributeQuery(attr, node=self.foot_ctrl,ex=1)
-            print(f"Exists: {attr_exists}")
             if attr_exists == False:
                 if attr == self.attr_list[0]:
                     cmds.addAttr(self.foot_ctrl,ln=self.attr_list[0],at="enum",en="############",k=1)
@@ -120,7 +127,6 @@ class CreateReverseFoot():
                 else:
                     cmds.addAttr(self.foot_ctrl, ln=attr, min=-20, max=20,k=1)
             else:
-                print("Attribute Exists continuing")
                 pass
 
         self.create_nodes()
@@ -141,59 +147,76 @@ class CreateReverseFoot():
         bank_in_node = self.create_condition_node(f"cond_{bank_in}")
         bank_out_node = self.create_condition_node(f"cond_{bank_out}")
         for x in [bank_in,bank_out]:
-            cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[2]}",f"cond_{x}.firstTerm")
-            cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[2]}",f"cond_{x}.colorIfTrueR")
+            if x == bank_in: condition_node = bank_in_node
+            elif x == bank_out: condition_node = bank_out_node
+            cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[2]}",f"{condition_node}.firstTerm")
+            cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[2]}",f"{condition_node}.colorIfTrueR")
 
-            cmds.shadingNode("floatMath",au=1,n=f"math_{x}")
+            math_node = cmds.shadingNode("floatMath",au=1,n=f"math_{x}")
 
-            cmds.connectAttr(f"cond_{x}.outColorR",f"math_{x}.floatA")
-            cmds.connectAttr(f"math_{x}.outFloat",f"{x}.rotateX")
+            cmds.connectAttr(f"{condition_node}.outColorR",f"{math_node}.floatA")
+            cmds.connectAttr(f"{math_node}.outFloat",f"{x}.rotateX")
 
-            cmds.setAttr(f"math_{x}.operation",2)
-            cmds.setAttr(f"math_{x}.floatB",2.5)
+            cmds.setAttr(f"{math_node}.operation",2)
+            cmds.setAttr(f"{math_node}.floatB",2.5)
 
-        cmds.setAttr(f"cond_{bank_in}.operation",2)
-        cmds.setAttr(f"cond_{bank_out}.operation",4)
+        cmds.setAttr(f"{bank_in_node}.operation",2)
+        cmds.setAttr(f"{bank_out_node}.operation",4)
 
         # HEEL & TOE TWIST
         heel_jnt = f"jnt{self.reverse_foot_data['loc_heel'][3:]}"
         toe_jnt = f"jnt{self.reverse_foot_data['loc_toe'][3:]}"
         for x in [heel_jnt, toe_jnt]:
-            cmds.shadingNode("floatMath",au=1,n=f"math_{x}")
+            math_node = cmds.shadingNode("floatMath",au=1,n=f"math_{x}")
 
-            cmds.connectAttr(f"math_{x}.outFloat",f"{x}.rotateZ")
+            cmds.connectAttr(f"{math_node}.outFloat",f"{x}.rotateZ")
 
-            cmds.setAttr(f"math_{x}.operation",2)
-            cmds.setAttr(f"math_{x}.floatB",2.5)
-        
-        cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[3]}",f"math_{heel_jnt}.floatA")
-        cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[4]}",f"math_{toe_jnt}.floatA")
+            cmds.setAttr(f"{math_node}.operation",2)
+            cmds.setAttr(f"{math_node}.floatB",2.5)
+
+            if x == heel_jnt:
+                cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[3]}",f"{math_node}.floatA")
+            if x == toe_jnt:
+                cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[4]}",f"{math_node}.floatA")
 
         # ROLL
         ball_jnt = f"jnt{self.reverse_foot_data['loc_ball'][3:]}"
-        self.create_condition_node(f"cond_{ball_jnt}")
-        cmds.shadingNode("floatMath",au=1,n=f"math_roll_{toe_jnt}")
-        cmds.shadingNode("floatMath",au=1,n=f"math_zeroed_{ball_jnt}")
-        cmds.shadingNode("floatMath",au=1,n=f"math_reversed_{ball_jnt}")
+        condition_node = self.create_condition_node(f"cond_{ball_jnt}")
+        zeroed_math_node = cmds.shadingNode("floatMath",au=1,n=f"math_zeroed_{ball_jnt}")
+        reversed_math_node = cmds.shadingNode("floatMath",au=1,n=f"math_reversed_{ball_jnt}")
+        roll_toe_math_node = cmds.shadingNode("floatMath",au=1,n=f"math_roll_{toe_jnt}")
+        roll_heel_math_node = cmds.shadingNode("floatMath",au=1,n=f"math_roll_{heel_jnt}")
+        roll_toe_condition_node = self.create_condition_node(f"cond_roll_{toe_jnt}")
+        roll_heel_condition_node = self.create_condition_node(f"cond_heel_{heel_jnt}")
 
-        cmds.connectAttr(f"math_zeroed_{ball_jnt}.outFloat",f"cond_{ball_jnt}.colorIfTrueR")
-        cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[1]}",f"cond_{ball_jnt}.firstTerm")
-        cmds.connectAttr(f"cond_{ball_jnt}.outColorR",f"math_reversed_{ball_jnt}.floatA")
+        cmds.connectAttr(f"{zeroed_math_node}.outFloat",f"{condition_node}.colorIfTrueR")
+        cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[1]}",f"{condition_node}.firstTerm")
+        cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[1]}",f"{roll_toe_condition_node}.firstTerm")
+        cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[1]}",f"{roll_heel_condition_node}.firstTerm")
+        cmds.connectAttr(f"{condition_node}.outColorR",f"{reversed_math_node}.floatA")
+        cmds.connectAttr(f"{roll_toe_math_node}.outFloat",f"{roll_toe_condition_node}.colorIfTrueR")
+        cmds.connectAttr(f"{roll_heel_math_node}.outFloat",f"{roll_heel_condition_node}.colorIfTrueR")
 
-        cmds.connectAttr(f"math_roll_{toe_jnt}.outFloat",f"{toe_jnt}.rotateY")
-        cmds.connectAttr(f"math_reversed_{ball_jnt}.outFloat",f"{ball_jnt}.rotateY")
+        cmds.connectAttr(f"{roll_toe_condition_node}.outColorR",f"{toe_jnt}.rotateY")
+        cmds.connectAttr(f"{roll_heel_condition_node}.outColorR",f"{heel_jnt}.rotateY")
+        cmds.connectAttr(f"{reversed_math_node}.outFloat",f"{ball_jnt}.rotateY")
 
-        cmds.setAttr(f"math_roll_{toe_jnt}.operation",2)
-        cmds.setAttr(f"math_roll_{toe_jnt}.floatB",4.5)
-        cmds.setAttr(f"math_zeroed_{ball_jnt}.operation",1)
-        cmds.setAttr(f"math_zeroed_{ball_jnt}.floatB",10)
-        cmds.setAttr(f"math_reversed_{ball_jnt}.operation",2)
-        cmds.setAttr(f"math_reversed_{ball_jnt}.floatB",-2.5)
-        cmds.setAttr(f"cond_{ball_jnt}.operation",3)
-        cmds.setAttr(f"cond_{ball_jnt}.secondTerm",10)
+        cmds.setAttr(f"{roll_toe_math_node}.operation",2)
+        cmds.setAttr(f"{roll_toe_math_node}.floatB",4.5)
+        cmds.setAttr(f"{roll_heel_math_node}.operation",2)
+        cmds.setAttr(f"{roll_heel_math_node}.floatB",2.5)
+        cmds.setAttr(f"{zeroed_math_node}.operation",1)
+        cmds.setAttr(f"{zeroed_math_node}.floatB",10)
+        cmds.setAttr(f"{reversed_math_node}.operation",2)
+        cmds.setAttr(f"{reversed_math_node}.floatB",-2.5)
+        cmds.setAttr(f"{condition_node}.operation",3)
+        cmds.setAttr(f"{condition_node}.secondTerm",10)
+        cmds.setAttr(f"{roll_toe_condition_node}.operation",2)
+        cmds.setAttr(f"{roll_heel_condition_node}.operation",4)
         
-        cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[1]}",f"math_roll_{toe_jnt}.floatA")
-        cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[1]}",f"math_zeroed_{ball_jnt}.floatA")
+        cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[1]}",f"{roll_toe_math_node}.floatA")
+        cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[1]}",f"{roll_heel_math_node}.floatA")
+        cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[1]}",f"{zeroed_math_node}.floatA")
 
     def create_system(self):
         side = self.side()
@@ -207,7 +230,6 @@ class CreateReverseFoot():
                 pass
 
         rev_list = self.create_rev_jnts()
-        #jnt_list = [f"{self.ui.ankle_jnt.text()}{side}",f"{self.ui.ball_jnt.text()}{side}",f"{self.ui.toe_jnt.text()}{side}"]
         jnt_verification_values = ["ankle","ball","toe"]
         jnt_list = [item for item in self.system["ik_joint_list"] if any(key in item for key in jnt_verification_values)]
 
@@ -221,5 +243,7 @@ class CreateReverseFoot():
 
         cmds.parent(rev_list[0],self.reverse_foot_data["loc_ankle"])
 
-        #cmds.parentConstraint(self.reverse_foot_data["loc_ankle"],f"jnt{self.reverse_foot_data['loc_ankle'][3:]}",n=f"pConst_{self.foot_ctrl}",mo=1)
-        #cmds.parent(self.system["ik_handle"],rev_list[3])
+        cmds.parentConstraint(self.foot_ctrl,self.reverse_foot_data["loc_heel"],mo=1,n=f"pConst_{self.reverse_foot_data['loc_heel']}")
+        if cmds.listRelatives(self.system["ik_handle"],c=1, type="parentConstraint"):
+            cmds.delete(cmds.listRelatives(self.system["ik_handle"],c=1, type="parentConstraint"))
+            cmds.parentConstraint(f"jnt{self.reverse_foot_data['loc_ankle'][3:]}",self.system["ik_handle"][0],mo=1,n=f"pConst_{self.system['ik_handle'][0]}")
