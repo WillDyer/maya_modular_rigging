@@ -21,22 +21,60 @@ main.run_ui()
 ```
 ### New Module Setup & Parameters
 
-#### Example Usage:
+#### system: a list of the joint names used in module.
+
 ```python
 system = ["joint_1","joint_2","joint_3"]
+# This variable is REQUIRED
+```
+#### system_pos: a list of translations of each joint from system.
+```python
 system_pos = {"joint_1": [X, Y, Z],"joint_2": [X, Y, Z],"joint_3": [X, Y, Z]}
+# This variable is REQUIRED
+```
+#### system_rot: a list of rotations of each joint from system.
+```python
 system_rot = {"joint_1": [X, Y, Z],"joint_2": [X, Y, Z],"joint_3": [X, Y, Z]}
+# This variable is REQUIRED
+```
+#### available_rig_types: a list of rig types available for module. Options are below.
+```python
+available_rig_types = ["FK","IK","FKIK"]
+# This variable is REQUIRED however can be one or more types.
+```
+#### ik_joints: which joints are needed for the ik handle
+```python
 ik_joints = {
     "start_joint": "joint_1",
     "end_joint": "joint_2",
     "pv_joint": "joint_3",
     "world_orientation": False
 }
+# This dictionary is only required if available_rig_types include IK or FKIK
+```
+#### side: which side of the rig.
+```python
 side = "_l"
+# This variable is REQUIRED.
+# Note: Currently only available on _l.
+```
+#### space_swapping: objects to be space swapped.
+```python
 space_swapping = ["joint_1","root","COG","Custom"]
+# This list is REQUIRED is available_rig_types include IK or FKIK.
+# Note: All object but custom must exist within the rig to work.
+```
+#### guide_scale: scale of guide curves.
+```python
 guide_scale = 1
-available_rig_types = ["FK","IK","FKIK"]
+# This variable is REQUIRED.
+```
+#### reverse_foot: if reverse foot is required.
+```python
 reverse_foot = True
+# This variable is REQUIRED.
+```
+```python
 rev_locators = {
     "foot_ctrl": system[2],
     "ankle": system[2],
@@ -46,4 +84,6 @@ rev_locators = {
     "bank_in": "bank_in",
     "bank_out": "bank_out",
 }
+# This dictionary is REQUIRED if reverse_foot is True.
+# Note: foot_ctrl, ankkle, ball, toe must exist within system.
 ```

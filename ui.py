@@ -252,7 +252,8 @@ class QtSampler(QWidget):
                     ikfk_switch.create_ikfk(key["joints"], fk_ctrls, ik_ctrls,ik_joint_list,fk_joint_list,master_guide)
                 else:
                     cmds.error("ERROR: rig_type attribute cannot be found or attribute value cannot be found.")
-                if rig_type == "IK" or "FKIK":
+                print(f"RIG_TYPE: {rig_type}")
+                if rig_type == "FKIK" or rig_type == "IK":
                     if "rev_locators" in key:
                         reverse_foot_module = reverse_foot.CreateReverseFoot(key["module"],key)
                     else: print(f"Didnt find rev_locators in key not making reverse foot for: {key}")
