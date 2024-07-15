@@ -11,3 +11,13 @@ side = "_l"
 space_swapping = ["hip","root","COG","Custom"]
 guide_scale = 1
 available_rig_types = ["FK","IK","FKIK"]
+reverse_foot = True
+rev_locators = {
+    "prefix": "jnt_rev",
+    "ankle": f"{system[2]}",
+    "ball": f"{system[3]}",
+    "toe": f"{system[4]}",
+    "heel": "heel",
+    "bank_in": "bank_in",
+    "bank_out": "bank_out",
+}

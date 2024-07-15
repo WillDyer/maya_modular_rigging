@@ -2,18 +2,26 @@ import maya.cmds as cmds
 import importlib
 import sys
 import os
-from systems.utils import (connect_modules, utils)
+from systems.utils import (connect_modules, utils, reverse_foot)
 importlib.reload(connect_modules)
 importlib.reload(utils)
+importlib.reload(reverse_foot)
 
 scale = 1
 
 class Guides():
     def __init__(self,accessed_module, offset,side, to_connect_to,use_existing_attr):
+        self.module = importlib.import_module(f"systems.modules.{accessed_module}")
+        importlib.reload(self.module)
         if accessed_module == "hand":
             self.create_guide = self.guides_hand(accessed_module,offset,side,to_connect_to,use_existing_attr)
         else:
             self.create_guide = self.guides(accessed_module,offset,side,use_existing_attr)
+        try: 
+            self.module.reverse_foot
+            reverse_foot.CreateReverseFoot(self.create_guide, accessed_module).create_loc()
+            print("rev foot existssss")
+        except AttributeError: pass
 
     def collect_guides(self):
         return self.create_guide
@@ -51,32 +59,30 @@ class Guides():
 
 
     def creation(self,accessed_module,offset,side,connector_list,use_existing_attr):
-        module = importlib.import_module(f"systems.modules.{accessed_module}")
-        importlib.reload(module)
         ABC_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),"imports","guide_shape.abc")
         COLOR_CONFIG = {'l': 6, 'r': 13, 'default': 22}
         guide_list = []
         root_exists = False
 
-        if module.side == "None":
+        if self.module.side == "None":
             side = ""
         else:
-            side = module.side
+            side = self.module.side
 
         # create master guide for module
-        if "root" in module.system:
+        if "root" in self.module.system:
             master_guide = "root"
-        elif "proximal" in module.system:
+        elif "proximal" in self.module.system:
             master_guide = "proximal"
         else:
             master_guide = utils.create_cube(f"master_{accessed_module}{side}_#",scale=[5,5,5])
-            pos = module.system_pos[module.system[0]]
-            rot = module.system_rot[module.system[0]]
+            pos = self.module.system_pos[self.module.system[0]]
+            rot = self.module.system_rot[self.module.system[0]]
             cmds.xform(master_guide,ws=1,t=[pos[0]+offset[0],pos[1]+offset[1],pos[2]+offset[2]])
             cmds.xform(master_guide,ws=1,ro=[rot[0],rot[1],rot[2]])
 
 
-        for x in module.system:
+        for x in self.module.system:
             # Import custom guide crv if fails use locator
             try:
                 if "root" in x:
@@ -85,7 +91,7 @@ class Guides():
                     guide = cmds.rename(imported[0], f"{x}{side}")
                 else:
                     imported = cmds.file(ABC_FILE, i=1,namespace="test",rnn=1)
-                    cmds.scale(module.guide_scale,module.guide_scale, module.guide_scale, imported)
+                    cmds.scale(self.module.guide_scale,self.module.guide_scale, self.module.guide_scale, imported)
                     guide = cmds.rename(imported[0], f"{x}{side}_#")
                 if "root" in x and root_exists == True:
                     master_guide = guide
@@ -104,8 +110,8 @@ class Guides():
                 cmds.spaceLocator(n=x)
 
             # set location of guide crvs then OPM
-            pos = module.system_pos[x]
-            rot = module.system_rot[x]
+            pos = self.module.system_pos[x]
+            rot = self.module.system_rot[x]
             cmds.xform(guide,ws=1,t=[pos[0]+offset[0],pos[1]+offset[1],pos[2]+offset[2]])
             cmds.xform(guide,ws=1,ro=[rot[0],rot[1],rot[2]])
 
@@ -126,8 +132,8 @@ class Guides():
         else:
             cmds.group(connector_list,n="grp_connector_clusters",w=1)
 
-        self.available_rig_types = ":".join(module.available_rig_types)
-        custom_attr = self.add_custom_attr(guide_list, master_guide, module,use_existing_attr)
+        self.available_rig_types = ":".join(self.module.available_rig_types)
+        custom_attr = self.add_custom_attr(guide_list, master_guide, self.module,use_existing_attr)
         cmds.addAttr(master_guide, ln="is_master",at="enum",en="True",k=0) # adding master group attr
         cmds.addAttr(master_guide, ln="base_module",at="enum",en=accessed_module,k=0) # module attr
         cmds.addAttr(master_guide, ln="module_side",at="enum",en=side,k=0) # module side

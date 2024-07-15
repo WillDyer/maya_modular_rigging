@@ -1,59 +1,65 @@
 import maya.cmds as cmds
 from maya import OpenMayaUI as omui
-
+import importlib
 
 class CreateReverseFoot():
-    def __init__(self):
+    def __init__(self, guides,accessed_module):
         self.attr_list = ["Rev_Foot_Dvdr","Roll","Bank","Heel_Twist","Toe_Twist"]
+        print(f"GUIDES: {guides}")
+        self.guides = guides
+        self.module = importlib.import_module(f"systems.modules.{accessed_module}")
+        importlib.reload(self.module)
 
-        self.ui.create_locators.clicked.connect(self.create_loc)
-        self.ui.make_rev_foot.clicked.connect(self.create_system)
+        # self.ui.create_locators.clicked.connect(self.create_loc)
+        # self.ui.make_rev_foot.clicked.connect(self.create_system)
 
     def side(self):
-        side_ui = self.ui.jnt_side.currentText()
-        if side_ui == "Left":
-            side = "_l"
-        elif side_ui == "Right":
-            side = "_r"
-        else:
-            side = ""
+        mirroring = False # tmp
+        if mirroring == True:
+            # side = self.system_to_be_made.side
+            pass
+        else: side = self.module.side
         return side
 
     def create_loc(self):
+        print("create loc ran")
         side = self.side()
+        rev_locators = self.module.rev_locators
+        jnt_prefix = self.module.rev_locators["prefix"]
 
-        if f"loc{self.ui.rev_ankle.text()[3:]}{side}" in cmds.ls(f"loc{self.ui.rev_ankle.text()[3:]}{side}"):
+        if f"loc_{rev_locators['ankle']}{side}" in cmds.ls(f"loc_{rev_locators['ankle']}{side}"):
             cmds.error("ERROR: Item with the same name already exists.")
 
-        loc_name = [f"{self.ui.rev_ankle.text()}{side}",f"{self.ui.rev_ball.text()}{side}",f"{self.ui.rev_toe.text()}{side}"]
-        jnt_name = [f"{self.ui.ankle_jnt.text()}{side}",f"{self.ui.ball_jnt.text()}{side}",f"{self.ui.toe_jnt.text()}{side}"]
-        print(loc_name)
+        loc_name = [f"rev_{rev_locators['ankle']}{side}",f"rev_{rev_locators['ball']}{side}",f"rev_{rev_locators['toe']}{side}"]
+        locators_keys = rev_locators.values()
+        jnt_name = [item for item in self.guides["ui_guide_list"] if any(key in item for key in locators_keys)]
+
+        # jnt_name = [f"{jnt_prefix}_{rev_locators['ankle']}{side}",f"{jnt_prefix}_{rev_locators['ball']}{side}",f"{jnt_prefix}_{rev_locators['toe']}{side}"]
         for x in range(len(loc_name)):
             try:
-                cmds.spaceLocator(n=f"loc{loc_name[x][3:]}")
-                cmds.matchTransform(f"loc{loc_name[x][3:]}",jnt_name[x])
+                cmds.spaceLocator(n=f"loc_{loc_name[x]}")
+                cmds.matchTransform(f"loc_{loc_name[x]}",jnt_name[x])
             except:
-                cmds.error("Error: jnt_name cant be found check backend")
-        bank_in = f"loc{self.ui.rev_bank_in.text()[3:]}{side}"
-        bank_out = f"loc{self.ui.rev_bank_out.text()[3:]}{side}"
+                cmds.error("Error: jnt_name cant be found check backend.")
+        bank_in = f"loc_{rev_locators['bank_in']}{side}"
+        bank_out = f"loc_{rev_locators['bank_out']}{side}"
         for x in [bank_in,bank_out]:
             cmds.spaceLocator(n=x)
-            cmds.matchTransform(x, f"loc{self.ui.rev_ball.text()[3:]}{side}")
-        offset = self.ui.offset.value()
+            cmds.matchTransform(x, f"loc_rev_{rev_locators['ball']}{side}")
+        offset = 10
         if bank_out[-2:] and bank_in[-2:] == "_l":
             cmds.move(offset,0,0,bank_out,r=1)
             cmds.move(-offset,0,0,bank_in,r=1)
-            print("moved")
         elif bank_out[-2:] and bank_in[-2:] == "_r":
-            cmds.move(-10,0,0,bank_out,r=1)
-            cmds.move(10,0,0,bank_in,r=1)
+            cmds.move(-offset,0,0,bank_out,r=1)
+            cmds.move(offset,0,0,bank_in,r=1)
         else:
             cmds.error("No matching side suffex")
 
 
-        cmds.spaceLocator(n=f"loc{self.ui.rev_heel.text()[3:]}{side}")
-        cmds.matchTransform(f"loc{self.ui.rev_heel.text()[3:]}{side}",f"loc{self.ui.rev_ball.text()[3:]}{side}")
-        cmds.move(0,0,-30,f"loc{self.ui.rev_heel.text()[3:]}{side}",r=1)
+        cmds.spaceLocator(n=f"loc_{rev_locators['heel']}{side}")
+        cmds.matchTransform(f"loc_{rev_locators['heel']}{side}",f"loc_rev_{rev_locators['ball']}{side}")
+        cmds.move(0,0,-offset,f"loc_{rev_locators['heel']}{side}",r=1)
     
     def create_rev_jnts(self):
         side = self.side()
@@ -101,7 +107,6 @@ class CreateReverseFoot():
         cmds.createNode("condition",n=name)
         for x in ["R","G","B"]:
             cmds.setAttr(f"{name}.colorIfFalse{x}",0)
-
 
     def create_nodes(self, foot_ctrl):
         #attr_list = ["Rev_Foot_Dvdr","Roll","Bank","Heel_Twist","Toe_Twist"]
