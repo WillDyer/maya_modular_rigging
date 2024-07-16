@@ -28,7 +28,8 @@ from systems.utils import (
     ikfk_switch,
     system_group,
     space_swap,
-    reverse_foot
+    reverse_foot,
+    ribbon
 )
 
 # debug
@@ -44,6 +45,7 @@ importlib.reload(system_group)
 importlib.reload(space_swap)
 importlib.reload(hands)
 importlib.reload(reverse_foot)
+importlib.reload(ribbon)
 
 mayaMainWindowPtr = omui.MQtUtil.mainWindow()
 mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QWidget)
@@ -236,6 +238,11 @@ class QtSampler(QWidget):
                     ik_handle = ik_module.get_ik_hdl()
                     utils.constraint_from_lists_1to1(ik_joint_list, key["joints"],maintain_offset=1)
                     key.update({"ik_joint_list": ik_joint_list, "ik_ctrl_list": ik_ctrls, "ik_handle": ik_handle})
+                elif rig_type == "IK_Ribbon":
+                    ik_joint_list = joints.joint(orientation, master_guide, system="ik")
+                    key.update({"ik_joint_list": ik_joint_list})
+                    ik_module = ribbon.create_ribbon(key, key["module"])
+                    key.update({"ik_ctrl_list": ik_module.get_ribbon_ctrls()})
                 elif rig_type == "FKIK":
                     fk_joint_list = joints.joint(orientation, master_guide, system="fk")
                     fk_module = fk.create_fk(fk_joint_list,master_guide,key["scale"],delete_end=False)

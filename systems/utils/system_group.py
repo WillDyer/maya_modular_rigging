@@ -53,7 +53,7 @@ def grpSetup(rig_name):
 
 
     #try:
-    grpList = ['grp_mesh','grp_controls','grp_joints','grp_locators','grp_blendshapes']
+    grpList = ['grp_mesh','grp_controls','grp_joints','grp_locators','grp_blendshapes','grp_ribbons']
     jntList = ['grp_ik_handles','grp_ik_jnts','grp_fk_jnts','grp_rig_jnts','grp_skn_jnts']
     # ctrlList = ['grp_ctrls_head','grp_ctrls_spine','grp_ctrls_arms','grp_ctrls_legs']
 
@@ -84,22 +84,27 @@ def grpSetup(rig_name):
     for type_sys in ["ik","fk"]:
         grp_list = cmds.ls(f"grp_{type_sys}_jnts_*")
         if grp_list:
-            try:
-                cmds.parent(grp_list,f"grp_{type_sys}_jnts")
-            except RuntimeError:
-                pass
+            try: cmds.parent(grp_list,f"grp_{type_sys}_jnts")
+            except RuntimeError: pass
+
         grp_ctrl_list = cmds.ls(f"grp_{type_sys}_ctrls_*")
         if grp_ctrl_list:
-            try:
-                cmds.parent(grp_ctrl_list,"grp_misc_ctrls")
-            except RuntimeError:
-                pass
+            try: cmds.parent(grp_ctrl_list,"grp_misc_ctrls")
+            except RuntimeError: pass
+
     hdl_list = cmds.ls("hdl_ik_*")
     if hdl_list:
-        try:
-            cmds.parent(hdl_list,"grp_ik_handles")
-        except RuntimeError:
-            pass
+        try: cmds.parent(hdl_list,"grp_ik_handles")
+        except RuntimeError: pass
+
+    ctrl_ribbon_list = cmds.ls("grp_ctrl_ribbon_*")
+    if ctrl_ribbon_list:
+        try: cmds.parent(ctrl_ribbon_list, "grp_misc_ctrls")
+        except RuntimeError: pass
+    parent_ribbon_list = cmds.ls("grp_parent_ribbon_*")
+    if parent_ribbon_list:
+        try: cmds.parent(parent_ribbon_list, "grp_ribbons")
+        except RuntimeError: pass
     
     root_jnt = next(item for item in cmds.ls("jnt_rig_*") if "root" in item)
     cog_jnt = next(item for item in cmds.ls("jnt_rig_*") if "COG" in item)
