@@ -18,7 +18,8 @@ from systems import (
     fk,
     ik,
     create_guides,
-    hands
+    hands,
+    ribbon
 )
 
 from systems.utils import (
@@ -28,8 +29,7 @@ from systems.utils import (
     ikfk_switch,
     system_group,
     space_swap,
-    reverse_foot,
-    ribbon
+    reverse_foot
 )
 
 # debug

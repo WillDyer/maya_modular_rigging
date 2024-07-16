@@ -3,7 +3,7 @@ import maya.OpenMaya as om
 import importlib
 import sys, os, math
 
-import OPM
+from systems.utils import OPM
 
 importlib.reload(OPM)
 
