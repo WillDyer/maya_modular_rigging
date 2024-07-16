@@ -71,22 +71,24 @@ class mirror_data():
                 pass
 
     def mirror_reverse_foot(self):
-        print(f"key: {self.key}")
-        if self.key["rev_locators"]:
-            mirrored_rev_locators = []
-            for loc in self.key["rev_locators"]:
-                new_loc_name = loc.replace(f"{self.key['side']}_",self.simple_side,1)
-                cmds.duplicate(loc, n=new_loc_name)
-                mirrored_rev_locators.append(new_loc_name)
+        try: 
+            if self.key["rev_locators"]:
+                mirrored_rev_locators = []
+                for loc in self.key["rev_locators"]:
+                    new_loc_name = loc.replace(f"{self.key['side']}_",self.simple_side,1)
+                    cmds.duplicate(loc, n=new_loc_name)
+                    mirrored_rev_locators.append(new_loc_name)
 
-            cmds.group(n="tmp_mirror",em=1)
-            cmds.parent(mirrored_rev_locators, "tmp_mirror")
-            cmds.setAttr("tmp_mirror.scaleX",-1)
-            cmds.parent(mirrored_rev_locators,w=1)
-            cmds.delete("tmp_mirror")
+                cmds.group(n="tmp_mirror",em=1)
+                cmds.parent(mirrored_rev_locators, "tmp_mirror")
+                cmds.setAttr("tmp_mirror.scaleX",-1)
+                cmds.parent(mirrored_rev_locators,w=1)
+                cmds.delete("tmp_mirror")
 
-            return mirrored_rev_locators
-        else:
+                return mirrored_rev_locators
+            else:
+                return None
+        except KeyError:
             return None
 
     def mirror_data(self):
