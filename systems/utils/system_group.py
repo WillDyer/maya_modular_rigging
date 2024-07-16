@@ -19,7 +19,8 @@ attrs = {
     'skn_system': ['Skin System','Shown:Hidden',False,True,'grp_skn_jnts.visibility'],
     'fk_system': ['FK System','Shown:Hidden',False,True,'grp_fk_jnts.visibility'],
     'ik_system': ['IK System','Shown:Hidden',False,True,'grp_ik_jnts.visibility'],
-    'ik_hndle_system': ['IK Handles','Shown:Hidden',False,True,'grp_ik_handles.visibility']
+    'ik_hndle_system': ['IK Handles','Shown:Hidden',False,True,'grp_ik_handles.visibility'],
+    'ribbon_system': ['Ribbons','Shown:Hidden',False,True,'grp_ribbons.visibility']
 }
 
 def sys_attr():
