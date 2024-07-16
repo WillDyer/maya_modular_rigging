@@ -189,16 +189,23 @@ class QtSampler(QWidget):
                 cmds.delete(module[0], key['connectors'])
 
     def create_joints(self):
-        jnt_list = joints.get_joint_list(self.ui.oritentation.currentText(),self.created_guides, system="rig")
+        print(f"created_guides: {self.created_guides}")
+        rig_jnt_list = joints.get_joint_list(self.ui.oritentation.currentText(),self.created_guides, system="rig")
         num = 0
         for dict in self.systems_to_be_made.values():
-            dict["joints"] = jnt_list[num]
+            dict["joints"] = rig_jnt_list[num]
             num = num+1
         self.ui.polish_rig.setEnabled(True)
 
         mirror_module = mirror_rig.mirror_data(self.systems_to_be_made)
         self.systems_to_be_made = mirror_module.get_mirror_data()
-        connect_modules.attach_joints(self.systems_to_be_made)
+        connect_modules.attach_joints(self.systems_to_be_made,system="rig")
+        
+        skn_created_guides = [key["master_guide"] for key in self.systems_to_be_made.values()]
+        skn_jnt_list = joints.get_joint_list(self.ui.oritentation.currentText(),skn_created_guides, system="skn")
+        connect_modules.attach_joints(self.systems_to_be_made,system="skn")
+        skn_jnt_list= [item for sublist in skn_jnt_list for item in sublist]
+        for joint in skn_jnt_list: cmds.parentConstraint(f"jnt_rig{joint[7:]}",joint,mo=1,n=f"pConst_jnt_rig{joint[7:]}")
 
         self.hide_guides()
         cmds.select(cl=1)
@@ -243,6 +250,7 @@ class QtSampler(QWidget):
                     key.update({"ik_joint_list": ik_joint_list})
                     ik_module = ribbon.create_ribbon(key, key["module"])
                     key.update({"ik_ctrl_list": ik_module.get_ribbon_ctrls()})
+                    utils.constraint_from_lists_1to1(ik_joint_list, key["joints"],maintain_offset=1)
                 elif rig_type == "FKIK":
                     fk_joint_list = joints.joint(orientation, master_guide, system="fk")
                     fk_module = fk.create_fk(fk_joint_list,master_guide,key["scale"],delete_end=False)

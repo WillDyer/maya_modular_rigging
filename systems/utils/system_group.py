@@ -107,12 +107,14 @@ def grpSetup(rig_name):
         try: cmds.parent(parent_ribbon_list, "grp_ribbons")
         except RuntimeError: pass
     
-    root_jnt = next(item for item in cmds.ls("jnt_rig_*") if "root" in item)
+    rig_root_jnt = next(item for item in cmds.ls("jnt_rig_*") if "root" in item)
+    skn_root_jnt = next(item for item in cmds.ls("jnt_skn_*") if "root" in item)
     cog_jnt = next(item for item in cmds.ls("jnt_rig_*") if "COG" in item)
 
-    cmds.parent(root_jnt, "grp_rig_jnts")
+    cmds.parent(rig_root_jnt, "grp_rig_jnts")
+    cmds.parent(skn_root_jnt, "grp_skn_jnts")
 
-    cmds.parentConstraint("ctrl_root",root_jnt,mo=1)
+    cmds.parentConstraint("ctrl_root",rig_root_jnt,mo=1)
     cmds.parentConstraint("ctrl_COG",cog_jnt,mo=1)
 
 

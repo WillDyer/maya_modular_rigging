@@ -28,10 +28,10 @@ def prep_attach_joints(child_joint, parent_joint, need_child):
 
     return [child_joint, parent_joint[0]]
 
-def attach_joints(systems_to_be_made):
+def attach_joints(systems_to_be_made, system):
     to_parent = [key["system_to_connect"] for key in systems_to_be_made.values() if key["system_to_connect"]]
     for x in to_parent:
-        cmds.parent(f"jnt_rig_{x[0]}",f"jnt_rig_{x[1]}")
+        cmds.parent(f"jnt_{system}_{x[0]}",f"jnt_{system}_{x[1]}")
 
 def connect_to_ikfk_switch(p_object, constraint):
     for x in p_object:
@@ -50,7 +50,8 @@ def connect_polished(systems_to_connect):
     ikfk_mapping = {
         "IK": "ctrl_ik",
         "FK": "ctrl_fk",
-        "FKIK": ["ctrl_ik", "ctrl_fk"]
+        "FKIK": ["ctrl_ik", "ctrl_fk"],
+        "IK_Ribbon": "jnt_ik"
     }
     
     systems_ikfk = []
