@@ -134,7 +134,7 @@ class Guides():
             cmds.group(connector_list,n="grp_connector_clusters",w=1)
 
         self.available_rig_types = ":".join(self.module.available_rig_types)
-        custom_attr = self.add_custom_attr(guide_list, master_guide, self.module,use_existing_attr)
+        custom_attr = self.add_custom_attr(guide_list, master_guide,use_existing_attr,accessed_module)
         cmds.addAttr(master_guide, ln="is_master",at="enum",en="True",k=0) # adding master group attr
         cmds.addAttr(master_guide, ln="base_module",at="enum",en=accessed_module,k=0) # module attr
         cmds.addAttr(master_guide, ln="module_side",at="enum",en=side,k=0) # module side
@@ -151,8 +151,9 @@ class Guides():
         }
         return ui_dict #[master_guide, connector_list, ui_guide_list]
 
-    def add_custom_attr(self,system, master_guide, module,use_existing_attr):
+    def add_custom_attr(self,system, master_guide,use_existing_attr,accessed_module):
         custom_attrs = {"module_dvdr": ["enum","------------","MODULE",True],
+                        "module_type": ["enum","Base Module",accessed_module,True],
                         "skeleton_dvdr": ["enum","------------", "SKELETON",True],
                         "mirror_jnts": ["enum","Mirror Joints", "No:Yes",False],
                         "twist_jnts": ["enum","Twist Joints", "Yes:No",False],

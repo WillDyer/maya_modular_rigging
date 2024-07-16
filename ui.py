@@ -257,7 +257,7 @@ class QtSampler(QWidget):
                     try: 
                         if key["rev_locators"]:
                             reverse_foot_module = reverse_foot.CreateReverseFoot(key["module"],key)
-                    except:
+                    except KeyError:
                         print(f"Didnt find rev_locators in key not making reverse foot for: {key}")
 
         system_group.grpSetup(self.ui.rig_master_name.text())
