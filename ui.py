@@ -194,8 +194,8 @@ class QtSampler(QWidget):
             num = num+1
         self.ui.polish_rig.setEnabled(True)
 
-        mirror = mirror_rig.collect_mirror_data(self.systems_to_be_made)
-        self.systems_to_be_made = mirror
+        mirror_module = mirror_rig.mirror_data(self.systems_to_be_made)
+        self.systems_to_be_made = mirror_module.get_mirror_data()
         connect_modules.attach_joints(self.systems_to_be_made)
 
         self.hide_guides()
@@ -252,7 +252,7 @@ class QtSampler(QWidget):
                     ikfk_switch.create_ikfk(key["joints"], fk_ctrls, ik_ctrls,ik_joint_list,fk_joint_list,master_guide)
                 else:
                     cmds.error("ERROR: rig_type attribute cannot be found or attribute value cannot be found.")
-                print(f"RIG_TYPE: {rig_type}")
+
                 if rig_type == "FKIK" or rig_type == "IK":
                     if "rev_locators" in key:
                         reverse_foot_module = reverse_foot.CreateReverseFoot(key["module"],key)

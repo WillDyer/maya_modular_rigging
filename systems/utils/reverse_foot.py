@@ -44,23 +44,25 @@ class CreateReverseLocators():
         bank_in = f"loc_{rev_locators['bank_in']}"
         bank_out = f"loc_{rev_locators['bank_out']}"
         for x in [bank_in,bank_out]:
-            tmp = cmds.spaceLocator(n=f"{x}_#")[0]
-            tmp = cmds.rename(tmp, f"{tmp}{side}")
+            tmp = cmds.spaceLocator(n=f"{x}{side}_#")[0]
+            #tmp = cmds.rename(tmp, f"{tmp}{side}")
             cmds.matchTransform(tmp, loc_ball)
             if x == bank_in: bank_in = tmp
             elif x == bank_out: bank_out = tmp
         offset = 10
-        if bank_out[-2:] and bank_in[-2:] == "_l":
+        bank_out_split = bank_out.split("_")[-2]
+        bank_in_split = bank_out.split("_")[-2]
+        if bank_out_split and bank_in_split == "l":
             cmds.move(offset,0,0,bank_out,r=1)
             cmds.move(-offset,0,0,bank_in,r=1)
-        elif bank_out[-2:] and bank_in[-2:] == "_r":
+        elif bank_out_split and bank_in_split == "r":
             cmds.move(-offset,0,0,bank_out,r=1)
             cmds.move(offset,0,0,bank_in,r=1)
         else:
             cmds.error("No matching side suffex")
 
-        loc_heel = cmds.spaceLocator(n=f"{loc_prefix}_{rev_locators['heel']}_#")[0]
-        loc_heel = cmds.rename(loc_heel, f"{loc_heel}{side}")
+        loc_heel = cmds.spaceLocator(n=f"{loc_prefix}_{rev_locators['heel']}{side}_#")[0]
+        #loc_heel = cmds.rename(loc_heel, f"{loc_heel}{side}")
         cmds.matchTransform(loc_heel,loc_ball)
         cmds.move(0,0,-offset,loc_heel,r=1)
 
@@ -76,6 +78,7 @@ class CreateReverseFoot():
         self.module = importlib.import_module(f"systems.modules.{accessed_module}")
         importlib.reload(self.module)
         self.system = system
+        print(self.system["rev_locators"])
         self.reverse_foot_data = {
             "loc_heel": self.system["rev_locators"][0],
             "loc_toe": self.system["rev_locators"][1],
@@ -88,11 +91,7 @@ class CreateReverseFoot():
         self.create_system()
 
     def side(self):
-        mirroring = False # tmp
-        if mirroring == True:
-            # side = self.system_to_be_made.side
-            pass
-        else: side = self.module.side
+        side = self.system['side']
         return side
     
     def create_rev_jnts(self):
