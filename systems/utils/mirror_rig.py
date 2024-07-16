@@ -71,7 +71,8 @@ class mirror_data():
                 pass
 
     def mirror_reverse_foot(self):
-        if "rev_locators" in self.key:
+        print(f"key: {self.key}")
+        if self.key["rev_locators"]:
             mirrored_rev_locators = []
             for loc in self.key["rev_locators"]:
                 new_loc_name = loc.replace(f"{self.key['side']}_",self.simple_side,1)

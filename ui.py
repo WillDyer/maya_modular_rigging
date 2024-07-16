@@ -254,9 +254,11 @@ class QtSampler(QWidget):
                     cmds.error("ERROR: rig_type attribute cannot be found or attribute value cannot be found.")
 
                 if rig_type == "FKIK" or rig_type == "IK":
-                    if "rev_locators" in key:
-                        reverse_foot_module = reverse_foot.CreateReverseFoot(key["module"],key)
-                    else: print(f"Didnt find rev_locators in key not making reverse foot for: {key}")
+                    try: 
+                        if key["rev_locators"]:
+                            reverse_foot_module = reverse_foot.CreateReverseFoot(key["module"],key)
+                    except:
+                        print(f"Didnt find rev_locators in key not making reverse foot for: {key}")
 
         system_group.grpSetup(self.ui.rig_master_name.text())
 
