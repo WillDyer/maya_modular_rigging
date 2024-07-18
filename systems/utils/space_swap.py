@@ -7,17 +7,19 @@ class SpaceSwapping():
         self.locator_list = self.system_to_be_made["space_swap"]
         self.guide_list = self.system_to_be_made["guide_list"]
         
-        self.space_swap_locators = self.create_locators()
-        if self.system_to_be_made["ik_ctrl_list"]:
-            self.cog_ctrl = next(item for item in cmds.ls("ctrl_*") if "COG" in item)
-            self.root_ctrl = next(item for item in cmds.ls("ctrl_*") if "root" in item)
-            self.ik_ctrls = self.system_to_be_made["ik_ctrl_list"]
-            self.handle_ctrl = [x for x in self.ik_ctrls if cmds.attributeQuery("handle", node=x, exists=True) and cmds.getAttr(f"{x}.handle", asString=1) == "True"]
-            self.parent_to_location()
-            self.blend_matrix()
-            for x in self.ik_ctrls:
-                try: OPM.offsetParentMatrix(x) 
-                except: pass
+        rig_type = cmds.getAttr(f"{self.system_to_be_made['master_guide']}.{self.system_to_be_made['master_guide']}_rig_type", asString=1)
+        if rig_type == "FKIK":
+            self.space_swap_locators = self.create_locators()
+            if self.system_to_be_made["ik_ctrl_list"]:
+                self.cog_ctrl = next(item for item in cmds.ls("ctrl_*") if "COG" in item)
+                self.root_ctrl = next(item for item in cmds.ls("ctrl_*") if "root" in item)
+                self.ik_ctrls = self.system_to_be_made["ik_ctrl_list"]
+                self.handle_ctrl = [x for x in self.ik_ctrls if cmds.attributeQuery("handle", node=x, exists=True) and cmds.getAttr(f"{x}.handle", asString=1) == "True"]
+                self.parent_to_location()
+                self.blend_matrix()
+                for x in self.ik_ctrls:
+                    try: OPM.offsetParentMatrix(x) 
+                    except: pass
 
     def create_locators(self):
         created_locator_list = [cmds.spaceLocator(n=f"loc_space_{x}")[0] for x in self.guide_list for item in self.locator_list if item in x]

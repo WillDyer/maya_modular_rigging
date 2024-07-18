@@ -8,10 +8,10 @@ from systems.utils import OPM
 importlib.reload(OPM)
 
 class create_ribbon():
-    def __init__(self, system,accessed_module):
+    def __init__(self, system,accessed_module,ctrl_amount):
         self.module = importlib.import_module(f"systems.modules.{accessed_module}")
         importlib.reload(self.module)
-        self.ctrl_amount = 3
+        self.ctrl_amount = ctrl_amount
         self.system = system
         self.scale = 10 * self.module.guide_scale
         self.create_ribbon()

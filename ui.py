@@ -87,8 +87,14 @@ class QtSampler(QWidget):
         loader = QUiLoader()
         UI_VERSION = "03"
         UI_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "interface", f"WD_Rig_Builder_{UI_VERSION}.ui")
+        print(f"UI file path: {UI_FILE}")  # Debug: Print the UI file path
+        if not os.path.exists(UI_FILE):
+            cmds.error(f"ERROR: UI file does not exist: {UI_FILE}")
+
         file = QFile(UI_FILE)
-        file.open(QFile.ReadOnly)
+        if not file.open(QFile.ReadOnly):
+            cmds.error(f"ERROR: Unable to open UI file: {UI_FILE}")
+
         self.ui = loader.load(file, parentWidget=self)
         file.close()
 
@@ -248,7 +254,7 @@ class QtSampler(QWidget):
                 elif rig_type == "IK_Ribbon":
                     ik_joint_list = joints.joint(orientation, master_guide, system="ik")
                     key.update({"ik_joint_list": ik_joint_list})
-                    ik_module = ribbon.create_ribbon(key, key["module"])
+                    ik_module = ribbon.create_ribbon(key, key["module"],ctrl_amount=3)
                     key.update({"ik_ctrl_list": ik_module.get_ribbon_ctrls()})
                     utils.constraint_from_lists_1to1(ik_joint_list, key["joints"],maintain_offset=1)
                 elif rig_type == "FKIK":
@@ -278,10 +284,10 @@ class QtSampler(QWidget):
         system_group.grpSetup(self.ui.rig_master_name.text())
 
         for key in self.systems_to_be_made.values(): # seperate loop to be sure systems are made before connecting
+            rig_type = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_rig_type", asString=1)
             if key['system_to_connect']:
                 systems_to_connect = key['system_to_connect']
                 connect_modules.connect_polished(systems_to_connect)
-            rig_type = cmds.getAttr(f"{master_guide}.{master_guide}_rig_type",asString=1)
             if rig_type == "FKIK":
                 space_swap_module = space_swap.SpaceSwapping(key)
 
