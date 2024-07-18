@@ -1,6 +1,6 @@
 import maya.cmds as cmds
-from maya import OpenMayaUI as omui
 import importlib
+
 
 class CreateReverseLocators():
     def __init__(self, guides,accessed_module):
@@ -10,8 +10,8 @@ class CreateReverseLocators():
         self.locator_list = self.create_loc()
 
     def side(self):
-        mirroring = False # tmp
-        if mirroring == True:
+        mirroring = False  # tmp
+        if mirroring is True:
             # side = self.system_to_be_made.side
             pass
         else: side = self.module.side
@@ -26,7 +26,7 @@ class CreateReverseLocators():
         if f"loc_{rev_locators['ankle']}{side}" in cmds.ls(f"loc_{rev_locators['ankle']}{side}"):
             cmds.error("ERROR: Item with the same name already exists.")
 
-        #loc_name = [f"rev_{rev_locators['toe']}{side}",f"rev_{rev_locators['ball']}{side}",f"rev_{rev_locators['ankle']}{side}"]
+        # loc_name = [f"rev_{rev_locators['toe']}{side}",f"rev_{rev_locators['ball']}{side}",f"rev_{rev_locators['ankle']}{side}"]
         locators_keys = rev_locators.values()
         jnt_name = [item for item in self.guides["ui_guide_list"] if any(key in item for key in locators_keys)]
         loc_name = [f"loc_rev_{item}" for item in self.guides["ui_guide_list"] if any(key in item for key in locators_keys)]
@@ -45,7 +45,7 @@ class CreateReverseLocators():
         bank_out = f"loc_{rev_locators['bank_out']}"
         for x in [bank_in,bank_out]:
             tmp = cmds.spaceLocator(n=f"{x}{side}_#")[0]
-            #tmp = cmds.rename(tmp, f"{tmp}{side}")
+            # tmp = cmds.rename(tmp, f"{tmp}{side}")
             cmds.matchTransform(tmp, loc_ball)
             if x == bank_in: bank_in = tmp
             elif x == bank_out: bank_out = tmp
@@ -62,7 +62,7 @@ class CreateReverseLocators():
             cmds.error("No matching side suffex")
 
         loc_heel = cmds.spaceLocator(n=f"{loc_prefix}_{rev_locators['heel']}{side}_#")[0]
-        #loc_heel = cmds.rename(loc_heel, f"{loc_heel}{side}")
+        # loc_heel = cmds.rename(loc_heel, f"{loc_heel}{side}")
         cmds.matchTransform(loc_heel,loc_ball)
         cmds.move(0,0,-offset,loc_heel,r=1)
 
@@ -71,6 +71,7 @@ class CreateReverseLocators():
 
     def get_locators(self):
         return self.locator_list
+
 
 class CreateReverseFoot():
     def __init__(self, accessed_module, system):
@@ -93,33 +94,39 @@ class CreateReverseFoot():
     def side(self):
         side = self.system['side']
         return side
-    
+
     def create_rev_jnts(self):
         side = self.side()
-        jnt_list = [f"jnt{self.reverse_foot_data['loc_heel'][3:]}",f"jnt{self.reverse_foot_data['loc_toe'][3:]}",f"jnt{self.reverse_foot_data['loc_ball'][3:]}",f"jnt{self.reverse_foot_data['loc_ankle'][3:]}"]
-        loc_list = [self.reverse_foot_data["loc_heel"],self.reverse_foot_data["loc_toe"],self.reverse_foot_data["loc_ball"],self.reverse_foot_data["loc_ankle"]]
+        jnt_list = [f"jnt{self.reverse_foot_data['loc_heel'][3:]}",
+                    f"jnt{self.reverse_foot_data['loc_toe'][3:]}",
+                    f"jnt{self.reverse_foot_data['loc_ball'][3:]}",
+                    f"jnt{self.reverse_foot_data['loc_ankle'][3:]}"]
+        loc_list = [self.reverse_foot_data["loc_heel"],
+                    self.reverse_foot_data["loc_toe"],
+                    self.reverse_foot_data["loc_ball"],
+                    self.reverse_foot_data["loc_ankle"]]
 
         cmds.select(cl=1)
         for jnt in range(len(loc_list)):
-            location = cmds.xform(loc_list[jnt], r=True, ws=True, q=True, t=True) # Gather locator location
-            cmds.joint(n=jnt_list[jnt], p=location) # create joint based off the location
+            location = cmds.xform(loc_list[jnt], r=True, ws=True, q=True, t=True)  # Gather locator location
+            cmds.joint(n=jnt_list[jnt], p=location)  # create joint based off the location
 
         # Orient joint
         cmds.joint(f"{jnt_list[0]}", edit=True, zso=1, oj="xyz", sao="xup", ch=True)
         # Orient end joint to world
-        cmds.joint(f"{jnt_list[-1]}", e=True, oj="none" ,ch=True, zso=True)
+        cmds.joint(f"{jnt_list[-1]}", e=True, oj="none",ch=True, zso=True)
 
         return jnt_list
 
     def foot_attr(self):
-        if self.foot_ctrl in cmds.ls(self.foot_ctrl): # checking for ctrl
+        if self.foot_ctrl in cmds.ls(self.foot_ctrl):  # checking for ctrl
             pass
         else:
             cmds.error("Error: Foot control does not exist in scene")
 
         for attr in self.attr_list:
             attr_exists = cmds.attributeQuery(attr, node=self.foot_ctrl,ex=1)
-            if attr_exists == False:
+            if attr_exists is False:
                 if attr == self.attr_list[0]:
                     cmds.addAttr(self.foot_ctrl,ln=self.attr_list[0],at="enum",en="############",k=1)
                     cmds.setAttr(f"{self.foot_ctrl}.{self.attr_list[0]}",l=1)
@@ -212,14 +219,19 @@ class CreateReverseFoot():
         cmds.setAttr(f"{condition_node}.secondTerm",10)
         cmds.setAttr(f"{roll_toe_condition_node}.operation",2)
         cmds.setAttr(f"{roll_heel_condition_node}.operation",4)
-        
+
         cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[1]}",f"{roll_toe_math_node}.floatA")
         cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[1]}",f"{roll_heel_math_node}.floatA")
         cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[1]}",f"{zeroed_math_node}.floatA")
 
     def create_system(self):
         side = self.side()
-        parent_order = [self.reverse_foot_data["loc_heel"],self.reverse_foot_data["loc_toe"],self.reverse_foot_data["bank_in"],self.reverse_foot_data["bank_out"],self.reverse_foot_data["loc_ball"],self.reverse_foot_data["loc_ankle"]]
+        parent_order = [self.reverse_foot_data["loc_heel"],
+                        self.reverse_foot_data["loc_toe"],
+                        self.reverse_foot_data["bank_in"],
+                        self.reverse_foot_data["bank_out"],
+                        self.reverse_foot_data["loc_ball"],
+                        self.reverse_foot_data["loc_ankle"]]
         parent_order.reverse()
 
         for loc in range(len(parent_order)):
@@ -245,7 +257,8 @@ class CreateReverseFoot():
         cmds.parentConstraint(self.foot_ctrl,self.reverse_foot_data["loc_heel"],mo=1,n=f"pConst_{self.reverse_foot_data['loc_heel']}")
         if cmds.listRelatives(self.system["ik_handle"],c=1, type="parentConstraint"):
             cmds.delete(cmds.listRelatives(self.system["ik_handle"],c=1, type="parentConstraint"))
-            cmds.parentConstraint(f"jnt{self.reverse_foot_data['loc_ankle'][3:]}",self.system["ik_handle"][0],mo=1,n=f"pConst_{self.system['ik_handle'][0]}")
+            cmds.parentConstraint(f"jnt{self.reverse_foot_data['loc_ankle'][3:]}",self.system["ik_handle"][0],
+                                  mo=1,n=f"pConst_{self.system['ik_handle'][0]}")
 
         cmds.parent(self.reverse_foot_data["loc_heel"],f"grp_ik_ctrls_{self.system['master_guide']}")
         cmds.setAttr(f"{self.reverse_foot_data['loc_heel']}.overrideEnabled",1)

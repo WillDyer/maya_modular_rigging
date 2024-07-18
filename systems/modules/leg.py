@@ -12,7 +12,7 @@ space_swapping = ["hip","root","COG","Custom"]
 guide_scale = 1
 available_rig_types = ["FK","IK","FKIK"]
 reverse_foot = True
-rev_locators = { # items foot_ctrl, ankle, ball, toe must be the same
+rev_locators = {  # items foot_ctrl, ankle, ball, toe must be the same
     "foot_ctrl": system[2],
     "ankle": system[2],
     "ball": system[3],

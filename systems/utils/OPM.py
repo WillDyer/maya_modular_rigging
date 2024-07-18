@@ -1,7 +1,8 @@
-#This script bakes Transform of node(eg: Nurbscurve_Ctrl) to its Offset Parent Matrix which then acts as its rest matrix. Credit to Muream @gitHubGist 
+# This script bakes Transform of node(eg: Nurbscurve_Ctrl) to its Offset Parent Matrix which then acts as its rest matrix. Credit to Muream @gitHubGist
 
 import maya.api.OpenMaya as om
 import maya.cmds as cmds
+
 
 def offsetParentMatrix(ctrl):
     object = ctrl
@@ -20,7 +21,6 @@ def offsetParentMatrix(ctrl):
                     if cmds.getAttr(attribute_name, lock=True) and current_value != default_value:
                         return True
 
-
     def reset_transforms(node):
         for attribute in ["translate", "rotate", "scale", "jointOrient"]:
             value = 1 if attribute == "scale" else 0
@@ -29,7 +29,6 @@ def offsetParentMatrix(ctrl):
                     attribute_name = "{}.{}{}".format(node, attribute, axis)
                     if not cmds.getAttr(attribute_name, lock=True):
                         cmds.setAttr(attribute_name, value)
-
 
     def bake_transform_to_offset_parent_matrix(node):
         if cmds.nodeType(node) not in TRANSFORM_NODETYPES:

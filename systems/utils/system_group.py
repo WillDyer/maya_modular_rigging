@@ -1,14 +1,13 @@
 import maya.cmds as cmds
-import importlib
 from systems.utils import OPM
 
 
 attrs = {
-    #'controls_divider': ['CONTROLS','------------',True,False,'not needed'],
-    #'face': ['Face','Shown:Hidden',False,True,'grp_ctrls_head.visibility'],
-    #'body': ['Body','Shown:Hidden',False,True,'grp_ctrls_spine.visibility'],
-    #'arms': ['Arms','Shown:Hidden',False,True,'grp_ctrls_arms.visibility'],
-    #'legs': ['Legs','Shown:Hidden',False,True,'grp_ctrls_legs.visibility'],
+    # 'controls_divider': ['CONTROLS','------------',True,False,'not needed'],
+    # 'face': ['Face','Shown:Hidden',False,True,'grp_ctrls_head.visibility'],
+    # 'body': ['Body','Shown:Hidden',False,True,'grp_ctrls_spine.visibility'],
+    # 'arms': ['Arms','Shown:Hidden',False,True,'grp_ctrls_arms.visibility'],
+    # 'legs': ['Legs','Shown:Hidden',False,True,'grp_ctrls_legs.visibility'],
     'visibility_divider': ['VISIBILITY','------------',True,False,'not needed'],
     'vis_geometry': ['Geometry','Shown:Hidden',False,True,'grp_mesh.visibility'],
     'blend_shapes': ['Blendshapes','Shown:Hidden',False,True,'grp_blendshapes.visibility'],
@@ -23,17 +22,19 @@ attrs = {
     'ribbon_system': ['Ribbons','Shown:Hidden',False,True,'grp_ribbons.visibility']
 }
 
+
 def sys_attr():
     for item in attrs.keys():
-        #print(attrs[item][0])
+        # print(attrs[item][0])
         cmds.addAttr("ctrl_root",sn=item,nn=attrs[item][0],k=True,at="enum",en=attrs[item][1])
         cmds.setAttr(f"ctrl_root.{item}",lock=attrs[item][2])
-        if attrs[item][3] == True:
+        if attrs[item][3] is True:
             cmds.createNode('reverse', n=f'reverse_{item}')
             cmds.connectAttr(f"ctrl_root.{item}",f"reverse_{item}.inputX")
             cmds.connectAttr(f"reverse_{item}.outputX",attrs[item][4])
     for xyz in ["X","Y","Z"]:
         cmds.setAttr(f"ctrl_root.scale{xyz}",k=False,lock=True)
+
 
 grp_controls = ['ctrl_root','ctrl_COG','ctrl_root_world']
 
@@ -50,10 +51,8 @@ def grpSetup(rig_name):
     cog_jnt = [item for item in cmds.ls("jnt_rig*") if "COG" in item]
     cmds.matchTransform("ctrl_COG", cog_jnt[0],pos=1)
     OPM.offsetParentMatrix(ctrl="ctrl_COG")
-    
 
-
-    #try:
+    # try:
     grpList = ['grp_mesh','grp_controls','grp_joints','grp_locators','grp_blendshapes','grp_ribbons']
     jntList = ['grp_ik_handles','grp_ik_jnts','grp_fk_jnts','grp_rig_jnts','grp_skn_jnts']
     # ctrlList = ['grp_ctrls_head','grp_ctrls_spine','grp_ctrls_arms','grp_ctrls_legs']
@@ -67,7 +66,7 @@ def grpSetup(rig_name):
         cmds.group(n=x,p="grp_rig",em=True)
     for x in jntList:
         cmds.group(n=x,p=grpList[2],em=True)
-    
+
     cmds.group(n='grp_root',p='grp_controls',em=True)
     cmds.group(n='grp_offset_ik_hdls',p='grp_controls',em=True)
     cmds.parent('ctrl_root','grp_root')
@@ -106,7 +105,7 @@ def grpSetup(rig_name):
     if parent_ribbon_list:
         try: cmds.parent(parent_ribbon_list, "grp_ribbons")
         except RuntimeError: pass
-    
+
     rig_root_jnt = next(item for item in cmds.ls("jnt_rig_*") if "root" in item)
     skn_root_jnt = next(item for item in cmds.ls("jnt_skn_*") if "root" in item)
     cog_jnt = next(item for item in cmds.ls("jnt_rig_*") if "COG" in item)
@@ -117,6 +116,5 @@ def grpSetup(rig_name):
     cmds.parentConstraint("ctrl_root",rig_root_jnt,mo=1)
     cmds.parentConstraint("ctrl_COG",cog_jnt,mo=1)
 
-
-    #except RuntimeError:
+    # except RuntimeError:
     #    cmds.error("Groups exists already that matches name, grps might be missing in file structure")"""

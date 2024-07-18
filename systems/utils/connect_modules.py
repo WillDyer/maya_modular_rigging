@@ -6,6 +6,7 @@ importlib.reload(utils)
 modules_to_connect = {}
 joints_to_parent = []
 
+
 def attach(master_guide, selection):
     connector_list = utils.connector(master_guide, selection[0])
 
@@ -19,6 +20,7 @@ def attach(master_guide, selection):
 
     return [modules_to_connect, connector_list]
 
+
 def prep_attach_joints(child_joint, parent_joint, need_child):
     if need_child:
         child_joint = cmds.listRelatives(child_joint, c=1, typ="transform")[0]
@@ -28,10 +30,12 @@ def prep_attach_joints(child_joint, parent_joint, need_child):
 
     return [child_joint, parent_joint[0]]
 
+
 def attach_joints(systems_to_be_made, system):
     to_parent = [key["system_to_connect"] for key in systems_to_be_made.values() if key["system_to_connect"]]
     for x in to_parent:
         cmds.parent(f"jnt_{system}_{x[0]}",f"jnt_{system}_{x[1]}")
+
 
 def connect_to_ikfk_switch(p_object, constraint):
     for x in p_object:
@@ -46,6 +50,7 @@ def connect_to_ikfk_switch(p_object, constraint):
             try: cmds.connectAttr(f"{x}.{ikfk_switch_name}",f"{constraint[0]}.{x}W1")
             except: pass
 
+
 def connect_polished(systems_to_connect):
     ikfk_mapping = {
         "IK": "ctrl_ik",
@@ -53,21 +58,21 @@ def connect_polished(systems_to_connect):
         "FKIK": ["ctrl_ik", "ctrl_fk"],
         "IK_Ribbon": "jnt_ik"
     }
-    
+
     systems_ikfk = []
-    
+
     for system in systems_to_connect:
         master_guide = cmds.getAttr(f"{system}.master_guide", asString=1)
         ikfk = cmds.getAttr(f"{system}.{master_guide}_rig_type", asString=1)
         mapped_value = ikfk_mapping.get(ikfk, ikfk)
-        
+
         if isinstance(mapped_value, list):
             system_values = [f"{value}_{system}" for value in mapped_value]
         else:
             system_values = [f"{mapped_value}_{system}"]
-        
+
         systems_ikfk.append(system_values)
-    
+
     target, p_object = systems_ikfk
 
     substrings_to_check = ["COG", "root"]
@@ -77,8 +82,8 @@ def connect_polished(systems_to_connect):
         if found_substring:
             found = True
             break
-     
-    if found == False:
+
+    if found is False:
         if len(target) == 2:
             constraint_1 = cmds.parentConstraint(p_object, target[0], mo=1, n=f"pConst_{p_object[0]}")
             connect_to_ikfk_switch(p_object, constraint_1)
@@ -89,4 +94,3 @@ def connect_polished(systems_to_connect):
             constraint_1 = cmds.parentConstraint(p_object, target, mo=1, n=f"pConst_{p_object[0]}")
             connect_to_ikfk_switch(p_object, constraint_1)
             return [constraint_1]
-

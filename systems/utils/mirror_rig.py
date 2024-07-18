@@ -1,11 +1,11 @@
 import maya.cmds as cmds
-import importlib
+
 
 class mirror_data():
     def __init__(self, systems_to_be_made):
         self.data_to_be_checked = systems_to_be_made
         self.mirror_data()
-    
+
     def mirror_joints(self):
         cmds.select(self.key["joints"][0])
         joint_list = cmds.mirrorJoint(mirrorYZ=True,mirrorBehavior=True,searchReplace=('_l_', '_r_'))
@@ -21,12 +21,12 @@ class mirror_data():
         else:
             self.side = ""
 
-    def get_mirrored_system_to_connect(self): # Mirrored system to connect
+    def get_mirrored_system_to_connect(self):  # Mirrored system to connect
         system_to_connect = self.key["system_to_connect"]
         mirrored_system_to_connect = [item.replace(f"{self.key['side']}_", self.simple_side) if f"{self.key['side']}_" in item else item for item in system_to_connect]
         return mirrored_system_to_connect
 
-    def create_mirrored_guides(self): # Create guide locators
+    def create_mirrored_guides(self):  # Create guide locators
         for jnt in self.joint_list:
 
             for type in ["jnt_rig_","jnt_ik_","jnt_fk_"]:
@@ -42,7 +42,7 @@ class mirror_data():
             except:
                 pass
 
-    def create_mirrored_master_guide(self): # Create master guide
+    def create_mirrored_master_guide(self):  # Create master guide
         split_master_guide = self.key["master_guide"].split("_")
         master_guide = self.key["master_guide"].replace(f"_{split_master_guide[-2]}_",self.simple_side)
         self.proxy_obj_list = self.locator_list
@@ -54,12 +54,12 @@ class mirror_data():
             self.proxy_obj_list.append(master_guide)
         return master_guide
 
-    def copy_mirrored_attrs(self): # Copy attrs accross
+    def copy_mirrored_attrs(self):  # Copy attrs accross
         for attr in cmds.listAttr(self.key["master_guide"], r=1,ud=1):
             try:
                 if attr == "master_guide":
                     cmds.addAttr(self.proxy_obj_list, ln="master_guide",at="enum",en=self.master_guide,k=0)
-                elif not attr in ['visibility', 'translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']:
+                elif attr not in ['visibility', 'translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']:
                     try:
                         new_attr_name = attr.replace(f"{self.key['side']}_",self.simple_side,1)
                     except:
@@ -71,7 +71,7 @@ class mirror_data():
                 pass
 
     def mirror_reverse_foot(self):
-        try: 
+        try:
             if self.key["rev_locators"]:
                 mirrored_rev_locators = []
                 for loc in self.key["rev_locators"]:
@@ -96,7 +96,7 @@ class mirror_data():
         for key in self.data_to_be_checked.values():
             self.locator_list = []
             mirror_attribute = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_mirror_jnts", asString=1)
-            if mirror_attribute == "Yes": # YES
+            if mirror_attribute == "Yes":  # YES
                 self.key = key
                 self.joint_list = self.mirror_joints()
                 self.get_mirrored_side()

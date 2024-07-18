@@ -50,6 +50,7 @@ importlib.reload(ribbon)
 mayaMainWindowPtr = omui.MQtUtil.mainWindow()
 mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QWidget)
 
+
 class QtSampler(QWidget):
     def __init__(self, *args, **kwargs):
         super(QtSampler,self).__init__(*args, **kwargs)
@@ -59,7 +60,7 @@ class QtSampler(QWidget):
         self.setFixedWidth(301)
         self.setFixedHeight(471)
         self.initUI()
-        
+
         self.update_dropdown()
         self.module_created = 0
         self.created_guides = []
@@ -67,7 +68,7 @@ class QtSampler(QWidget):
         self.systems_rev_foot = {}
         self.systems_to_be_deleted_polished = []
 
-        #page 1
+        # page 1
         self.ui.image.setPixmap(os.path.join(os.path.dirname(os.path.abspath(__file__)),"interface","UI_Logo.png"))
         self.ui.add_module.clicked.connect(self.add_module)
         self.ui.remove_module.clicked.connect(self.remove_module)
@@ -76,9 +77,9 @@ class QtSampler(QWidget):
         self.ui.edit_blueprint.clicked.connect(self.edit_blueprint)
         self.ui.polish_rig.clicked.connect(self.polish_rig)
 
-        #page 2
+        # page 2
 
-        #page 3
+        # page 3
         self.ui.colour_left.clicked.connect(lambda: self.colour_button(button="colour_left"))
         self.ui.colour_middle.clicked.connect(lambda: self.colour_button(button="colour_middle"))
         self.ui.colour_right.clicked.connect(lambda: self.colour_button(button="colour_right"))
@@ -130,7 +131,6 @@ class QtSampler(QWidget):
         index = files.index("basic_root")
         self.ui.available_modules.setCurrentIndex(index)
 
-
     def add_module(self):
         module = self.ui.available_modules.currentText()
         sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules"))
@@ -141,7 +141,6 @@ class QtSampler(QWidget):
             self.ui.offset_y.value(),
             self.ui.offset_z.value()
         ]
-
 
         guides = create_guides.Guides(module,offset,module_path.side,to_connect_to=[],use_existing_attr=[])
         guide = guides.collect_guides()
@@ -206,11 +205,11 @@ class QtSampler(QWidget):
         mirror_module = mirror_rig.mirror_data(self.systems_to_be_made)
         self.systems_to_be_made = mirror_module.get_mirror_data()
         connect_modules.attach_joints(self.systems_to_be_made,system="rig")
-        
+
         skn_created_guides = [key["master_guide"] for key in self.systems_to_be_made.values()]
         skn_jnt_list = joints.get_joint_list(self.ui.oritentation.currentText(),skn_created_guides, system="skn")
         connect_modules.attach_joints(self.systems_to_be_made,system="skn")
-        skn_jnt_list= [item for sublist in skn_jnt_list for item in sublist]
+        skn_jnt_list = [item for sublist in skn_jnt_list for item in sublist]
         for joint in skn_jnt_list: cmds.parentConstraint(f"jnt_rig{joint[7:]}",joint,mo=1,n=f"pConst_jnt_rig{joint[7:]}")
 
         self.hide_guides()
@@ -220,14 +219,13 @@ class QtSampler(QWidget):
 
     def edit_blueprint(self):
         path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules")
-        if platform.system() == "Windows": 
+        if platform.system() == "Windows":
             subprocess.Popen(f'explorer "{path}"')
-        elif platform.system() == "Linux": 
+        elif platform.system() == "Linux":
             subprocess.Popen(['xdg-open', path])
         else: cmds.warning(f"OS not found or supported by this tool please use the following: Windows, Linux. Your current OS: {platform.system()}")
 
     def polish_rig(self):
-        
         for key in self.systems_to_be_made.values():
             master_guide = key['master_guide']
             rig_type = cmds.getAttr(f"{master_guide}.{master_guide}_rig_type", asString=1)
@@ -275,7 +273,7 @@ class QtSampler(QWidget):
                     cmds.error("ERROR: rig_type attribute cannot be found or attribute value cannot be found.")
 
                 if rig_type == "FKIK" or rig_type == "IK":
-                    try: 
+                    try:
                         if key["rev_locators"]:
                             reverse_foot_module = reverse_foot.CreateReverseFoot(key["module"],key)
                     except KeyError:
@@ -283,7 +281,7 @@ class QtSampler(QWidget):
 
         system_group.grpSetup(self.ui.rig_master_name.text())
 
-        for key in self.systems_to_be_made.values(): # seperate loop to be sure systems are made before connecting
+        for key in self.systems_to_be_made.values():  # seperate loop to be sure systems are made before connecting
             rig_type = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_rig_type", asString=1)
             if key['system_to_connect']:
                 systems_to_connect = key['system_to_connect']
@@ -292,10 +290,9 @@ class QtSampler(QWidget):
                 space_swap_module = space_swap.SpaceSwapping(key)
 
         self.delete_guides()
-        
 
         button_names = ["colour_left","colour_middle","colour_right"]
-        button_colour_dict ={"colour_left":[],"colour_middle":[],"colour_right":[]}
+        button_colour_dict = {"colour_left":[],"colour_middle":[],"colour_right":[]}
         for x in button_names:
             button_name = getattr(self.ui, x)
             palette = button_name.palette()
@@ -319,6 +316,7 @@ class QtSampler(QWidget):
         for key in self.systems_to_be_made.values():
             cmds.hide(key["master_guide"])
         cmds.hide("grp_connector_clusters")
+
 
 def main():
     ui = QtSampler()
