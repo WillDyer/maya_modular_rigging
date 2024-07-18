@@ -1,5 +1,7 @@
 import maya.cmds as cmds
-from systems.utils import OPM
+from systems.utils import OPM, control_shape
+import importlib
+importlib.reload(control_shape)
 
 
 class create_fk():
@@ -19,8 +21,10 @@ class create_fk():
         fk_joint_list.reverse()
         scale = 10 * self.scale
         for i in range(len(fk_joint_list)):
-            cmds.circle(n=f"ctrl_fk_{fk_joint_list[i][7:]}",
-                        r=scale, nr=(1, 0, 0))
+            # cmds.circle(n=f"ctrl_fk_{fk_joint_list[i][7:]}",
+            #             r=scale, nr=(1, 0, 0))
+            control_module = control_shape.Controls(scale,guide=fk_joint_list[i][7:],ctrl_name=f"ctrl_fk_{fk_joint_list[i][7:]}")
+            ctrl_shape = control_module.return_ctrl()
             cmds.matchTransform(f"ctrl_fk_{fk_joint_list[i][7:]}",
                                 fk_joint_list[i])
             if delete_end is True:

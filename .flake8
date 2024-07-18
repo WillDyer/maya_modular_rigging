@@ -1,0 +1,4 @@
+[flake8]
+exclude = systems/modules/*
+max-line-length = 200
+extend-ignore = E722, E701, F841, E231, F403, F405
