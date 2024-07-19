@@ -148,7 +148,9 @@ class Guides():
         control_shape_en = ":".join(control_shape_list)
         for guide in ui_guide_list:
             if "root" in guide or "COG" in guide: pass
-            else: cmds.addAttr(guide,ln=f"{guide}_control_shape",at="enum",en=control_shape_en,k=1)
+            else:
+                cmds.addAttr(guide,ln=f"{guide}_ik_control_shape",at="enum",en=control_shape_en,k=1)
+                cmds.addAttr(guide,ln=f"{guide}_fk_control_shape",at="enum",en=control_shape_en,k=1)
 
         ui_dict = {
             "master_guide": master_guide,

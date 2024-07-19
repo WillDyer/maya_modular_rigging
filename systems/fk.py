@@ -19,11 +19,11 @@ class create_fk():
         self.ctrls_fk = []
         jnt_ctrls_fk = []
         fk_joint_list.reverse()
-        scale = 10 * self.scale
+        scale = self.scale
         for i in range(len(fk_joint_list)):
             # cmds.circle(n=f"ctrl_fk_{fk_joint_list[i][7:]}",
             #             r=scale, nr=(1, 0, 0))
-            control_module = control_shape.Controls(scale,guide=fk_joint_list[i][7:],ctrl_name=f"ctrl_fk_{fk_joint_list[i][7:]}")
+            control_module = control_shape.Controls(scale,guide=fk_joint_list[i][7:],ctrl_name=f"ctrl_fk_{fk_joint_list[i][7:]}",rig_type="fk")
             ctrl_shape = control_module.return_ctrl()
             cmds.matchTransform(f"ctrl_fk_{fk_joint_list[i][7:]}",
                                 fk_joint_list[i])

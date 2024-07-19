@@ -1,28 +1,6 @@
 import maya.cmds as cmds
 
 
-def create_ctrl(joint):
-    ctrl_crv = cmds.circle(n=f"ctrl_ik_{joint[7:]}",r=1, nr=(1, 0, 0))
-    cmds.matchTransform(ctrl_crv,joint)
-    cmds.parentConstraint(ctrl_crv, joint,mo=1,n=f"pConst_{joint[7:]}")
-    return f"ctrl_ik_{joint[7:]}"
-
-
-def create_cube(name, scale):
-    ctrlCV = cmds.curve(n=name,d=1,p=[(0,0,0),(1,0,0),(1,0,1),(0,0,1),(0,0,0),
-                                      (0,1,0),(1,1,0),(1,0,0),(1,1,0),
-                                      (1,1,1),(1,0,1),(1,1,1),
-                                      (0,1,1),(0,0,1),(0,1,1),(0,1,0)])
-
-    cmds.CenterPivot()
-    cmds.xform(ctrlCV,t=(-.5,-.5,-.5))
-    cmds.xform(ctrlCV,s=[scale[0],scale[1],scale[2]])
-    cmds.select(ctrlCV)
-    cmds.FreezeTransformations()
-    cmds.delete(ctrlCV, ch=1)
-    return ctrlCV
-
-
 def connector(first_jnt, second_jnt):
     first_point_loc = cmds.xform(first_jnt,q=1,ws=1,rp=1)
     second_point_loc = cmds.xform(second_jnt,q=1,ws=1,rp=1)

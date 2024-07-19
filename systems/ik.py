@@ -1,10 +1,11 @@
 import maya.cmds as cmds
 import importlib
-from systems.utils import (OPM, utils, pole_vector)
+from systems.utils import (OPM, utils, pole_vector,control_shape)
 
 importlib.reload(OPM)
 importlib.reload(pole_vector)
 importlib.reload(utils)
+importlib.reload(control_shape)
 
 # CLEAN THIS FILE UP
 
@@ -50,7 +51,8 @@ class create_ik():
         return f"ctrl_pv_{self.pv_joint[7:]}"
 
     def create_handle(self):
-        ctrl_crv = utils.create_cube(f"ctrl_ik_{self.end_joint[7:]}",scale=[5,5,5])
+        control_module = control_shape.Controls(scale=[1,1,1],guide=self.end_joint[7:],ctrl_name=f"ctrl_ik_{self.end_joint[7:]}",rig_type="ik")
+        ctrl_crv = control_module.return_ctrl()
         self.handle = cmds.ikHandle(n=f"hdl_ik_{self.end_joint[7:]}", solver="ikRPsolver", sj=self.start_joint, ee=self.end_joint)
         cmds.poleVectorConstraint(f"ctrl_pv_{self.pv_joint[7:]}", f"hdl_ik_{self.end_joint[7:]}", n=f"pvConst_{self.pv_joint[7:]}")
         if self.validation_joints["world_orientation"] is True:
@@ -62,7 +64,8 @@ class create_ik():
         return ctrl_crv
 
     def create_top_hdl_ctrl(self):
-        self.start_ctrl_crv = cmds.circle(n=f"ctrl_ik_{self.start_joint[7:]}",r=10, nr=(1, 0, 0))[0]
+        control_module = control_shape.Controls(scale=1,guide=self.start_joint[7:],ctrl_name=f"ctrl_ik_{self.start_joint[7:]}",rig_type="ik")
+        self.start_ctrl_crv = control_module.return_ctrl()
         cmds.matchTransform(self.start_ctrl_crv,self.start_joint)
         cmds.parentConstraint(self.start_ctrl_crv, self.start_joint,mo=1,n=f"pConst_{self.start_joint[7:]}")
         return self.start_ctrl_crv
@@ -87,7 +90,8 @@ class create_ik():
         self.to_be_parented = []
         if self.above_root_joints:
             for joint in self.above_root_joints:
-                ctrl_crv_tmp = cmds.circle(n=f"ctrl_ik_{joint[7:]}",r=10,nr=(1, 0, 0))[0]
+                control_module = control_shape.Controls(scale=1,guide=joint[7:],ctrl_name=f"ctrl_ik_{joint[7:]}",rig_type="ik")
+                ctrl_crv_tmp = control_module.return_ctrl()
                 self.to_be_parented.append(ctrl_crv_tmp)
                 cmds.matchTransform(ctrl_crv_tmp,joint)
                 cmds.parentConstraint(ctrl_crv_tmp, joint,mo=1,n=f"pConst_{joint[7:]}")

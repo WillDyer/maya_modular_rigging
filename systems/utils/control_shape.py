@@ -6,28 +6,24 @@ def control_shape_list():
 
 
 class ControlTypes():
-    def __init__(self, name, scale, control_type):
+    def __init__(self, name, control_type):
         self.name = name
-        self.scale = scale
         module = f"self.create_{control_type}()"
         eval(module)
 
     def create_circle(self):
-        self.ctrl_crv = cmds.circle(n=self.name,r=self.scale, nr=(1, 0, 0))
+        self.ctrl_crv = cmds.circle(n=self.name,r=1, nr=(1, 0, 0))[0]
         return self.ctrl_crv
 
     def create_cube(self):
-        self.ctrlCV = cmds.curve(n=self.name,d=1,p=[(0,0,0),(1,0,0),(1,0,1),(0,0,1),(0,0,0),
-                                                    (0,1,0),(1,1,0),(1,0,0),(1,1,0),(1,1,1),
-                                                    (1,0,1),(1,1,1),(0,1,1),(0,0,1),(0,1,1),(0,1,0)])
+        self.ctrl_crv = cmds.curve(n=self.name,d=1,p=[(0,0,0),(1,0,0),(1,0,1),(0,0,1),(0,0,0),
+                                                      (0,1,0),(1,1,0),(1,0,0),(1,1,0),(1,1,1),
+                                                      (1,0,1),(1,1,1),(0,1,1),(0,0,1),(0,1,1),(0,1,0)])
 
         cmds.CenterPivot()
-        cmds.xform(self.ctrlCV,t=(-.5,-.5,-.5))
-        cmds.xform(self.ctrlCV,s=[self.scale[0],self.scale[1],self.scale[2]])
-        cmds.select(self.ctrlCV)
-        cmds.FreezeTransformations()
-        cmds.delete(self.ctrlCV, ch=1)
-        return self.ctrlCV
+        cmds.xform(self.ctrl_crv,t=(-.5,-.5,-.5))
+        cmds.xform(self.ctrl_crv,s=[5,5,5])
+        return self.ctrl_crv
 
     def create_locator(self):
         self.ctrl_crv = cmds.spaceLocator(n=self.name)
@@ -38,21 +34,31 @@ class ControlTypes():
 
 
 class Controls():
-    def __init__(self,scale,guide,ctrl_name):
-        control_type = cmds.getAttr(f"{guide}.{guide}_control_shape",asString=1)
+    def __init__(self,scale,guide,ctrl_name,rig_type):
         self.ctrl_name = ctrl_name
+
+        self.scale = scale
+        if type(self.scale) is int or type(self.scale) is float:
+            self.scale = [self.scale,self.scale,self.scale]
+
+        control_type = cmds.getAttr(f"{guide}.{guide}_{rig_type}_control_shape",asString=1)
         if control_type in control_shape_list():
-            control_module = ControlTypes(self.ctrl_name,scale,control_type)
+            control_module = ControlTypes(self.ctrl_name,control_type)
             self.ctrl = control_module.return_ctrl()
+            self.set_control_size()
+            self.set_name()
 
     def get_bounding_region(self):
         pass
 
     def set_control_size(self):
-        pass
+        cmds.xform(self.ctrl,s=[10*self.scale[0],10*self.scale[1],10*self.scale[2]])
+        cmds.select(self.ctrl)
+        cmds.makeIdentity(a=1,t=1,r=1,s=1)
+        cmds.delete(self.ctrl, ch=1)
 
     def set_name(self):
-        pass
+        cmds.rename(self.ctrl,self.ctrl_name)
 
     def return_ctrl(self):
         return self.ctrl
