@@ -1,6 +1,21 @@
 import maya.cmds as cmds
 
 
+def create_cube(name, scale):
+    ctrlCV = cmds.curve(n=name,d=1,p=[(0,0,0),(1,0,0),(1,0,1),(0,0,1),(0,0,0),
+                                      (0,1,0),(1,1,0),(1,0,0),(1,1,0),
+                                      (1,1,1),(1,0,1),(1,1,1),
+                                      (0,1,1),(0,0,1),(0,1,1),(0,1,0)])
+
+    cmds.CenterPivot()
+    cmds.xform(ctrlCV,t=(-.5,-.5,-.5))
+    cmds.xform(ctrlCV,s=[scale[0],scale[1],scale[2]])
+    cmds.select(ctrlCV)
+    cmds.FreezeTransformations()
+    cmds.delete(ctrlCV, ch=1)
+    return ctrlCV
+
+
 def connector(first_jnt, second_jnt):
     first_point_loc = cmds.xform(first_jnt,q=1,ws=1,rp=1)
     second_point_loc = cmds.xform(second_jnt,q=1,ws=1,rp=1)
