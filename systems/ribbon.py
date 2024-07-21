@@ -3,9 +3,10 @@ import maya.OpenMaya as om
 import importlib
 import math
 
-from systems.utils import OPM
+from systems.utils import (OPM, utils)
 
 importlib.reload(OPM)
+importlib.reload(utils)
 
 
 class create_ribbon():
@@ -33,7 +34,8 @@ class create_ribbon():
     def create_nurbs_curve(self):
         start_joint = [x for x in self.system["ik_joint_list"] if self.module.ik_joints["start_joint"] in x][0]
         end_joint = [x for x in self.system["ik_joint_list"] if self.module.ik_joints["end_joint"] in x][0]
-        self.joint_chain = self.get_joints_between(start_joint, end_joint)
+        # self.joint_chain = self.get_joints_between(start_joint, end_joint)
+        self.joint_chain = utils.get_joints_between(start_joint, end_joint)
 
         positions = []
         for joint in self.joint_chain:

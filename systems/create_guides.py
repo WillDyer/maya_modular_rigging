@@ -164,7 +164,7 @@ class Guides():
                         "module_type": ["enum","Base Module",accessed_module,True],
                         "skeleton_dvdr": ["enum","------------", "SKELETON",True],
                         "mirror_jnts": ["enum","Mirror Joints", "No:Yes",False],
-                        "twist_jnts": ["enum","Twist Joints", "Yes:No",False],
+                        "twist_jnts": ["enum","Twist Joints", "No:Yes",False],
                         "twist_amount": ["float","Twist Amount", "UPDATE",False],
                         "rig_dvdr": ["enum","------------","RIG",True],
                         "rig_type": ["enum","Rig Type",self.available_rig_types,False]

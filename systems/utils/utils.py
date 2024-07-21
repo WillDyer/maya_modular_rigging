@@ -84,3 +84,40 @@ def colour_controls(ctrl_list,colour_dict):
                 pass
         except:
             pass
+
+
+def get_joints_between(start_joint, end_joint):
+    print("GET JOINTS BETWEEN RAN")
+    # Ensure both joints exist
+    if not cmds.objExists(start_joint) or not cmds.objExists(end_joint):
+        raise ValueError("One or both of the specified joints do not exist.")
+
+    # Get the full path for both joints
+    start_path = cmds.ls(start_joint, long=True)[0]
+    end_path = cmds.ls(end_joint, long=True)[0]
+
+    # Split the paths into individual joint names
+    start_joints = start_path.split('|')[1:]  # Exclude the root '|'
+    end_joints = end_path.split('|')[1:]      # Exclude the root '|'
+
+    # Find the common ancestor
+    common_ancestor = None
+    for sj, ej in zip(start_joints, end_joints):
+        if sj == ej:
+            common_ancestor = sj
+        else:
+            break
+
+    if common_ancestor is None:
+        raise ValueError("The specified joints do not share a common ancestor.")
+
+    # Build the path from start_joint to common_ancestor
+    start_to_common = start_joints[start_joints.index(common_ancestor):]
+
+    # Build the path from common_ancestor to end_joint (reverse order)
+    common_to_end = end_joints[end_joints.index(common_ancestor)+1:]
+
+    # Combine the paths
+    joint_path = start_to_common + common_to_end
+
+    return joint_path

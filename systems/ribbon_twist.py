@@ -4,6 +4,10 @@ from systems.utils import OPM
 importlib.reload(OPM)
 
 
+class prep_skeleton():
+    def __init__(self):
+        pass
+
 class ribbon_twist():
     def __init__(self):
         selected_surface = cmds.ls(selection=True)

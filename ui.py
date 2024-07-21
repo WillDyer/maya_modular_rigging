@@ -19,7 +19,8 @@ from systems import (
     ik,
     create_guides,
     hands,
-    ribbon
+    ribbon,
+    ribbon_twist
 )
 
 from systems.utils import (
@@ -46,6 +47,7 @@ importlib.reload(space_swap)
 importlib.reload(hands)
 importlib.reload(reverse_foot)
 importlib.reload(ribbon)
+importlib.reload(ribbon_twist)
 
 mayaMainWindowPtr = omui.MQtUtil.mainWindow()
 mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QWidget)
@@ -283,11 +285,16 @@ class QtSampler(QWidget):
 
         for key in self.systems_to_be_made.values():  # seperate loop to be sure systems are made before connecting
             rig_type = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_rig_type", asString=1)
+            twist_joint = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_twist_jnts", asString=1)
             if key['system_to_connect']:
                 systems_to_connect = key['system_to_connect']
                 connect_modules.connect_polished(systems_to_connect)
             if rig_type == "FKIK":
                 space_swap_module = space_swap.SpaceSwapping(key)
+            if twist_joint == "Yes":
+                twist_amount = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_twist_amount")
+                if twist_amount > 0:
+                    tween_joint_list = ribbon_twist.ribbon_twist
 
         self.delete_guides()
 
