@@ -206,11 +206,23 @@ class QtSampler(QWidget):
 
         mirror_module = mirror_rig.mirror_data(self.systems_to_be_made)
         self.systems_to_be_made = mirror_module.get_mirror_data()
-        connect_modules.attach_joints(self.systems_to_be_made,system="rig")
 
         skn_created_guides = [key["master_guide"] for key in self.systems_to_be_made.values()]
         skn_jnt_list = joints.get_joint_list(self.ui.oritentation.currentText(),skn_created_guides, system="skn")
+
+        for key in self.systems_to_be_made.values():
+            twist_joint = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_twist_jnts", asString=1)
+            if twist_joint == "Yes":
+                twist_amount = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_twist_amount")
+                if twist_amount > 0:
+                    ribbon_twist_module = ribbon_twist.prep_skeleton(key,system="rig")
+                    twist_dict = ribbon_twist_module.return_data()
+                    ribbon_twist.prep_skeleton(key,system="skn")
+                    key.update({"twist_dict": twist_dict})
+
+        connect_modules.attach_joints(self.systems_to_be_made,system="rig")
         connect_modules.attach_joints(self.systems_to_be_made,system="skn")
+
         skn_jnt_list = [item for sublist in skn_jnt_list for item in sublist]
         for joint in skn_jnt_list: cmds.parentConstraint(f"jnt_rig{joint[7:]}",joint,mo=1,n=f"pConst_jnt_rig{joint[7:]}")
 
@@ -254,7 +266,7 @@ class QtSampler(QWidget):
                 elif rig_type == "IK_Ribbon":
                     ik_joint_list = joints.joint(orientation, master_guide, system="ik")
                     key.update({"ik_joint_list": ik_joint_list})
-                    ik_module = ribbon.create_ribbon(key, key["module"],ctrl_amount=3)
+                    ik_module = ribbon.create_ribbon(key, key["module"],ctrl_amount=3, ribbon_type="ik_ribbon", start_joint="", end_joint="", joint_list="")
                     key.update({"ik_ctrl_list": ik_module.get_ribbon_ctrls()})
                     utils.constraint_from_lists_1to1(ik_joint_list, key["joints"],maintain_offset=1)
                 elif rig_type == "FKIK":
@@ -294,7 +306,7 @@ class QtSampler(QWidget):
             if twist_joint == "Yes":
                 twist_amount = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_twist_amount")
                 if twist_amount > 0:
-                    tween_joint_list = ribbon_twist.ribbon_twist(key)
+                    tween_joint_list = ribbon_twist.ribbon_twist(self.systems_to_be_made)
 
         self.delete_guides()
 

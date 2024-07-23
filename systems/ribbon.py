@@ -10,12 +10,18 @@ importlib.reload(utils)
 
 
 class create_ribbon():
-    def __init__(self, system, accessed_module, ctrl_amount):
+    def __init__(self, system, accessed_module, ctrl_amount, ribbon_type, start_joint, end_joint, joint_list):
         self.module = importlib.import_module(f"systems.modules.{accessed_module}")
         importlib.reload(self.module)
+        self.ribbon_type = ribbon_type
         self.ctrl_amount = ctrl_amount
         self.system = system
         self.scale = 10 * self.module.guide_scale
+
+        # Only applicable for ribbon_twist:
+        self.start_joint = start_joint
+        self.end_joint = end_joint
+        self.joint_list = joint_list
         self.create_ribbon()
 
     def create_ribbon(self):
@@ -27,28 +33,49 @@ class create_ribbon():
         self.group_setup()
         self.skin_ribbon()
         self.constrain_to_ik_joints()
-        cmds.group(self.system["ik_joint_list"], n=f"grp_ik_jnts_{self.system['master_guide']}", w=1)
+        if self.ribbon_type != "ribbon_twist":
+            cmds.group(self.system["ik_joint_list"], n=f"grp_ik_jnts_{self.system['master_guide']}", w=1)
         cmds.parent(self.nurbs_curve, f"grp_parent_ribbon_{self.system['master_guide']}")
         cmds.select(clear=1)
 
     def create_nurbs_curve(self):
-        start_joint = [x for x in self.system["ik_joint_list"] if self.module.ik_joints["start_joint"] in x][0]
-        end_joint = [x for x in self.system["ik_joint_list"] if self.module.ik_joints["end_joint"] in x][0]
-        # self.joint_chain = self.get_joints_between(start_joint, end_joint)
-        self.joint_chain = utils.get_joints_between(start_joint, end_joint)
+        if self.ribbon_type == "ik_ribbon":
+            start_joint = [x for x in self.system["ik_joint_list"] if self.module.ik_joints["start_joint"] in x][0]
+            end_joint = [x for x in self.system["ik_joint_list"] if self.module.ik_joints["end_joint"] in x][0]
+            self.joint_chain = utils.get_joints_between(start_joint, end_joint)
+        elif self.ribbon_type == "ribbon_twist":
+            start_joint = self.start_joint
+            end_joint = self.end_joint
+            self.joint_chain = self.joint_list
 
         positions = []
+        offset_positions_left = []
+        offset_positions_right = []
+        print(self.joint_chain)
         for joint in self.joint_chain:
-            pos = cmds.xform(joint, query=True, worldSpace=True, translation=True)
-            positions.append(pos)
+            # pos = cmds.xform(joint, query=True, worldSpace=True, translation=True)
+            loc_left = cmds.spaceLocator(n="loc_tmp_left")[0]
+            loc_right = cmds.spaceLocator(n="loc_tmp_right")[0]
+            cmds.matchTransform(loc_left, joint)
+            cmds.matchTransform(loc_right, joint)
+
+            # note currently only works for xyz orientation needs to be improved
+            cmds.move((5 * self.module.guide_scale),loc_right,relative=True, objectSpace=True, worldSpaceDistance=True, moveZ=1)
+            cmds.move((-5 * self.module.guide_scale),loc_left,relative=True, objectSpace=True, worldSpaceDistance=True, moveZ=1)
+
+            loc_left_translation = cmds.xform(loc_left, query=True, translation=True, worldSpace=True)
+            offset_positions_left.append(loc_left_translation)
+
+            loc_right_translation = cmds.xform(loc_right, query=True, translation=True, worldSpace=True)
+            offset_positions_right.append(loc_right_translation)
+
+            cmds.delete(loc_left, loc_right)
 
         curves = []
 
-        offset_positions_left = []
-        offset_positions_right = []
-        for pos in positions:
+        """for pos in positions:
             offset_positions_left.append([pos[0] - (5 * self.module.guide_scale), pos[1], pos[2]])
-            offset_positions_right.append([pos[0] + (5 * self.module.guide_scale), pos[1], pos[2]])
+            offset_positions_right.append([pos[0] + (5 * self.module.guide_scale), pos[1], pos[2]])"""
         curve_left = cmds.curve(degree=1, point=offset_positions_left)
         curve_right = cmds.curve(degree=1, point=offset_positions_right)
         curves.append(curve_left)
@@ -120,6 +147,9 @@ class create_ribbon():
         elif cmds.getAttr(surface + ".formU") == 0 or cmds.getAttr(surface + ".formV") == 0:  # check not closed
             curve_type = "open"
             spans = self.spansV + 1
+        else:  # presuming curve is open
+            curve_type = "open"
+            spans = self.spansV + 1
 
         u_curve_corr = cmds.duplicateCurve(self.nurbs_curve + ".v[.5]", local=True, ch=0)[0]
         param_ctrls = self.param_from_length(u_curve_corr, spans, curve_type, "uv", delete_curve=False)
@@ -183,9 +213,9 @@ class create_ribbon():
             self.ctrl_list.append(ctrl)
 
     def group_setup(self):
-        cmds.group(self.ctrl_list, n=f"grp_ctrl_ribbon_{self.system['master_guide']}", p=self.top_grp)
-        cmds.group(self.skn_jnt_list, n=f"grp_ribbon_{self.system['master_guide']}_skn_jnt", p=self.top_grp)
-        cmds.group(self.fol_parent_list, n=f"grp_ribbon_{self.system['master_guide']}_fol", p=self.top_grp)
+        self.ctrl_grp = cmds.group(self.ctrl_list, n=f"grp_ctrl_ribbon_{self.system['master_guide']}", p=self.top_grp)
+        self.skn_jnt_grp = cmds.group(self.skn_jnt_list, n=f"grp_ribbon_{self.system['master_guide']}_skn_jnt", p=self.top_grp)
+        self.fol_grp = cmds.group(self.fol_parent_list, n=f"grp_ribbon_{self.system['master_guide']}_fol", p=self.top_grp)
 
     def skin_ribbon(self):
         cmds.skinCluster(self.skn_jnt_list, self.nurbs_curve)
@@ -199,3 +229,13 @@ class create_ribbon():
 
     def get_ribbon_ctrls(self):
         return self.ctrl_list
+
+    def get_ribbon_twist_data(self):
+        ribbon_dict = {
+            "nurbs_curve": self.nurbs_curve,
+            "top_level_grp": self.top_grp,
+            "grp_ctrl": self.ctrl_grp,
+            "grp_skn_jnt": self.skn_jnt_grp,
+            "grp_fol": self.fol_grp
+        }
+        return ribbon_dict
