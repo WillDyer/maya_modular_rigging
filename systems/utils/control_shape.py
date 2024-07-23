@@ -41,7 +41,10 @@ class Controls():
         if type(self.scale) is int or type(self.scale) is float:
             self.scale = [self.scale,self.scale,self.scale]
 
+        # print(f"{guide}.{guide}_{rig_type}_control_shape")
         control_type = cmds.getAttr(f"{guide}.{guide}_{rig_type}_control_shape",asString=1)
+        # except ValueError: control_type = "circle"
+
         if control_type in control_shape_list():
             control_module = ControlTypes(self.ctrl_name,control_type)
             self.ctrl = control_module.return_ctrl()

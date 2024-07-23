@@ -28,7 +28,6 @@ class mirror_data():
 
     def create_mirrored_guides(self):  # Create guide locators
         for jnt in self.joint_list:
-
             for type in ["jnt_rig_","jnt_ik_","jnt_fk_"]:
                 if type in jnt:
                     tmp_jnt = jnt.replace(type, "")
@@ -55,20 +54,32 @@ class mirror_data():
         return master_guide
 
     def copy_mirrored_attrs(self):  # Copy attrs accross
+        self.non_proxy_attr_list = []
         for attr in cmds.listAttr(self.key["master_guide"], r=1,ud=1):
-            try:
-                if attr == "master_guide":
-                    cmds.addAttr(self.proxy_obj_list, ln="master_guide",at="enum",en=self.master_guide,k=0)
-                elif attr not in ['visibility', 'translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']:
-                    try:
-                        new_attr_name = attr.replace(f"{self.key['side']}_",self.simple_side,1)
-                    except:
-                        pass
-                    cmds.addAttr(self.proxy_obj_list,ln=f"{new_attr_name}", proxy=f"{self.key['master_guide']}.{attr}")
-                else:
-                    pass
-            except:
+            if "_control_shape" in attr:
                 pass
+            else:
+                try:
+                    if attr == "master_guide":
+                        cmds.addAttr(self.proxy_obj_list, ln="master_guide",at="enum",en=self.master_guide,k=0)
+                    elif attr not in ['visibility', 'translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']:
+                        try:
+                            new_attr_name = attr.replace(f"{self.key['side']}_",self.simple_side,1)
+                        except:
+                            pass
+                        cmds.addAttr(self.proxy_obj_list,ln=f"{new_attr_name}", proxy=f"{self.key['master_guide']}.{attr}")
+                    else:
+                        pass
+                except:
+                    pass
+
+        for guide in self.key["guide_list"]:
+            for attr in cmds.listAttr(guide, r=1,ud=1):
+                if "_control_shape" in attr:
+                    new_attr_name = attr.replace(f"{self.key['side']}_",self.simple_side,1)
+                    mirrored_guide = guide.replace(f"{self.key['side']}_",self.simple_side,1)
+                    enum_value = cmds.getAttr(f"{guide}.{attr}",asString=1)
+                    cmds.addAttr(mirrored_guide,ln=f"{new_attr_name}",at="enum",en=enum_value)
 
     def mirror_reverse_foot(self):
         try:

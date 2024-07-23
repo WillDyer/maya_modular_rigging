@@ -1,16 +1,37 @@
 import maya.cmds as cmds
 import importlib
-from systems.utils import OPM
+import sys
+import os
+from systems.utils import OPM, utils
 importlib.reload(OPM)
+importlib.reload(utils)
 
 
 class prep_skeleton():
-    def __init__(self):
+    def __init__(self,key):
+        module = importlib.import_module(key['module'])
+        importlib.reload(module)
+        for guide in key["guide_list"]:
+            rig_joint = f"jnt_rig_{guide}"
+            if module.twist_joint["start"] in rig_joint:
+                start_joint = rig_joint
+            elif module.twist_joint["end"] in rig_joint:
+                end_joint = rig_joint
+
+        print(f"start: {start_joint}, end: {end_joint}")
+        self.joint_list = utils.get_joints_between(start_joint, end_joint)
+        print(self.joint_list)
+
+    def insert_joints_between(self):
         pass
 
+
 class ribbon_twist():
-    def __init__(self):
-        selected_surface = cmds.ls(selection=True)
+    def __init__(self,key):
+        print("ribbon_twist ran")
+        prep_skeleton(key)
+
+        """selected_surface = cmds.ls(selection=True)
         if selected_surface:
             self.nurbs_surface = selected_surface[0]
             self.grp = f"grp_{self.nurbs_surface}"
@@ -25,7 +46,7 @@ class ribbon_twist():
 
             cmds.select(clear=1)
         else:
-            print("Please select a NURBS surface.")
+            print("Please select a NURBS surface.")"""
 
     def select_isoparms(self, UV):
         surface_info = cmds.createNode('surfaceInfo')

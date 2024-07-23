@@ -294,7 +294,7 @@ class QtSampler(QWidget):
             if twist_joint == "Yes":
                 twist_amount = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_twist_amount")
                 if twist_amount > 0:
-                    tween_joint_list = ribbon_twist.ribbon_twist
+                    tween_joint_list = ribbon_twist.ribbon_twist(key)
 
         self.delete_guides()
 

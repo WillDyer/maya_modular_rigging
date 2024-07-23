@@ -7,6 +7,10 @@ ik_joints = {
     "pv_joint": "elbow",
     "world_orientation": False
 }
+twist_joint = {
+    "start": "shoulder",
+    "end": "wrist"
+}
 side = "_l"
 space_swapping = ["shoulder","root","COG","Custom"]
 guide_scale = 1
