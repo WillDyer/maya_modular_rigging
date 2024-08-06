@@ -1,8 +1,29 @@
+import importlib
 import maya.cmds as cmds
 
 
-def control_shape_list():
-    return ["circle","cube","locator"]
+class ControlShapeList():
+    def __init__(self):
+        self.ctrl_shape_list = ["circle","cube","locator"]
+
+    def return_filtered_list(self, type, object):
+        module = cmds.getAttr(f"{object}.base_module", asString=True)
+        module_path = importlib.import_module(module)
+        importlib.reload(module_path)
+
+        base_guide = cmds.getAttr(f"{object}.original_guide", asString=True)
+
+        try:
+            if module_path.default_ctrl_shape[f"{type}_{base_guide}"]:
+                default_ctrl_shape = module_path.default_ctrl_shape[f"{type}_{base_guide}"]
+                if default_ctrl_shape in self.ctrl_shape_list:
+                    self.ctrl_shape_list.remove(default_ctrl_shape)
+                    self.ctrl_shape_list.insert(0, default_ctrl_shape)
+        except KeyError:
+            pass  # guide isnt in the default_ctrl_shape dict
+
+    def return_list(self):
+        return self.ctrl_shape_list
 
 
 class ControlTypes():
@@ -45,7 +66,9 @@ class Controls():
         control_type = cmds.getAttr(f"{guide}.{guide}_{rig_type}_control_shape",asString=1)
         # except ValueError: control_type = "circle"
 
-        if control_type in control_shape_list():
+        ctrl_shape_instance = ControlShapeList()
+        ctrl_list = ctrl_shape_instance.return_list()
+        if control_type in ctrl_list.return_regular_list():
             control_module = ControlTypes(self.ctrl_name,control_type)
             self.ctrl = control_module.return_ctrl()
             self.set_control_size()

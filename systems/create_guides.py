@@ -115,6 +115,8 @@ class Guides():
             cmds.xform(guide, ws=1, t=[pos[0]+offset[0], pos[1]+offset[1], pos[2]+offset[2]])
             cmds.xform(guide, ws=1, ro=[rot[0], rot[1], rot[2]])
 
+            cmds.addAttr(guide, ln="original_guide", at="enum", en=x, k=0)  # original guide attr
+
         # parent together
         guide_list.reverse()
         ui_guide_list = guide_list
@@ -144,13 +146,15 @@ class Guides():
                 cmds.setAttr(f"{guide}.{item}",k=0)
 
         # control shape attr (custom per guide).
-        control_shape_list = control_shape.control_shape_list()
-        control_shape_en = ":".join(control_shape_list)
         for guide in ui_guide_list:
-            if "root" in guide or "COG" in guide: pass
+            if "root" in guide or "COG" in guide or "master" in guide: pass
             else:
-                cmds.addAttr(guide,ln=f"{guide}_ik_control_shape",at="enum",en=control_shape_en,k=1)
-                cmds.addAttr(guide,ln=f"{guide}_fk_control_shape",at="enum",en=control_shape_en,k=1)
+                for fkik in ["ik","fk"]:
+                    control_shape_instance = control_shape.ControlShapeList()
+                    control_shape_instance.return_filtered_list(type=fkik, object=guide)
+                    control_shape_list = control_shape_instance.return_list()
+                    control_shape_en = ":".join(control_shape_list)
+                    cmds.addAttr(guide,ln=f"{guide}_{fkik}_control_shape",at="enum",en=control_shape_en,k=1)
 
         ui_dict = {
             "master_guide": master_guide,

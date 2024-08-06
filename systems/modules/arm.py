@@ -15,3 +15,7 @@ side = "_l"
 space_swapping = ["shoulder","root","COG","Custom"]
 guide_scale = 1
 available_rig_types = ["FK","IK","FKIK"]
+default_ctrl_shape = {
+    "fk_wrist": "circle",
+    "ik_wrist": "cube"
+}

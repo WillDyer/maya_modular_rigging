@@ -93,3 +93,14 @@ rev_locators = {
 # This dictionary is REQUIRED if reverse_foot is True.
 # Note: foot_ctrl, ankkle, ball, toe must exist within system.
 ```
+#### default_ctrl_shape: default shape configuration
+
+```python
+default_ctrl_shape = {
+    "fk_wrist": "circle",
+    "ik_wrist": "cube"
+}
+
+# This dictionary is not required.
+# Note: dictionary key needs to be equal to type ik or fk _ guide name from system. Objects only need to be added if the default isnt a circle.
+```
