@@ -20,7 +20,7 @@ from systems import (
     create_guides,
     hands,
     ribbon,
-    ribbon_twist
+    twist_joints
 )
 
 from systems.utils import (
@@ -47,7 +47,7 @@ importlib.reload(space_swap)
 importlib.reload(hands)
 importlib.reload(reverse_foot)
 importlib.reload(ribbon)
-importlib.reload(ribbon_twist)
+importlib.reload(twist_joints)
 
 mayaMainWindowPtr = omui.MQtUtil.mainWindow()
 mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QWidget)
@@ -215,10 +215,11 @@ class QtSampler(QWidget):
             if twist_joint == "Yes":
                 twist_amount = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_twist_amount")
                 if twist_amount > 0:
-                    ribbon_twist_module = ribbon_twist.prep_skeleton(key,system="rig")
-                    twist_dict = ribbon_twist_module.return_data()
-                    ribbon_twist.prep_skeleton(key,system="skn")
-                    key.update({"twist_dict": twist_dict})
+                    rig_twist_instance = twist_joints.PrepSkeleton(key,system="rig")
+                    rig_twist_list = rig_twist_instance.return_data()
+                    twist_joints.PrepSkeleton(key,system="skn")
+                    twist_joints.rig_to_skn(rig_twist_list)
+                    key.update({"twist_dict": rig_twist_list})
 
         connect_modules.attach_joints(self.systems_to_be_made,system="rig")
         connect_modules.attach_joints(self.systems_to_be_made,system="skn")
@@ -305,8 +306,8 @@ class QtSampler(QWidget):
                 space_swap_module = space_swap.SpaceSwapping(key)
             if twist_joint == "Yes":
                 twist_amount = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_twist_amount")
-                if twist_amount > 0:
-                    tween_joint_list = ribbon_twist.ribbon_twist(self.systems_to_be_made)
+                """if twist_amount > 0:
+                    tween_joint_list = ribbon_twist.ribbon_twist(self.systems_to_be_made)"""
 
         self.delete_guides()
 

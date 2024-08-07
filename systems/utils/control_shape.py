@@ -68,7 +68,7 @@ class Controls():
 
         ctrl_shape_instance = ControlShapeList()
         ctrl_list = ctrl_shape_instance.return_list()
-        if control_type in ctrl_list.return_regular_list():
+        if control_type in ctrl_list:
             control_module = ControlTypes(self.ctrl_name,control_type)
             self.ctrl = control_module.return_ctrl()
             self.set_control_size()

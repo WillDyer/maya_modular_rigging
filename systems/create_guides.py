@@ -179,7 +179,10 @@ class Guides():
             if custom_attrs[i][0] == "enum":
                 cmds.addAttr(master_guide,k=1,ln=f"{system[-1]}_{i}",nn=custom_attrs[i][1],at="enum",en=custom_attrs[i][2])
             elif custom_attrs[i][0] == "float":
-                cmds.addAttr(master_guide,k=1,ln=f"{system[-1]}_{i}",nn=custom_attrs[i][1],at="float",min=0)
+                if custom_attrs[i][1] == "Twist Amount":
+                    cmds.addAttr(master_guide,k=1,ln=f"{system[-1]}_{i}",nn=custom_attrs[i][1],at="float",min=0,max=3)
+                else:
+                    cmds.addAttr(master_guide,k=1,ln=f"{system[-1]}_{i}",nn=custom_attrs[i][1],at="float",min=0)
             if custom_attrs[i][3] is True:
                 cmds.setAttr(f"{master_guide}.{system[-1]}_{i}", l=1)
 
