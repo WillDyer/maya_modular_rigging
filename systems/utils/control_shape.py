@@ -14,13 +14,14 @@ class ControlShapeList():
         base_guide = cmds.getAttr(f"{object}.original_guide", asString=True)
 
         try:
-            if module_path.default_ctrl_shape[f"{type}_{base_guide}"]:
-                default_ctrl_shape = module_path.default_ctrl_shape[f"{type}_{base_guide}"]
-                if default_ctrl_shape in self.ctrl_shape_list:
-                    self.ctrl_shape_list.remove(default_ctrl_shape)
-                    self.ctrl_shape_list.insert(0, default_ctrl_shape)
-        except KeyError:
-            pass  # guide isnt in the default_ctrl_shape dict
+            try:
+                if module_path.default_ctrl_shape[f"{type}_{base_guide}"]:
+                    default_ctrl_shape = module_path.default_ctrl_shape[f"{type}_{base_guide}"]
+                    if default_ctrl_shape in self.ctrl_shape_list:
+                        self.ctrl_shape_list.remove(default_ctrl_shape)
+                        self.ctrl_shape_list.insert(0, default_ctrl_shape)
+            except AttributeError: pass  # catches if the module_path.default_ctrl_shape dict exists
+        except KeyError: pass  # guide isnt in the default_ctrl_shape dict
 
     def return_list(self):
         return self.ctrl_shape_list

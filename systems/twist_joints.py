@@ -22,11 +22,6 @@ class PrepSkeleton():
         self.joint_list = utils.get_joints_between(start_joint, end_joint)
         self.create_tween_joints()
 
-        """if system == "rig":
-            CreateTwist(twist_joint_dict)
-            points_to_create_on = utils.get_joints_between(start_joint, end_joint)
-            self.ribbon_module = ribbon.create_ribbon(self.key, self.key["module"],ctrl_amount=len(self.joint_list), ribbon_type="ribbon_twist",start_joint=start_joint, end_joint=end_joint, joint_list=points_to_create_on)"""
-
     def create_tween_joints(self):
         self.return_data_list = []
         for x in range(len(self.joint_list)):
@@ -94,7 +89,8 @@ class PrepSkeleton():
         # twist joint1 & joint2
         self.joint1_twist = f"{self.joint1}_twist"
         cmds.duplicate(self.joint1, parentOnly=True, n=self.joint1_twist)
-        cmds.parent(f"{self.joint1}_twist", w=True)
+        parent_joint = cmds.listRelatives(f"{self.joint1}_twist", parent=True)
+        if parent_joint: cmds.parent(f"{self.joint1}_twist", w=True)
         joint2_split = self.joint1.split("_")
         joint2_split.insert(2, f"tween{num_joints + 1}")
         self.joint2_twist = '_'.join(joint2_split)
@@ -134,6 +130,7 @@ class CreateTwist():
             cmds.warning("Twist joint cannot be set on this system.")
 
     def ik_handle(self):
+        cmds.select(clear=True)
         self.ik_hdl = cmds.ikHandle(n=f"hdl_{self.joint1_twist}", sj=self.joint1_twist, ee=self.joint2_twist, solver="ikSCsolver")[0]
         cmds.pointConstraint(self.joint2, f"hdl_{self.joint1_twist}")
 
@@ -141,7 +138,6 @@ class CreateTwist():
         cmds.orientConstraint(self.joint1, self.joint2_twist)
 
     def twist_constraints(self):
-        print(self.tween_joints)
         if len(self.tween_joints) > 3:
             cmds.error("self.tween_joints var cannot be greater than 3")
         else:
@@ -166,11 +162,12 @@ class CreateTwist():
 
     def parent_to_heirachy(self):
         parent_joint = cmds.listRelatives(self.joint1, parent=True)
+        # print(f"parent_joint: {parent_joint}, joint1: {self.joint1}, joint1_twist: {self.joint1_twist}")
+        if parent_joint is None:
+            parent_joint = self.joint1
         cmds.parent(self.joint1_twist, parent_joint)
         if self.system == "rig":
             cmds.parent(self.ik_hdl, parent_joint)
-
-            # cmds.parentConstraint(self.joint1_twist, f"jnt_skn{self.joint1_twist[7:]}", n=f"pConst_{self.joint1_twist}")
 
 
 def rig_to_skn(list):

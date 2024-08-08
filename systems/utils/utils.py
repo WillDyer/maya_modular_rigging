@@ -87,7 +87,6 @@ def colour_controls(ctrl_list,colour_dict):
 
 
 def get_joints_between(start_joint, end_joint):
-    print("GET JOINTS BETWEEN RAN")
     # Ensure both joints exist
     if not cmds.objExists(start_joint) or not cmds.objExists(end_joint):
         raise ValueError("One or both of the specified joints do not exist.")
