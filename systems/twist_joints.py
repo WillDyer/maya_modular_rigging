@@ -10,17 +10,21 @@ class PrepSkeleton():
     def __init__(self,key,system):
         self.key = key
         self.system = system
-        module = importlib.import_module(self.key['module'])
-        importlib.reload(module)
-        for guide in self.key["guide_list"]:
-            rig_joint = f"jnt_{system}_{guide}"
-            if module.twist_joint["start"] in rig_joint:
-                start_joint = rig_joint
-            elif module.twist_joint["end"] in rig_joint:
-                end_joint = rig_joint
+        self.module = importlib.import_module(self.key['module'])
+        importlib.reload(self.module)
+        try:
+            if self.module.twist_joint:
+                for guide in self.key["guide_list"]:
+                    rig_joint = f"jnt_{system}_{guide}"
+                    if self.module.twist_joint["start"] in rig_joint:
+                        start_joint = rig_joint
+                    elif self.module.twist_joint["end"] in rig_joint:
+                        end_joint = rig_joint
 
-        self.joint_list = utils.get_joints_between(start_joint, end_joint)
-        self.create_tween_joints()
+                self.joint_list = utils.get_joints_between(start_joint, end_joint)
+                self.create_tween_joints()
+        except AttributeError:
+            self.return_data_list = None  # self.module.twist_joint doesnt exist
 
     def create_tween_joints(self):
         self.return_data_list = []
@@ -42,6 +46,9 @@ class PrepSkeleton():
                 self.return_data_list.extend(self.tween_joint_list)
                 self.return_data_list.append(self.joint1_twist)
                 self.return_data_list.append(self.joint2_twist)
+
+                for joint in self.return_data_list:
+                    cmds.setAttr(f"{joint}.radius", 0.5*self.module.guide_scale)
 
                 CreateTwist(self.twist_joint_dict, self.system)
             except IndexError:
@@ -171,5 +178,7 @@ class CreateTwist():
 
 
 def rig_to_skn(list):
-    for joint in list:
-        cmds.parentConstraint(joint, f"jnt_skn{joint[7:]}", n=f"pConst_{joint}")
+    if list:
+        for joint in list:
+            cmds.parentConstraint(joint, f"jnt_skn{joint[7:]}", n=f"pConst_{joint}")
+    else: pass
