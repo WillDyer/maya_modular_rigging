@@ -5,7 +5,8 @@ ik_joints = {
     "start_joint": "hip",
     "end_joint": "ankle",
     "pv_joint": "knee",
-    "world_orientation": True
+    "world_orientation": True,
+    "ik_type": "biped"
 }
 side = "_l"
 space_swapping = ["hip","root","COG","Custom"]
@@ -24,4 +25,7 @@ rev_locators = {  # items foot_ctrl, ankle, ball, toe must be the same
 twist_joint = {
     "start": "hip",
     "end": "ankle"
+}
+default_ctrl_shape = {
+    "ik_ankle": "cube"
 }

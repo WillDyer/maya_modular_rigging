@@ -5,7 +5,8 @@ ik_joints = {
     "start_joint": "shoulder",
     "end_joint": "wrist",
     "pv_joint": "elbow",
-    "world_orientation": False
+    "world_orientation": False,
+    "ik_type": "biped"
 }
 twist_joint = {
     "start": "shoulder",

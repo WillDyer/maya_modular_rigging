@@ -94,8 +94,9 @@ def grpSetup(rig_name):
 
     hdl_list = cmds.ls("hdl_ik_*")
     if hdl_list:
-        try: cmds.parent(hdl_list,"grp_ik_handles")
-        except RuntimeError: pass
+        for hdl in hdl_list:
+            parent = cmds.listRelatives(hdl, parent=True)
+            if not parent: cmds.parent(hdl,"grp_ik_handles")
 
     ctrl_ribbon_list = cmds.ls("grp_ctrl_ribbon_*")
     if ctrl_ribbon_list:
