@@ -4,10 +4,10 @@ system_rot = {"scapula": [0.0, -47.76110741692336, -90.00000000000004], "shoulde
 ik_joints = {
     "start_joint": "scapula",
     "end_joint": "wrist",
-    "pv_joint": "elbow ",
+    "pv_joint": "shoulder",
     "world_orientation": True,
     "ik_type": "quadruped",
-    "hock": ""
+    "hock": "elbow"
 }
 side = "_l"
 space_swapping = ["scapula","root","COG","Custom"]
@@ -24,8 +24,8 @@ rev_locators = {  # items foot_ctrl, ankle, ball, toe must be the same
     "bank_out": "bank_out",
 }
 twist_joint = {
-    "start": "hip",
-    "end": "ankle"
+    "start": "scapula",
+    "end": "wrist"
 }
 default_ctrl_shape = {
     "ik_wrist": "cube"

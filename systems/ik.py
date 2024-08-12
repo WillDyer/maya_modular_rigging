@@ -115,8 +115,6 @@ class create_ik():
         control_module = control_shape.Controls(scale=1,guide=self.start_joint[7:],ctrl_name=f"ctrl_ik_{self.start_joint[7:]}",rig_type="ik")
         self.start_ctrl_crv = control_module.return_ctrl()
         cmds.matchTransform(self.start_ctrl_crv,self.start_joint)
-        print(self.start_ctrl_crv)
-        print(self.start_joint)
         cmds.parentConstraint(self.start_ctrl_crv, self.start_joint,mo=1,n=f"pConst_{self.start_joint[7:]}")
         return self.start_ctrl_crv
 
