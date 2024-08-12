@@ -7,7 +7,8 @@ importlib.reload(utils)
 
 
 class PrepSkeleton():
-    def __init__(self,key,system):
+    def __init__(self,orientation,key,system):
+        self.orientation = orientation
         self.key = key
         self.system = system
         self.module = importlib.import_module(self.key['module'])
@@ -50,6 +51,11 @@ class PrepSkeleton():
                 for joint in self.return_data_list:
                     cmds.setAttr(f"{joint}.radius", 0.5*self.module.guide_scale)
 
+                """# Orient joint
+                cmds.joint(f"{joint_tag}{list_ctrls[0]}", edit=True, zso=1, oj=orientation, sao=sao_axis, ch=True)
+                # Orient end joint to world
+                cmds.joint(f"{joint_tag}{list_ctrls[-1]}", e=True, oj="none",ch=True, zso=True)"""
+
                 CreateTwist(self.twist_joint_dict, self.system)
             except IndexError:
                 pass
@@ -86,7 +92,10 @@ class PrepSkeleton():
         # Reparent the final joint to joint2
         cmds.parent(self.joint2, previous_joint)
         cmds.parent(first_joint, self.joint1)
-        cmds.joint(first_joint, edit=True, zso=1, oj="xyz", sao="xup", ch=True)
+        mirror_attribute = cmds.getAttr(f"{self.key['master_guide']}.mirror_orientation", asString=1)
+        if mirror_attribute == "Yes": sao_axis = f"{self.orientation[0]}down"
+        else: sao_axis = f"{self.orientation[0]}up"
+        cmds.joint(first_joint, edit=True, zso=1, oj="xyz", sao=sao_axis, ch=True)
 
         cmds.parent(self.joint2, self.joint1)
 

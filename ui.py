@@ -216,9 +216,9 @@ class QtSampler(QWidget):
             if twist_joint == "Yes":
                 twist_amount = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_twist_amount")
                 if twist_amount > 0:
-                    rig_twist_instance = twist_joints.PrepSkeleton(key,system="rig")
+                    rig_twist_instance = twist_joints.PrepSkeleton(self.ui.oritentation.currentText(),key,system="rig")
                     rig_twist_list = rig_twist_instance.return_data()
-                    twist_joints.PrepSkeleton(key,system="skn")
+                    twist_joints.PrepSkeleton(self.ui.oritentation.currentText(),key,system="skn")
                     twist_joints.rig_to_skn(rig_twist_list)
                     key.update({"twist_dict": rig_twist_list})
 
