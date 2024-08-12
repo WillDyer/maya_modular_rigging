@@ -42,9 +42,12 @@ def joint(orientation,top_skeleton_joint, system):
         loc = cmds.xform(locator, r=True, ws=True, q=True, t=True)  # Gather locator location
         jnt_name = cmds.joint(n=f"{joint_tag}{locator}", p=loc)  # create joint based off the location
         jnt_names.append(jnt_name)
+    mirror_attribute = cmds.getAttr(f"{top_skeleton_joint}.mirror_orientation", asString=1)
 
+    if mirror_attribute == "Yes": sao_axis = "xdown"
+    else: sao_axis = "xup"
     # Orient joint
-    cmds.joint(f"{joint_tag}{list_ctrls[0]}", edit=True, zso=1, oj=orientation, sao="xup", ch=True)
+    cmds.joint(f"{joint_tag}{list_ctrls[0]}", edit=True, zso=1, oj=orientation, sao=sao_axis, ch=True)
     # Orient end joint to world
     cmds.joint(f"{joint_tag}{list_ctrls[-1]}", e=True, oj="none",ch=True, zso=True)
     return jnt_names

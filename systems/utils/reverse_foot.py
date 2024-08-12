@@ -5,6 +5,7 @@ import importlib
 class CreateReverseLocators():
     def __init__(self, guides,accessed_module):
         self.guides = guides
+        self.accessed_module = accessed_module
         self.module = importlib.import_module(f"systems.modules.{accessed_module}")
         importlib.reload(self.module)
         self.locator_list = self.create_loc()
@@ -67,6 +68,9 @@ class CreateReverseLocators():
         cmds.move(0,0,-offset,loc_heel,r=1)
 
         loc_list = [loc_heel,loc_toe,loc_ball,loc_ankle,bank_in, bank_out]
+        ankle_guide = [guide for guide in self.guides["ui_guide_list"] if self.module.rev_locators["ankle"] in guide][0]
+        grp = cmds.group(loc_list, n=f"grp_rev_loc_{ankle_guide}")
+        cmds.parentConstraint(ankle_guide, grp, mo=1, n=f"pConst_{ankle_guide}")
         return loc_list
 
     def get_locators(self):
@@ -247,10 +251,10 @@ class CreateReverseFoot():
         self.foot_ctrl = [x for x in self.system["ik_ctrl_list"] if cmds.attributeQuery("handle", node=x, exists=True) and cmds.getAttr(f"{x}.handle", asString=1) == "True"][0]
         self.foot_attr()
 
-        cmds.ikHandle(n=f"hdl_rev_ball{side}",sj=jnt_list[0],ee=jnt_list[1],sol="ikSCsolver")
-        cmds.parent(f"hdl_rev_ball{side}",rev_list[2])
-        cmds.ikHandle(n=f"hdl_rev_toe{side}",sj=jnt_list[1],ee=jnt_list[2],sol="ikSCsolver")
-        cmds.parent(f"hdl_rev_toe{side}",rev_list[1])
+        hdl_rev_ball = cmds.ikHandle(n=f"hdl_rev_ball{side}_#",sj=jnt_list[0],ee=jnt_list[1],sol="ikSCsolver")[0]
+        cmds.parent(hdl_rev_ball,rev_list[2])
+        hdl_rev_toe = cmds.ikHandle(n=f"hdl_rev_toe{side}_#",sj=jnt_list[1],ee=jnt_list[2],sol="ikSCsolver")[0]
+        cmds.parent(hdl_rev_toe,rev_list[1])
 
         cmds.parent(rev_list[0],self.reverse_foot_data["loc_ankle"])
 

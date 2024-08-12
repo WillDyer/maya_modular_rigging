@@ -2,13 +2,15 @@ import maya.cmds as cmds
 
 
 class mirror_data():
-    def __init__(self, systems_to_be_made):
+    def __init__(self, systems_to_be_made, orientation):
         self.data_to_be_checked = systems_to_be_made
+        self.orientation = orientation
         self.mirror_data()
 
     def mirror_joints(self):
         cmds.select(self.key["joints"][0])
-        joint_list = cmds.mirrorJoint(mirrorYZ=True,mirrorBehavior=True,searchReplace=('_l_', '_r_'))
+        joint_list = cmds.mirrorJoint(mirrorYZ=True,mirrorBehavior=False,searchReplace=('_l_', '_r_'))
+        cmds.joint(joint_list[0], edit=True, zso=1, oj=self.orientation, sao="xdown", ch=True)
         return joint_list
 
     def get_mirrored_side(self):
@@ -51,6 +53,7 @@ class mirror_data():
             cmds.parent(self.locator_list[-1],master_guide)
 
             self.proxy_obj_list.append(master_guide)
+            cmds.addAttr(master_guide, ln="mirror_orientation",nn="Mirror Orientation", at="enum",en="Yes",k=1)
         return master_guide
 
     def copy_mirrored_attrs(self):  # Copy attrs accross

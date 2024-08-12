@@ -19,7 +19,9 @@ class create_ik():
         self.validation_joints = validation_joints
         self.ik_system(ik_joint_list)
         cmds.group(self.grouped_ctrls,n=f"grp_ik_ctrls_{master_guide}",w=1)
-        cmds.group([self.driver_joint_list[-1], ik_joint_list[0]],n=f"grp_ik_jnts_{master_guide}",w=1)
+        cmds.group(ik_joint_list[0],n=f"grp_ik_jnts_{master_guide}",w=1)
+        if self.validation_joints["ik_type"] == "quadruped":
+            cmds.parent(self.driver_joint_list[-1], f"grp_ik_jnts_{master_guide}")
 
     def ik_system(self, ik_joint_list):
         self.other_joints = []
@@ -37,7 +39,7 @@ class create_ik():
         if self.validation_joints["ik_type"] == "biped":
             self.collect_other_controls(ik_joint_list)
             pv_ctrl = self.create_pv()
-            hdl_ctrl = self.create_handle(self.start_joint, self.end_joint, solver="ikRPsolver")
+            hdl_ctrl = self.create_handle(self.start_joint, self.end_joint, solver="ikRPsolver", pv=True, constrain=True)
             above_ctrls = self.above_root_ctrl()
             root_ctrl = self.create_top_hdl_ctrl()
 

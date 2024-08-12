@@ -13,7 +13,7 @@ side = "_l"
 space_swapping = ["scapula","root","COG","Custom"]
 guide_scale = 1
 available_rig_types = ["FK","IK","FKIK"]
-reverse_foot = True
+reverse_foot = False
 rev_locators = {  # items foot_ctrl, ankle, ball, toe must be the same
     "foot_ctrl": system[3],
     "ankle": system[3],
@@ -24,7 +24,7 @@ rev_locators = {  # items foot_ctrl, ankle, ball, toe must be the same
     "bank_out": "bank_out",
 }
 twist_joint = {
-    "start": "scapula",
+    "start": "shoulder",
     "end": "wrist"
 }
 default_ctrl_shape = {

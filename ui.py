@@ -204,10 +204,11 @@ class QtSampler(QWidget):
             num = num+1
         self.ui.polish_rig.setEnabled(True)
 
-        mirror_module = mirror_rig.mirror_data(self.systems_to_be_made)
+        mirror_module = mirror_rig.mirror_data(self.systems_to_be_made, self.ui.oritentation.currentText())
         self.systems_to_be_made = mirror_module.get_mirror_data()
 
         skn_created_guides = [key["master_guide"] for key in self.systems_to_be_made.values()]
+        print(skn_created_guides)
         skn_jnt_list = joints.get_joint_list(self.ui.oritentation.currentText(),skn_created_guides, system="skn")
 
         for key in self.systems_to_be_made.values():
@@ -252,7 +253,7 @@ class QtSampler(QWidget):
             if key["module"] == "basic_root": pass
             else:
                 if rig_type == "FK":
-                    fk_joint_list = joints.joint(orientation, master_guide, system="fk")
+                    fk_joint_list = joints.joint(orientation, master_guide, system="fk", )
                     fk_module = fk.create_fk(fk_joint_list,master_guide,key["scale"],delete_end=False)
                     fk_ctrls = fk_module.get_ctrls()
                     utils.constraint_from_lists_1to1(fk_joint_list, key["joints"],maintain_offset=1)
@@ -304,10 +305,6 @@ class QtSampler(QWidget):
                 connect_modules.connect_polished(systems_to_connect)
             if rig_type == "FKIK":
                 space_swap_module = space_swap.SpaceSwapping(key)
-            if twist_joint == "Yes":
-                twist_amount = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_twist_amount")
-                """if twist_amount > 0:
-                    tween_joint_list = ribbon_twist.ribbon_twist(self.systems_to_be_made)"""
 
         self.delete_guides()
 

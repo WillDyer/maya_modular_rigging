@@ -23,10 +23,10 @@ rev_locators = {  # items foot_ctrl, ankle, ball, toe must be the same
     "bank_in": "bank_in",
     "bank_out": "bank_out",
 }
-"""twist_joint = {
+twist_joint = {
     "start": "hip",
     "end": "ankle"
-}"""
+}
 default_ctrl_shape = {
     "ik_ankle": "cube"
 }
