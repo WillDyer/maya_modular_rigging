@@ -40,8 +40,8 @@ class create_ik():
             self.collect_other_controls(ik_joint_list)
             pv_ctrl = self.create_pv()
             hdl_ctrl = self.create_handle(self.start_joint, self.end_joint, solver="ikRPsolver", pv=True, constrain=True)
-            above_ctrls = self.above_root_ctrl()
             root_ctrl = self.create_top_hdl_ctrl()
+            above_ctrls = self.above_root_ctrl()
 
         elif self.validation_joints["ik_type"] == "quadruped":
             self.driver_joint_list = []
@@ -145,6 +145,7 @@ class create_ik():
                 self.to_be_parented.append(ctrl_crv_tmp)
                 cmds.matchTransform(ctrl_crv_tmp,joint)
                 cmds.parentConstraint(ctrl_crv_tmp, joint,mo=1,n=f"pConst_{joint[7:]}")
+            print(f"parenting: {self.start_ctrl_crv} to {self.to_be_parented[0]}")
             cmds.parent(self.start_ctrl_crv,self.to_be_parented[0])
             for ctrl in range(len(self.to_be_parented)):
                 if ctrl == 0:

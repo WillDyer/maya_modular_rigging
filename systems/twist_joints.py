@@ -51,11 +51,6 @@ class PrepSkeleton():
                 for joint in self.return_data_list:
                     cmds.setAttr(f"{joint}.radius", 0.5*self.module.guide_scale)
 
-                """# Orient joint
-                cmds.joint(f"{joint_tag}{list_ctrls[0]}", edit=True, zso=1, oj=orientation, sao=sao_axis, ch=True)
-                # Orient end joint to world
-                cmds.joint(f"{joint_tag}{list_ctrls[-1]}", e=True, oj="none",ch=True, zso=True)"""
-
                 CreateTwist(self.twist_joint_dict, self.system)
             except IndexError:
                 pass

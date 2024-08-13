@@ -185,6 +185,10 @@ class QtSampler(QWidget):
                 self.ui.add_hand.setChecked(False)
                 self.systems_to_be_deleted_polished.append(hand_module.get_hand_grp_to_delete())
 
+        self.ui.offset_x.setValue(0)
+        self.ui.offset_y.setValue(0)
+        self.ui.offset_z.setValue(0)
+
         cmds.select(clear=1)
 
     def remove_module(self):
@@ -208,7 +212,6 @@ class QtSampler(QWidget):
         self.systems_to_be_made = mirror_module.get_mirror_data()
 
         skn_created_guides = [key["master_guide"] for key in self.systems_to_be_made.values()]
-        print(skn_created_guides)
         skn_jnt_list = joints.get_joint_list(self.ui.oritentation.currentText(),skn_created_guides, system="skn")
 
         for key in self.systems_to_be_made.values():

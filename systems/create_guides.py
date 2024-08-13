@@ -42,6 +42,10 @@ class Guides():
                 connector_list.append(connector[1])
                 self.system_to_connect = connect_modules.prep_attach_joints(master_guide, selection, need_child=True)
                 guide.update({"system_to_connect": self.system_to_connect})
+
+                if "root" not in accessed_module:
+                    pos = cmds.xform(selection, r=True, ws=True, q=True, t=True)
+                    cmds.xform(master_guide, ws=1, t=[pos[0]+offset[0], pos[1]+offset[1], pos[2]+offset[2]])
                 return guide
         else:
             guide = self.creation(accessed_module, offset, side, connector_list, use_existing_attr)
@@ -79,7 +83,7 @@ class Guides():
             master_guide = utils.create_cube(f"master_{accessed_module}{side}_#", scale=[5, 5, 5])
             pos = self.module.system_pos[self.module.system[0]]
             rot = self.module.system_rot[self.module.system[0]]
-            cmds.xform(master_guide, ws=1, t=[pos[0]+offset[0], pos[1]+offset[1], pos[2]+offset[2]])
+            cmds.xform(master_guide, ws=1, t=[pos[0], pos[1], pos[2]])
             cmds.xform(master_guide, ws=1, ro=[rot[0], rot[1], rot[2]])
 
         for x in self.module.system:
@@ -112,7 +116,7 @@ class Guides():
             # set location of guide crvs then OPM
             pos = self.module.system_pos[x]
             rot = self.module.system_rot[x]
-            cmds.xform(guide, ws=1, t=[pos[0]+offset[0], pos[1]+offset[1], pos[2]+offset[2]])
+            cmds.xform(guide, ws=1, t=[pos[0], pos[1], pos[2]])
             cmds.xform(guide, ws=1, ro=[rot[0], rot[1], rot[2]])
 
             cmds.addAttr(guide, ln="original_guide", at="enum", en=x, k=0)  # original guide attr
