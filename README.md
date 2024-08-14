@@ -6,7 +6,7 @@
 </p>
 
 
-[Example Video][https://www.youtube.com/watch?v=ecIqxUa3Tns]
+[Example Video](https://www.youtube.com/watch?v=ecIqxUa3Tns)
 
 
 A assortment of tools I've integrated into a modular auto limb/rigging tool to speed up my workflow
