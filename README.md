@@ -1,9 +1,13 @@
 <h1 align="center">WD-Modular-Auto-Rigging</h1>
-<p align="center"}>
+<p align="center">
   <img src="https://img.shields.io/badge/Maya-37A5CC?style=for-the-badge&logo=autodeskmaya&logoColor=white">
   <img src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue">
   <img src="https://img.shields.io/badge/Qt-41CD52?style=for-the-badge&logo=Qt&logoColor=white">
 </p>
+
+
+[![Example](https://img.youtube.com/vi/ecIqxUa3Tns/0.jpg)](https://www.youtube.com/watch?v=ecIqxUa3Tns)
+
 
 A assortment of tools I've integrated into a modular auto limb/rigging tool to speed up my workflow
 > [!NOTE]
