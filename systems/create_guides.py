@@ -144,7 +144,7 @@ class Guides():
         cmds.addAttr(master_guide, ln="base_module", at="enum", en=accessed_module, k=0)  # module attr
         cmds.addAttr(master_guide, ln="module_side", at="enum", en=side, k=0)  # module side
         cmds.addAttr(master_guide, ln="master_guide", at="enum", en=master_guide, k=0)  # master guide
-        cmds.addAttr(master_guide, ln="mirror_orientation",nn="Mirror Orientation", at="enum",en="No")
+        cmds.addAttr(master_guide, ln="mirror_orientation",nn="Mirror Orientation", at="enum",en="No")  # joint orientation for mirrored joints
         for item in ["is_master", "base_module", "module_side", "master_guide"]:
             cmds.addAttr(guide_list[:-1],ln=f"{item}", proxy=f"{guide_list[-1]}.{item}")
             for guide in guide_list[:-1]:

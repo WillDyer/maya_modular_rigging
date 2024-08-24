@@ -83,7 +83,6 @@ class CreateReverseFoot():
         self.module = importlib.import_module(f"systems.modules.{accessed_module}")
         importlib.reload(self.module)
         self.system = system
-        print(self.system["rev_locators"])
         self.reverse_foot_data = {
             "loc_heel": self.system["rev_locators"][0],
             "loc_toe": self.system["rev_locators"][1],
