@@ -329,6 +329,8 @@ class QtSampler(QWidget):
         ctrl_list = cmds.ls("ctrl_*",type="transform")
         utils.colour_controls(ctrl_list,button_colour_dict)
 
+        system_group.heirachy_parenting(self.systems_to_be_made)
+
         cmds.select(cl=1)
 
     def delete_guides(self):

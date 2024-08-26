@@ -51,4 +51,6 @@ def joint(orientation,top_skeleton_joint, system):
     cmds.joint(f"{joint_tag}{list_ctrls[0]}", edit=True, zso=1, oj=orientation, sao=sao_axis, ch=True)
     # Orient end joint to world
     cmds.joint(f"{joint_tag}{list_ctrls[-1]}", e=True, oj="none",ch=True, zso=True)
+
+    cmds.setAttr(f"{joint_tag}{list_ctrls[0]}.overrideEnabled",1)
     return jnt_names
