@@ -175,9 +175,9 @@ class Guides():
                         "mirror_jnts": ["enum","Mirror Joints", "No:Yes",False],
                         "twist_jnts": ["enum","Twist Joints", "No:Yes",False],
                         "twist_amount": ["float","Twist Amount", "UPDATE",False],
+                        "squash_stretch": ["enum","Squash Stech","No:Yes",False],
                         "rig_dvdr": ["enum","------------","RIG",True],
                         "rig_type": ["enum","Rig Type",self.available_rig_types,False]
-                        # "squash_stretch": ["enum","Squash Stech","No:Yes",False]
                         }
 
         def add_new_attr():

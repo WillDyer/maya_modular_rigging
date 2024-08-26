@@ -20,7 +20,8 @@ from systems import (
     create_guides,
     hands,
     ribbon,
-    twist_joints
+    twist_joints,
+    squash_and_stretch
 )
 
 from systems.utils import (
@@ -48,6 +49,7 @@ importlib.reload(hands)
 importlib.reload(reverse_foot)
 importlib.reload(ribbon)
 importlib.reload(twist_joints)
+importlib.reload(squash_and_stretch)
 
 mayaMainWindowPtr = omui.MQtUtil.mainWindow()
 mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QWidget)
@@ -294,9 +296,12 @@ class QtSampler(QWidget):
                 if rig_type == "FKIK" or rig_type == "IK":
                     try:
                         if key["rev_locators"]:
-                            reverse_foot_module = reverse_foot.CreateReverseFoot(key["module"],key)
+                            reverse_foot_instance = reverse_foot.CreateReverseFoot(key["module"],key)
                     except KeyError:
                         print(f"Didnt find rev_locators in key not making reverse foot for: {key}")
+                    squash_stretch_attr = cmds.getAttr(f"{master_guide}.{master_guide}_squash_stretch", asString=1)
+                    if squash_stretch_attr == "Yes":
+                        squash_and_stretch_instance = squash_and_stretch.CreateSquashAndStretch(key, module.ik_joints)
 
         system_group.grpSetup(self.ui.rig_master_name.text())
 
