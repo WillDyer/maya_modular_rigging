@@ -51,7 +51,7 @@ class PrepSkeleton():
                 for joint in self.return_data_list:
                     cmds.setAttr(f"{joint}.radius", 0.5*self.module.guide_scale)
 
-                CreateTwist(self.twist_joint_dict, self.system)
+                CreateTwist(self.twist_joint_dict, self.system, self.key)
             except IndexError:
                 pass
 
@@ -121,8 +121,9 @@ class PrepSkeleton():
 
 
 class CreateTwist():
-    def __init__(self, twist_joint_dict, system):
+    def __init__(self, twist_joint_dict, system, key):
         self.system = system
+        self.key = key
         # unpack dictionary
         self.joint1 = twist_joint_dict["joint1"]
         self.joint1_twist = twist_joint_dict["joint1_twist"]
@@ -170,6 +171,11 @@ class CreateTwist():
 
                 cmds.setAttr(f"orientConst_{self.tween_joints[2]}.{self.joint2_twist}W1",3)
                 cmds.setAttr(f"pointConst_{self.tween_joints[2]}.{self.joint2_twist}W1",3)
+
+        # checks if twist enabled if yes. point constraint to follow stretch
+        if cmds.getAttr(f"{self.key['master_guide']}.{self.key['master_guide']}_squash_stretch", asString=1) == "Yes":
+            cmds.pointConstraint(self.joint1, self.joint1_twist, n=f"pConst_{self.joint1_twist}")
+            cmds.pointConstraint(self.joint2, self.joint2_twist, n=f"pConst_{self.joint2_twist}")
 
     def parent_to_heirachy(self):
         parent_joint = cmds.listRelatives(self.joint1, parent=True)
