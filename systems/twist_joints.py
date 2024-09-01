@@ -174,12 +174,11 @@ class CreateTwist():
 
         # checks if twist enabled if yes. point constraint to follow stretch
         if cmds.getAttr(f"{self.key['master_guide']}.{self.key['master_guide']}_squash_stretch", asString=1) == "Yes":
-            cmds.pointConstraint(self.joint1, self.joint1_twist, n=f"pConst_{self.joint1_twist}")
-            cmds.pointConstraint(self.joint2, self.joint2_twist, n=f"pConst_{self.joint2_twist}")
+            cmds.pointConstraint(self.joint1, self.joint1_twist, n=f"pointConst_{self.joint1_twist}")
+            cmds.pointConstraint(self.joint2, self.joint2_twist, n=f"pointConst_{self.joint2_twist}")
 
     def parent_to_heirachy(self):
         parent_joint = cmds.listRelatives(self.joint1, parent=True)
-        # print(f"parent_joint: {parent_joint}, joint1: {self.joint1}, joint1_twist: {self.joint1_twist}")
         if parent_joint is None:
             parent_joint = self.joint1
         cmds.parent(self.joint1_twist, parent_joint)

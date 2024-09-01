@@ -112,6 +112,7 @@ def heirachy_parenting(systems_dict):
         except RuntimeError: pass
     parent_ribbon_list = cmds.ls("grp_parent_ribbon_*")
     if parent_ribbon_list:
+        cmds.group(n="grp_ribbons",p="grp_rig",em=1)
         try: cmds.parent(parent_ribbon_list, "grp_ribbons")
         except RuntimeError: pass
 
@@ -124,6 +125,3 @@ def heirachy_parenting(systems_dict):
 
     cmds.parentConstraint("ctrl_root",rig_root_jnt,mo=1)
     cmds.parentConstraint("ctrl_COG",cog_jnt,mo=1)
-
-    # except RuntimeError:
-    #    cmds.error("Groups exists already that matches name, grps might be missing in file structure")"""
