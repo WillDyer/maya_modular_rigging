@@ -1,6 +1,7 @@
 import maya.cmds as cmds
 import importlib
 from systems import create_guides
+from systems.utils import OPM
 importlib.reload(create_guides)
 
 
@@ -14,6 +15,8 @@ class create_hands():
         self.space_out()
         cmds.parent(self.hand_master_guides, self.hand_grp)
         cmds.matchTransform(self.hand_grp,self.to_connect_to)
+        OPM.offsetParentMatrix(self.hand_grp)
+        cmds.connectAttr(f"{self.to_connect_to[0]}.worldMatrix", f"{self.hand_grp}.offsetParentMatrix")
 
     def module_hand(self, guide_list):
         self.module = "hand"

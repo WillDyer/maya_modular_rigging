@@ -19,7 +19,6 @@ class CreateReverseLocators():
         return side
 
     def create_loc(self):
-        print("create loc ran")
         side = self.side()
         rev_locators = self.module.rev_locators
         loc_prefix = "loc_rev"
@@ -46,7 +45,6 @@ class CreateReverseLocators():
         bank_out = f"loc_{rev_locators['bank_out']}"
         for x in [bank_in,bank_out]:
             tmp = cmds.spaceLocator(n=f"{x}{side}_#")[0]
-            # tmp = cmds.rename(tmp, f"{tmp}{side}")
             cmds.matchTransform(tmp, loc_ball)
             if x == bank_in: bank_in = tmp
             elif x == bank_out: bank_out = tmp
@@ -63,7 +61,6 @@ class CreateReverseLocators():
             cmds.error("No matching side suffex")
 
         loc_heel = cmds.spaceLocator(n=f"{loc_prefix}_{rev_locators['heel']}{side}_#")[0]
-        # loc_heel = cmds.rename(loc_heel, f"{loc_heel}{side}")
         cmds.matchTransform(loc_heel,loc_ball)
         cmds.move(0,0,-offset,loc_heel,r=1)
 
