@@ -153,6 +153,7 @@ class QtSampler(QWidget):
             guide_connector_list = guide["connector_list"]
             system_to_connect = guide["system_to_connect"]
             guide_list = guide["ui_guide_list"]
+            data_guide = guide["data_guide"]
             if "rev_locators" in guide: rev_locators = guide["rev_locators"]
             else: rev_locators = []
             self.created_guides.append(master_guide)
@@ -179,6 +180,7 @@ class QtSampler(QWidget):
                 "rev_locators": rev_locators
             }
             self.systems_to_be_made[master_guide] = temp_dict
+            self.data_guide_setup(temp_dict, data_guide)
 
             if self.ui.add_hand.isChecked():
                 hand_module = hands.create_hands(guide_list[0],self.systems_to_be_made, self.created_guides, self.ui.fingers_amount.value())
@@ -192,6 +194,21 @@ class QtSampler(QWidget):
         self.ui.offset_z.setValue(0)
 
         cmds.select(clear=1)
+
+    def data_guide_setup(self, temp_dict, data_guide):
+        for key in temp_dict.keys():
+            if isinstance(temp_dict[key], str):
+                cmds.addAttr(data_guide, ln=key, at="enum", en=temp_dict[key], k=1)
+            elif isinstance(temp_dict[key], list):
+                if len(temp_dict[key]) == 0: enum_list = "empty"
+                else: enum_list = ":".join(temp_dict[key])
+                cmds.addAttr(data_guide, ln=key, at="enum", en=enum_list, k=1)
+
+        # hide in outliner:
+        cmds.setAttr(f"{data_guide}.hiddenInOutliner", True)
+
+        for attr in ["tx","ty","tz","rx","ry","rz","sx","sy","sz","v"]:
+            cmds.setAttr(f"{data_guide}.{attr}", cb=0,k=0,l=1)
 
     def remove_module(self):
         module = cmds.ls(sl=1)
@@ -337,7 +354,11 @@ class QtSampler(QWidget):
         for key in self.systems_to_be_made.values():
             cmds.delete(key["master_guide"])
         cmds.delete("grp_connector_clusters")
-        cmds.delete(self.systems_to_be_deleted_polished)
+        if len(self.systems_to_be_deleted_polished) > 0:
+            cmds.delete(self.systems_to_be_deleted_polished)
+        grp_reverse_foot_guides = cmds.ls("grp_rev_loc_*")
+        if len(grp_reverse_foot_guides) > 0:
+            cmds.delete(grp_reverse_foot_guides)
 
     def hide_guides(self):
         for key in self.systems_to_be_made.values():

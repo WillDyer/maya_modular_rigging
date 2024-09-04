@@ -137,7 +137,16 @@ class Guides():
             cmds.parent(connector_list, "grp_connector_clusters")
         else:
             cmds.group(connector_list, n="grp_connector_clusters",w=1)
+            cmds.setAttr("grp_connector_clusters.hiddenInOutliner", True)
 
+        # create data guide
+        if "root" in self.module.system or "proximal" in self.module.system: data_guide_name = f"data_{master_guide}"
+        else: data_guide_name = master_guide.replace("master_", "data_")
+        cmds.spaceLocator(n=data_guide_name)
+        cmds.matchTransform(data_guide_name, master_guide)
+        cmds.parent(data_guide_name, master_guide)
+
+        # attr setp
         self.available_rig_types = ":".join(self.module.available_rig_types)
         custom_attr = self.add_custom_attr(guide_list, master_guide, use_existing_attr, accessed_module)
         cmds.addAttr(master_guide, ln="is_master", at="enum", en="True", k=0)  # adding master group attr
@@ -164,7 +173,8 @@ class Guides():
         ui_dict = {
             "master_guide": master_guide,
             "connector_list": connector_list,
-            "ui_guide_list": ui_guide_list
+            "ui_guide_list": ui_guide_list,
+            "data_guide": data_guide_name
         }
         return ui_dict  # [master_guide, connector_list, ui_guide_list]
 

@@ -32,7 +32,7 @@ def joint(orientation,top_skeleton_joint, system):
         side = ""
 
     for x in list:
-        if "cluster" in x:
+        if "cluster" in x or "data_" in x:
             pass
         else:
             list_ctrls.append(x)

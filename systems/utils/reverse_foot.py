@@ -67,7 +67,8 @@ class CreateReverseLocators():
         loc_list = [loc_heel,loc_toe,loc_ball,loc_ankle,bank_in, bank_out]
         ankle_guide = [guide for guide in self.guides["ui_guide_list"] if self.module.rev_locators["ankle"] in guide][0]
         grp = cmds.group(loc_list, n=f"grp_rev_loc_{ankle_guide}")
-        cmds.parentConstraint(ankle_guide, grp, mo=1, n=f"pConst_{ankle_guide}")
+        constraint_name = cmds.parentConstraint(ankle_guide, grp, mo=1, n=f"pConst_{ankle_guide}")[0]
+        cmds.setAttr(f"{constraint_name}.hiddenInOutliner", True)
         return loc_list
 
     def get_locators(self):

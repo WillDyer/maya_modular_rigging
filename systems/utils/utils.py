@@ -25,7 +25,8 @@ def connector(first_jnt, second_jnt):
     cmds.parent(cluster_1[1], first_jnt)
     cmds.parent(cluster_2[1], second_jnt)
     for x in cmds.ls(typ="cluster"):
-        cmds.hide(x+"Handle")
+        cmds.hide(f"{x}Handle")
+        cmds.setAttr(f"{x}Handle.hiddenInOutliner", True)
     cmds.setAttr(f"connector_curve_{first_jnt}.template", 1)
 
     curve = f"connector_curve_{first_jnt}"
