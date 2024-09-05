@@ -9,7 +9,7 @@ QComboBox {
     border-radius: 8px;
 }
 
-QGroupBox::title {
+QGroupBox {
     background-color: #2a2e32;
     border-color: #2a2e32;
 }
@@ -190,4 +190,10 @@ QTabBar::tab:selected {
 
 QTabWidget::pane {
     border-color: #1d2023;
+}
+
+QToolBox {
+    background-color: #1b1e20;
+    border-radius: 10px;
+    border-image: none;
 }

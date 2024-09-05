@@ -106,11 +106,6 @@ class QtSampler(QWidget):
         self.ui = loader.load(file, parentWidget=self)
         file.close()
 
-        """stylesheet_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"interface","style","style.css")
-        with open(stylesheet_path, "r") as file:
-            stylesheet = file.read()
-        self.ui.setStyleSheet(stylesheet)"""
-
     def get_colour(self):
         colour = QColorDialog.getColor()
         if colour.isValid():
