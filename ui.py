@@ -76,7 +76,7 @@ class QtSampler(QWidget):
         self.init_existing_module()
 
         # page 1
-        self.ui.image.setPixmap(os.path.join(os.path.dirname(os.path.abspath(__file__)),"interface","UI_Logo.png"))
+        self.ui.image.setPixmap(os.path.join(os.path.dirname(os.path.abspath(__file__)),"interface","images","UI_Logo.png"))
         self.ui.add_module.clicked.connect(self.add_module)
         self.ui.remove_module.clicked.connect(self.remove_module)
         self.ui.scale_box.valueChanged.connect(self.rig_global_scale)
@@ -94,7 +94,7 @@ class QtSampler(QWidget):
     def initUI(self):
         loader = QUiLoader()
         UI_VERSION = "03"
-        UI_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "interface", f"WD_Rig_Builder_{UI_VERSION}.ui")
+        UI_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "interface", "ui", f"WD_Rig_Builder_{UI_VERSION}.ui")
         print(f"UI file path: {UI_FILE}")  # Debug: Print the UI file path
         if not os.path.exists(UI_FILE):
             cmds.error(f"ERROR: UI file does not exist: {UI_FILE}")
@@ -105,6 +105,11 @@ class QtSampler(QWidget):
 
         self.ui = loader.load(file, parentWidget=self)
         file.close()
+
+        """stylesheet_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"interface","style","style.css")
+        with open(stylesheet_path, "r") as file:
+            stylesheet = file.read()
+        self.ui.setStyleSheet(stylesheet)"""
 
     def get_colour(self):
         colour = QColorDialog.getColor()
