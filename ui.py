@@ -31,7 +31,8 @@ from systems.utils import (
     ikfk_switch,
     system_group,
     space_swap,
-    reverse_foot
+    reverse_foot,
+    guide_data
 )
 
 # debug
@@ -50,6 +51,7 @@ importlib.reload(reverse_foot)
 importlib.reload(ribbon)
 importlib.reload(twist_joints)
 importlib.reload(squash_and_stretch)
+importlib.reload(guide_data)
 
 mayaMainWindowPtr = omui.MQtUtil.mainWindow()
 mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QWidget)
@@ -71,6 +73,7 @@ class QtSampler(QWidget):
         self.systems_to_be_made = {}
         self.systems_rev_foot = {}
         self.systems_to_be_deleted_polished = []
+        self.init_existing_module()
 
         # page 1
         self.ui.image.setPixmap(os.path.join(os.path.dirname(os.path.abspath(__file__)),"interface","UI_Logo.png"))
@@ -135,6 +138,13 @@ class QtSampler(QWidget):
         index = files.index("basic_root")
         self.ui.available_modules.setCurrentIndex(index)
 
+    def init_existing_module(self):
+        temp_dict = guide_data.init_data()
+        for dict in temp_dict.values():
+            master_guide = dict["master_guide"]
+            self.created_guides.append(master_guide)
+            self.systems_to_be_made[master_guide] = dict
+
     def add_module(self):
         module = self.ui.available_modules.currentText()
         sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules"))
@@ -167,7 +177,7 @@ class QtSampler(QWidget):
                 "module": module,
                 "master_guide": master_guide,
                 "guide_list": guide_list,
-                "scale": module_path.guide_scale,
+                "guide_scale": module_path.guide_scale,
                 "joints": [],
                 "side": module_path.side,
                 "connectors": guide_connector_list,
@@ -180,7 +190,7 @@ class QtSampler(QWidget):
                 "rev_locators": rev_locators
             }
             self.systems_to_be_made[master_guide] = temp_dict
-            self.data_guide_setup(temp_dict, data_guide)
+            guide_data.setup(temp_dict, data_guide)
 
             if self.ui.add_hand.isChecked():
                 hand_module = hands.create_hands(guide_list[0],self.systems_to_be_made, self.created_guides, self.ui.fingers_amount.value())
@@ -194,21 +204,6 @@ class QtSampler(QWidget):
         self.ui.offset_z.setValue(0)
 
         cmds.select(clear=1)
-
-    def data_guide_setup(self, temp_dict, data_guide):
-        for key in temp_dict.keys():
-            if isinstance(temp_dict[key], str):
-                cmds.addAttr(data_guide, ln=key, at="enum", en=temp_dict[key], k=1)
-            elif isinstance(temp_dict[key], list):
-                if len(temp_dict[key]) == 0: enum_list = "empty"
-                else: enum_list = ":".join(temp_dict[key])
-                cmds.addAttr(data_guide, ln=key, at="enum", en=enum_list, k=1)
-
-        # hide in outliner:
-        cmds.setAttr(f"{data_guide}.hiddenInOutliner", True)
-
-        for attr in ["tx","ty","tz","rx","ry","rz","sx","sy","sz","v"]:
-            cmds.setAttr(f"{data_guide}.{attr}", cb=0,k=0,l=1)
 
     def remove_module(self):
         module = cmds.ls(sl=1)
@@ -276,7 +271,7 @@ class QtSampler(QWidget):
             else:
                 if rig_type == "FK":
                     fk_joint_list = joints.joint(orientation, master_guide, system="fk", )
-                    fk_module = fk.create_fk(fk_joint_list,master_guide,key["scale"],delete_end=False)
+                    fk_module = fk.create_fk(fk_joint_list,master_guide,key["guide_scale"],delete_end=False)
                     fk_ctrls = fk_module.get_ctrls()
                     utils.constraint_from_lists_1to1(fk_joint_list, key["joints"],maintain_offset=1)
                     key.update({"fk_joint_list": fk_joint_list, "fk_ctrl_list": fk_ctrls})
@@ -295,7 +290,7 @@ class QtSampler(QWidget):
                     utils.constraint_from_lists_1to1(ik_joint_list, key["joints"],maintain_offset=1)
                 elif rig_type == "FKIK":
                     fk_joint_list = joints.joint(orientation, master_guide, system="fk")
-                    fk_module = fk.create_fk(fk_joint_list,master_guide,key["scale"],delete_end=False)
+                    fk_module = fk.create_fk(fk_joint_list,master_guide,key["guide_scale"],delete_end=False)
                     fk_ctrls = fk_module.get_ctrls()
                     key.update({"fk_joint_list": fk_joint_list, "fk_ctrl_list": fk_ctrls})
 
