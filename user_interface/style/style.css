@@ -3,6 +3,10 @@
     color: #fff;
 }
 
+test {
+    background-color: #25292c;
+}
+
 QComboBox {
     border: none;
     background-color: #1b1e20;

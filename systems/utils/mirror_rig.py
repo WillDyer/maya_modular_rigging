@@ -124,7 +124,7 @@ class mirror_data():
                     "module": key["module"],
                     "master_guide": self.master_guide,
                     "guide_list": self.locator_list,
-                    "scale": key["scale"],
+                    "guide_scale": key["guide_scale"],
                     "joints": self.joint_list,
                     "side": self.side,
                     "connectors": [],

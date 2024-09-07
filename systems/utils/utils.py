@@ -59,10 +59,10 @@ def find_substring_in_list(string, substrings):
 def colour_controls(ctrl_list,colour_dict):
     def set_drawing_override_color(nurbs_curve, rgb_colour,side):
         if side == "None": colour = rgb_colour["root"]
-        elif side == "l": colour = rgb_colour["colour_left"]
-        elif side == "r": colour = rgb_colour["colour_right"]
-        elif side == "default": colour = rgb_colour["colour_middle"]
-        else: colour = rgb_colour["colour_middle"]
+        elif side == "l": colour = rgb_colour["L_colour"]
+        elif side == "r": colour = rgb_colour["R_Colour"]
+        elif side == "default": colour = rgb_colour["C_colour"]
+        else: colour = rgb_colour["C_colour"]
         colour = [c / 255.0 for c in colour]
         cmds.setAttr(f"{nurbs_curve}.overrideEnabled", 1)
         cmds.setAttr(f"{nurbs_curve}.overrideRGBColors", 1)
