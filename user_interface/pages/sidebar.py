@@ -27,7 +27,6 @@ class AddAvailableModules(QWidget):
 
         module_label = QLabel("MODULES:")
         module_label.setFixedSize(200,25)
-        # module_label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         module_label.setStyleSheet("""
             QLabel {
                 font-weight: bold;
@@ -46,7 +45,7 @@ class AddAvailableModules(QWidget):
             button.setObjectName(f"button_{module}")
             self.sidebar_layout.addWidget(button)
 
-            QObject.connect(button, SIGNAL("clicked()"), lambda m=module: self.interface_class.module_buttons(m))
+            QObject.connect(button, SIGNAL("clicked()"), lambda m=module: self.interface_class.add_module(m))
 
         spacer = QSpacerItem(20,40,QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.sidebar_layout.addSpacerItem(spacer)

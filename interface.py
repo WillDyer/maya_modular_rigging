@@ -127,7 +127,7 @@ class Interface(QWidget):
         self.scroll_area.setWidgetResizable(True)
         self.module_layout.addWidget(self.scroll_area)
 
-    def module_buttons(self, module):
+    def add_module(self, module):
         print(f'Button clicked: {module}')
         createdmodule_instance = module_settings.AddModule(module)
         module_dict = createdmodule_instance.return_data()
@@ -137,8 +137,9 @@ class Interface(QWidget):
         else: module_name = module_dict["master_guide"]
 
         page = QWidget()
-        page.setObjectName(f"parent_widget_{module_dict['master_guide']}")
-        page.setStyleSheet(""" QWidget#parenWidget { background-color: #25292c; } """)
+        page.setObjectName(f"parentWidget_{module_dict['master_guide']}")
+        page.setStyleSheet(f"QWidget#parentWidget_{module_dict['master_guide']} {{ background-color: #25292c; }}")
+
         layout = QVBoxLayout(page)
         button = QPushButton(module_name)
         button.setCheckable(True)
@@ -159,13 +160,12 @@ class Interface(QWidget):
         for dict in self.systems_to_be_made.values():
             dict["joints"] = rig_jnt_list[num]
             num = num+1
-        # self.ui.polish_rig.setEnabled(True)
 
         mirror_module = mirror_rig.mirror_data(self.systems_to_be_made, orientation)
         self.systems_to_be_made = mirror_module.get_mirror_data()
 
         skn_created_guides = [key["master_guide"] for key in self.systems_to_be_made.values()]
-        skn_jnt_list = joints.get_joint_list(orientation,skn_created_guides, system="skn")
+        self.skn_jnt_list = joints.get_joint_list(orientation,skn_created_guides, system="skn")
 
         for key in self.systems_to_be_made.values():
             twist_joint = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_twist_jnts", asString=1)
@@ -181,13 +181,15 @@ class Interface(QWidget):
         connect_modules.attach_joints(self.systems_to_be_made,system="rig")
         connect_modules.attach_joints(self.systems_to_be_made,system="skn")
 
-        skn_jnt_list = [item for sublist in skn_jnt_list for item in sublist]
-        for joint in skn_jnt_list: cmds.parentConstraint(f"jnt_rig{joint[7:]}",joint,mo=1,n=f"pConst_jnt_rig{joint[7:]}")
+        self.skn_jnt_list = [item for sublist in self.skn_jnt_list for item in sublist]
+        for joint in self.skn_jnt_list: cmds.parentConstraint(f"jnt_rig{joint[7:]}",joint,mo=1,n=f"pConst_jnt_rig{joint[7:]}")
 
-        self.hide_guides()
+        for module in self.created_guides:
+            pushButton = self.module_widget.findChild(QPushButton, f"button_remove_{module}")
+            pushButton.setEnabled(False)
+
+        self.hide_guides(hidden=True)
         cmds.select(cl=1)
-
-        # self.ui.skeleton_box.setEnabled(False)
 
     def polish_rig(self):
         for key in self.systems_to_be_made.values():
@@ -277,10 +279,20 @@ class Interface(QWidget):
 
         cmds.select(cl=1)
 
-    def hide_guides(self):
-        for key in self.systems_to_be_made.values():
-            cmds.hide(key["master_guide"])
-        cmds.hide("grp_connector_clusters")
+    def hide_guides(self, hidden):
+        if hidden is True:
+            for key in self.systems_to_be_made.values():
+                cmds.hide(key["master_guide"])
+                cmds.setAttr(f"{key['master_guide']}.hiddenInOutliner", True)
+            cmds.hide("grp_connector_clusters")
+        else:
+            for key in self.systems_to_be_made.values():
+                cmds.showHidden(key["master_guide"])
+                cmds.setAttr(f"{key['master_guide']}.hiddenInOutliner", False)
+            cmds.showHidden("grp_connector_clusters")
+            for module in self.created_guides:
+                pushButton = self.module_widget.findChild(QPushButton, f"button_remove_{module}")
+                pushButton.setEnabled(True)
 
     def delete_guides(self):
         for key in self.systems_to_be_made.values():
@@ -292,12 +304,21 @@ class Interface(QWidget):
         if len(grp_reverse_foot_guides) > 0:
             cmds.delete(grp_reverse_foot_guides)
 
+    def delete_joints(self):
+        for key in self.systems_to_be_made.values():
+            cmds.delete(key["joints"])
+        cmds.delete(self.skn_jnt_list)
+
     def remove_module(self, master_guide, settings_page):
         for key in list(self.systems_to_be_made.values()):
             if master_guide in key['master_guide']:
                 self.systems_to_be_made.pop(master_guide)
                 self.created_guides.remove(master_guide)
-                cmds.delete(master_guide, key['connectors'])
+                if cmds.ls(master_guide):
+                    cmds.delete(master_guide, key['connectors'])
+                else:
+                    cmds.warning(f"{master_guide} not found proceeding to remove module.")
+                    cmds.delete(key['connectors'])
 
         self.settings_page_widget = self.findChild(QWidget, settings_page)
         self.settings_page_widget.deleteLater()

@@ -34,7 +34,7 @@ class CreateModuleTab(QWidget):
         self.interface_class = interface_class
 
         self.settings_page = QWidget()
-        self.settings_page.setObjectName(f"settings_page_{self.master_guide}")
+        self.settings_page.setObjectName("settings_page")
         self.settings_page.setStyleSheet(""" QWidget#settings_page { background-color: #25292c;} """)
         self.settings_layout = QFormLayout(self.settings_page)
         self.settings_layout.setLabelAlignment(Qt.AlignLeft | Qt.AlignVCenter)
@@ -122,10 +122,10 @@ class CreateModuleTab(QWidget):
     def remove_module(self):
         # remove module
         remove_module = QPushButton("Remove Module")
-        remove_module.setObjectName(f"button_remove_{self.module}")
+        remove_module.setObjectName(f"button_remove_{self.master_guide}")
 
         self.settings_layout.addRow(remove_module)
-        QObject.connect(remove_module, SIGNAL("clicked()"), lambda: self.interface_class.remove_module(self.master_guide, settings_page=f"parent_widget_{self.master_guide}"))
+        QObject.connect(remove_module, SIGNAL("clicked()"), lambda: self.interface_class.remove_module(self.master_guide, settings_page=f"parentWidget_{self.master_guide}"))
 
     def move_widget_dropdown(self):
         # move widget settings
