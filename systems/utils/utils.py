@@ -1,4 +1,5 @@
 import maya.cmds as cmds
+from PySide2.QtWidgets import *
 
 
 def create_cube(name, scale):
@@ -121,3 +122,36 @@ def get_joints_between(start_joint, end_joint):
     joint_path = start_to_common + common_to_end
 
     return joint_path
+
+
+def hide_guides(systems_to_be_made, created_guides, module_widget, hidden):
+    if hidden is True:
+        for key in systems_to_be_made.values():
+            cmds.hide(key["master_guide"])
+            cmds.setAttr(f"{key['master_guide']}.hiddenInOutliner", True)
+        cmds.hide("grp_connector_clusters")
+    else:
+        for key in systems_to_be_made.values():
+            cmds.showHidden(key["master_guide"])
+            cmds.setAttr(f"{key['master_guide']}.hiddenInOutliner", False)
+        cmds.showHidden("grp_connector_clusters")
+        for module in created_guides:
+            pushButton = module_widget.findChild(QPushButton, f"button_remove_{module}")
+            pushButton.setEnabled(True)
+
+
+def delete_guides(systems_to_be_made, systems_to_be_deleted_polished):
+    for key in systems_to_be_made.values():
+        cmds.delete(key["master_guide"])
+    cmds.delete("grp_connector_clusters")
+    if len(systems_to_be_deleted_polished) > 0:
+        cmds.delete(systems_to_be_deleted_polished)
+    grp_reverse_foot_guides = cmds.ls("grp_rev_loc_*")
+    if len(grp_reverse_foot_guides) > 0:
+        cmds.delete(grp_reverse_foot_guides)
+
+
+def delete_joints(systems_to_be_made, skn_jnt_list):
+    for key in systems_to_be_made.values():
+        cmds.delete(key["joints"])
+    cmds.delete(skn_jnt_list)

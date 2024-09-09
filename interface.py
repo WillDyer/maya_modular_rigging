@@ -52,6 +52,7 @@ class Interface(QWidget):
         self.systems_to_be_made = {}
         self.created_guides = []
         self.systems_to_be_deleted_polished = []
+        self.last_selected_button = "guides"
 
     def initUI(self):
         # layout
@@ -188,10 +189,9 @@ class Interface(QWidget):
             pushButton = self.module_widget.findChild(QPushButton, f"button_remove_{module}")
             pushButton.setEnabled(False)
 
-        self.hide_guides(hidden=True)
         cmds.select(cl=1)
 
-    def polish_rig(self):
+    def create_rig(self):
         for key in self.systems_to_be_made.values():
             master_guide = key['master_guide']
             rig_type = cmds.getAttr(f"{master_guide}.{master_guide}_rig_type", asString=1)
@@ -260,8 +260,6 @@ class Interface(QWidget):
             if rig_type == "FKIK":
                 space_swap_module = space_swap.SpaceSwapping(key)
 
-        self.delete_guides()
-
         button_names = ["L_colour","C_colour","R_colour"]
         button_colour_dict = {"L_colour":[],"C_colour":[],"R_colour":[]}
         for x in button_names:
@@ -279,36 +277,6 @@ class Interface(QWidget):
 
         cmds.select(cl=1)
 
-    def hide_guides(self, hidden):
-        if hidden is True:
-            for key in self.systems_to_be_made.values():
-                cmds.hide(key["master_guide"])
-                cmds.setAttr(f"{key['master_guide']}.hiddenInOutliner", True)
-            cmds.hide("grp_connector_clusters")
-        else:
-            for key in self.systems_to_be_made.values():
-                cmds.showHidden(key["master_guide"])
-                cmds.setAttr(f"{key['master_guide']}.hiddenInOutliner", False)
-            cmds.showHidden("grp_connector_clusters")
-            for module in self.created_guides:
-                pushButton = self.module_widget.findChild(QPushButton, f"button_remove_{module}")
-                pushButton.setEnabled(True)
-
-    def delete_guides(self):
-        for key in self.systems_to_be_made.values():
-            cmds.delete(key["master_guide"])
-        cmds.delete("grp_connector_clusters")
-        if len(self.systems_to_be_deleted_polished) > 0:
-            cmds.delete(self.systems_to_be_deleted_polished)
-        grp_reverse_foot_guides = cmds.ls("grp_rev_loc_*")
-        if len(grp_reverse_foot_guides) > 0:
-            cmds.delete(grp_reverse_foot_guides)
-
-    def delete_joints(self):
-        for key in self.systems_to_be_made.values():
-            cmds.delete(key["joints"])
-        cmds.delete(self.skn_jnt_list)
-
     def remove_module(self, master_guide, settings_page):
         for key in list(self.systems_to_be_made.values()):
             if master_guide in key['master_guide']:
@@ -322,6 +290,38 @@ class Interface(QWidget):
 
         self.settings_page_widget = self.findChild(QWidget, settings_page)
         self.settings_page_widget.deleteLater()
+
+    def update_rig(self, button):
+        rig_name = self.sidebar_widget.findChild(QLineEdit, "rig_name")
+        if button == "guides":
+            if self.last_selected_button == "skeleton":
+                utils.hide_guides(self.systems_to_be_made, self.created_guides, module_widget=self.module_widget, hidden=False)
+                utils.delete_joints(self.systems_to_be_made, self.skn_jnt_list)
+            elif self.last_selected_button == "rig":
+                utils.hide_guides(self.systems_to_be_made, self.created_guides, module_widget=self.module_widget, hidden=True)
+                cmds.delete(rig_name.text())
+            elif self.last_selected_button == "polish":
+                cmds.warning("Rig has been polished past data has been deleted")
+
+        elif button == "skeleton":
+            if self.last_selected_button == "guides":
+                self.create_joints()
+                utils.hide_guides(self.systems_to_be_made, self.created_guides, module_widget=self.module_widget, hidden=True)
+            elif self.last_selected_button == "rig" or self.last_selected_button == "polish":
+                cmds.delete(rig_name.text())
+                self.create_joints()
+
+        elif button == "rig":
+            if self.last_selected_button == "guides":
+                self.create_joints()
+                utils.hide_guides(self.systems_to_be_made, self.created_guides, module_widget=self.module_widget, hidden=True)
+                self.create_rig()
+            elif self.last_selected_button == "skeleton":
+                self.create_rig()
+            elif self.last_selected_button == "polish":
+                cmds.warning("Rig has been polished past data has been deleted")
+
+        self.last_selected_button = button
 
 
 def main():

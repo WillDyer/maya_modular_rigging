@@ -255,10 +255,6 @@ class AddModule():
                 self.ui.add_hand.setChecked(False)
                 self.systems_to_be_deleted_polished.append(hand_module.get_hand_grp_to_delete())"""
 
-        # self.ui.offset_x.setValue(0)
-        # self.ui.offset_y.setValue(0)
-        # self.ui.offset_z.setValue(0)
-
         cmds.select(clear=1)
 
     def return_data(self):

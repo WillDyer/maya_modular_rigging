@@ -52,7 +52,7 @@ class RigProgression(QWidget):
         self.rig_layout.addWidget(self.rig_button)
         self.rig_layout.addWidget(self.polish_button)
 
-        QObject.connect(self.guides_button, SIGNAL("clicked()"), lambda: self.interface_class.hide_guides(hidden=False))
-        QObject.connect(self.guides_button, SIGNAL("clicked()"), lambda: self.interface_class.delete_joints())
-        QObject.connect(self.skeleton_button, SIGNAL("clicked()"), lambda: self.interface_class.create_joints())
-        QObject.connect(self.polish_button, SIGNAL("clicked()"), lambda: self.interface_class.polish_rig())
+        QObject.connect(self.guides_button, SIGNAL("clicked()"), lambda: self.interface_class.update_rig(button="guides"))
+        QObject.connect(self.skeleton_button, SIGNAL("clicked()"), lambda: self.interface_class.update_rig(button="skeleton"))
+        QObject.connect(self.rig_button, SIGNAL("clicked()"), lambda: self.interface_class.update_rig(button="rig"))
+        QObject.connect(self.polish_button, SIGNAL("clicked()"), lambda: self.interface_class.update_rig(button="polish"))
