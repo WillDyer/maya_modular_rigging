@@ -153,5 +153,7 @@ def delete_guides(systems_to_be_made, systems_to_be_deleted_polished):
 
 def delete_joints(systems_to_be_made, skn_jnt_list):
     for key in systems_to_be_made.values():
-        cmds.delete(key["joints"])
-    cmds.delete(skn_jnt_list)
+        try: cmds.delete(key["joints"])
+        except: ValueError  # catches if the joints already been deleted
+    try: cmds.delete(skn_jnt_list)
+    except: ValueError  # catches if the joints already been deleted

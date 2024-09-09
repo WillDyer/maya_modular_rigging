@@ -86,6 +86,8 @@ def heirachy_parenting(systems_dict):
             grp_fk_jnts = f"grp_fk_jnts_{master_guide}"
             grp_ik_jnts = f"grp_ik_jnts_{master_guide}"
 
+            if "master" in master_guide:
+                master_guide = master_guide.replace("master_","")
             cmds.group(n=master_guide,p="modules",em=1)
             try:
                 cmds.parent(cmds.listRelatives(grp_fk_jnts,c=1), master_guide)

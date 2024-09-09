@@ -298,7 +298,7 @@ class Interface(QWidget):
                 utils.hide_guides(self.systems_to_be_made, self.created_guides, module_widget=self.module_widget, hidden=False)
                 utils.delete_joints(self.systems_to_be_made, self.skn_jnt_list)
             elif self.last_selected_button == "rig":
-                utils.hide_guides(self.systems_to_be_made, self.created_guides, module_widget=self.module_widget, hidden=True)
+                utils.hide_guides(self.systems_to_be_made, self.created_guides, module_widget=self.module_widget, hidden=False)
                 cmds.delete(rig_name.text())
             elif self.last_selected_button == "polish":
                 cmds.warning("Rig has been polished past data has been deleted")
