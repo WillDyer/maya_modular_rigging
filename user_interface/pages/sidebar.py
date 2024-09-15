@@ -20,7 +20,7 @@ class AddAvailableModules(QWidget):
         self.update_modules()
 
     def update_modules(self):
-        files = [".".join(f.split(".")[:-1]) for f in os.listdir("/home/will/maya/scripts/maya_modular_rigging/systems/modules")]
+        files = [".".join(f.split(".")[:-1]) for f in os.listdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'systems', 'modules'))]
         try: files.remove("")
         except ValueError: pass
         files = [f for f in files if f not in ["__init__", "hand"]]

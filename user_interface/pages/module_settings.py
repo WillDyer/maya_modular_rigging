@@ -20,7 +20,9 @@ class CreateModuleTab(QWidget):
     def __init__(self, interface_class, module, button, page, scroll_area_layout, layout, module_dict):
         super().__init__()
 
-        sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules"))
+        # sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules"))
+        print(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'systems', 'modules'))
+        sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'systems', 'modules'))
         self.module_path = importlib.import_module(module_dict["module"])
         importlib.reload(self.module_path)
 
@@ -205,7 +207,9 @@ class AddModule():
 
     def add_module(self, module):
         # module = self.ui.available_modules.currentText()
-        sys.path.append("/home/will/maya/scripts/maya_modular_rigging/systems/modules")
+        # sys.path.append("/home/will/maya/scripts/maya_modular_rigging/systems/modules")
+        print(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'systems', 'modules'))
+        sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'systems', 'modules'))
         module_path = importlib.import_module(module)
         importlib.reload(module_path)
         offset = [
