@@ -7,7 +7,7 @@ ik_joints = {
     "pv_joint": None,
     "world_orientation": True
 }
-side = "None"
+side = "C"
 space_swapping = []
 guide_scale = 1
 available_rig_types = ["FK","IK_Ribbon"]

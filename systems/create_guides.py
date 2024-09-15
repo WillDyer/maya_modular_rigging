@@ -76,11 +76,11 @@ class Guides():
 
         # create master guide for module
         if "root" in self.module.system:
-            master_guide = "root"
+            master_guide = f"{side}_root"
         elif "proximal" in self.module.system:
             master_guide = "proximal"
         else:
-            master_guide = utils.create_cube(f"master_{accessed_module}{side}_#", scale=[5, 5, 5])
+            master_guide = utils.create_cube(f"master_{side}_{accessed_module}#", scale=[5, 5, 5])
             pos = self.module.system_pos[self.module.system[0]]
             rot = self.module.system_rot[self.module.system[0]]
             cmds.xform(master_guide, ws=1, t=[pos[0], pos[1], pos[2]])

@@ -9,7 +9,7 @@ ik_joints = {
     "ik_type": "quadruped",
     "hock": "hock"
 }
-side = "_l"
+side = "L"
 space_swapping = ["hip","root","COG","Custom"]
 guide_scale = 1
 available_rig_types = ["FK","IK","FKIK"]

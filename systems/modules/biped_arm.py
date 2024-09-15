@@ -12,7 +12,7 @@ twist_joint = {
     "start": "shoulder",
     "end": "wrist"
 }
-side = "_l"
+side = "L"
 space_swapping = ["shoulder","root","COG","Custom"]
 guide_scale = 1
 available_rig_types = ["FK","IK","FKIK"]
