@@ -41,26 +41,26 @@ class CreateReverseLocators():
                 cmds.matchTransform(loc_name[x],jnt_name[x])
             except:
                 cmds.error("Error: jnt_name cant be found check backend.")
-        bank_in = f"loc_{rev_locators['bank_in']}"
-        bank_out = f"loc_{rev_locators['bank_out']}"
+        bank_in = f"loc_rev_{side}_{rev_locators['bank_in']}_#"
+        bank_out = f"loc_rev_{side}_{rev_locators['bank_out']}_#"
         for x in [bank_in,bank_out]:
-            tmp = cmds.spaceLocator(n=f"{x}{side}_#")[0]
+            tmp = cmds.spaceLocator(n=f"{x}")[0]
             cmds.matchTransform(tmp, loc_ball)
             if x == bank_in: bank_in = tmp
             elif x == bank_out: bank_out = tmp
         offset = 10
-        bank_out_split = bank_out.split("_")[-2]
-        bank_in_split = bank_out.split("_")[-2]
-        if bank_out_split and bank_in_split == "l":
+        # bank_out_split = bank_out.split("_")[-2]
+        # bank_in_split = bank_out.split("_")[-2]
+        if "L" in bank_out and "L" in bank_in:
             cmds.move(offset,0,0,bank_out,r=1)
             cmds.move(-offset,0,0,bank_in,r=1)
-        elif bank_out_split and bank_in_split == "r":
+        elif "R" in bank_out and "R" in bank_in:
             cmds.move(-offset,0,0,bank_out,r=1)
             cmds.move(offset,0,0,bank_in,r=1)
         else:
             cmds.error("No matching side suffex")
 
-        loc_heel = cmds.spaceLocator(n=f"{loc_prefix}_{rev_locators['heel']}{side}_#")[0]
+        loc_heel = cmds.spaceLocator(n=f"{loc_prefix}_{side}_{rev_locators['heel']}_#")[0]
         cmds.matchTransform(loc_heel,loc_ball)
         cmds.move(0,0,-offset,loc_heel,r=1)
 

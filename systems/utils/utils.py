@@ -59,10 +59,11 @@ def find_substring_in_list(string, substrings):
 
 def colour_controls(ctrl_list,colour_dict):
     def set_drawing_override_color(nurbs_curve, rgb_colour,side):
-        if side == "C": colour = rgb_colour["root"]
+        print(side)
+        if side == "green": colour = rgb_colour["root"]
         elif side == "L": colour = rgb_colour["L_colour"]
-        elif side == "R": colour = rgb_colour["R_Colour"]
-        elif side == "default": colour = rgb_colour["C_colour"]
+        elif side == "R": colour = rgb_colour["R_colour"]
+        elif side == "C": colour = rgb_colour["C_colour"]
         else: colour = rgb_colour["C_colour"]
         colour = [c / 255.0 for c in colour]
         cmds.setAttr(f"{nurbs_curve}.overrideEnabled", 1)
@@ -73,20 +74,12 @@ def colour_controls(ctrl_list,colour_dict):
     # COLOR_CONFIG = {'l': 6, 'r': 13, 'default': 22}
     for ctrl in ctrl_list:
         print(ctrl)
-        try:
-            if ctrl == "ctrl_root" or ctrl == "ctrl_COG":
-                set_drawing_override_color(ctrl, colour_dict,side="None")
-            elif ctrl[:4] == "ctrl":
-                side = ctrl.split("_")[2][0]
-                print(side)
-                try:
-                    set_drawing_override_color(ctrl, colour_dict, side)
-                except KeyError:
-                    set_drawing_override_color(ctrl, colour_dict, side="default")
-                    pass
-            else:
-                pass
-        except:
+        if ctrl == "ctrl_root" or ctrl == "ctrl_COG":
+            set_drawing_override_color(ctrl, colour_dict,side="green")
+        elif ctrl[:4] == "ctrl":
+            side = ctrl.split("_")[2][0]
+            set_drawing_override_color(ctrl, colour_dict, side)
+        else:
             pass
 
 

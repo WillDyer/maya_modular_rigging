@@ -27,9 +27,9 @@ def joint(orientation,top_skeleton_joint, system):
         list.append(top_skeleton_joint)
     list.reverse()
 
-    side = cmds.getAttr(f"{top_skeleton_joint}.module_side",asString=1)
+    """side = cmds.getAttr(f"{top_skeleton_joint}.module_side",asString=1)
     if side == "None":
-        side = ""
+        side = """""
 
     for x in list:
         if "cluster" in x or "data_" in x:

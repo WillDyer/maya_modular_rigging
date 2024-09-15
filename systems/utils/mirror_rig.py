@@ -1,4 +1,8 @@
 import maya.cmds as cmds
+import importlib
+
+from systems import joints
+importlib.reload(joints)
 
 
 class mirror_data():
@@ -7,70 +11,80 @@ class mirror_data():
         self.orientation = orientation
         self.mirror_data()
 
+    def create_mirrored_guides(self):  # Create guide locators
+        tmp_guide_list = []
+        for guide in self.key["guide_list"]:
+            if "master" in guide:
+                guide_name = f"master_{self.side}{guide[8:]}"
+            else:
+                guide_name = f"{self.side}{guide[1:]}"
+
+            loc = cmds.xform(guide, r=True, ws=True, q=True, t=True)
+            rot = cmds.xform(guide, r=True, ws=True, q=True, ro=True)
+
+            tmp = cmds.spaceLocator(n=guide_name)[0]
+            cmds.xform(tmp, t=loc, ro=rot)
+            tmp_guide_list.append(tmp)
+
+        grp_name = cmds.group(n="mirroring_transform", em=1)
+        cmds.parent(tmp_guide_list, grp_name)
+        cmds.xform(grp_name, scale=[-1,1,1])
+        cmds.parent(tmp_guide_list, w=True)
+        cmds.makeIdentity(tmp_guide_list[-1], apply=True, s=True)
+        cmds.delete(grp_name)
+
+        for guide in range(len(tmp_guide_list)):
+            try:
+                cmds.parent(tmp_guide_list[guide], tmp_guide_list[guide+1])
+            except:
+                pass
+
+        self.master_guide = tmp_guide_list[-1]
+        self.guide_list = tmp_guide_list
+
     def mirror_joints(self):
-        cmds.select(self.key["joints"][0])
-        joint_list = cmds.mirrorJoint(mirrorYZ=True,mirrorBehavior=False,searchReplace=('_l_', '_r_'))
-        cmds.joint(joint_list[0], edit=True, zso=1, oj=self.orientation, sao="xdown", ch=True)
+        joint_list = joints.joint("xyz",self.master_guide,system="rig")
         return joint_list
 
     def get_mirrored_side(self):
-        if self.key["side"] == "_l":
-            self.side = "_r"
-            self.simple_side = "_r_"
-        elif self.key["side"] == "_r":
-            self.side = "_l"
-            self.simple_side = "_l_"
+        if self.key["side"] == "L":
+            self.side = "R"
+        elif self.key["side"] == "R":
+            self.side = "L"
         else:
             self.side = ""
 
     def get_mirrored_system_to_connect(self):  # Mirrored system to connect
         system_to_connect = self.key["system_to_connect"]
-        mirrored_system_to_connect = [item.replace(f"{self.key['side']}_", self.simple_side) if f"{self.key['side']}_" in item else item for item in system_to_connect]
+        print(system_to_connect)
+        # mirrored_system_to_connect = [item.replace(f"{self.key['side']}_", self.simple_side) if f"{self.key['side']}_" in item else item for item in system_to_connect]
+        mirrored_system_to_connect = []
+        for item in system_to_connect:
+            if f"{self.key['side']}" in item:
+                mirrored_item = item.replace(f"{self.key['side']}", self.side,1)
+            else:
+                mirrored_item = item
+            mirrored_system_to_connect.append(mirrored_item)
+
         return mirrored_system_to_connect
-
-    def create_mirrored_guides(self):  # Create guide locators
-        for jnt in self.joint_list:
-            for type in ["jnt_rig_","jnt_ik_","jnt_fk_"]:
-                if type in jnt:
-                    tmp_jnt = jnt.replace(type, "")
-            locator_name = cmds.spaceLocator(n=tmp_jnt)
-            cmds.matchTransform(locator_name, jnt)
-            self.locator_list.append(locator_name[0])
-        self.locator_list.reverse()
-        for locator in range(len(self.locator_list)):
-            try:
-                cmds.parent(self.locator_list[locator], self.locator_list[locator+1])
-            except:
-                pass
-
-    def create_mirrored_master_guide(self):  # Create master guide
-        split_master_guide = self.key["master_guide"].split("_")
-        master_guide = self.key["master_guide"].replace(f"_{split_master_guide[-2]}_",self.simple_side)
-        self.proxy_obj_list = self.locator_list
-        if "master" in master_guide:
-            cmds.spaceLocator(n=master_guide)
-            cmds.matchTransform(master_guide,self.joint_list[0])
-            cmds.parent(self.locator_list[-1],master_guide)
-
-            self.proxy_obj_list.append(master_guide)
-            cmds.addAttr(master_guide, ln="mirror_orientation",nn="Mirror Orientation", at="enum",en="Yes",k=1)
-        return master_guide
 
     def copy_mirrored_attrs(self):  # Copy attrs accross
         self.non_proxy_attr_list = []
+        proxy_obj_list = self.guide_list
         for attr in cmds.listAttr(self.key["master_guide"], r=1,ud=1):
             if "_control_shape" in attr:
                 pass
             else:
                 try:
                     if attr == "master_guide":
-                        cmds.addAttr(self.proxy_obj_list, ln="master_guide",at="enum",en=self.master_guide,k=0)
+                        cmds.addAttr(proxy_obj_list, ln="master_guide",at="enum",en=self.master_guide,k=0)
                     elif attr not in ['visibility', 'translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']:
                         try:
-                            new_attr_name = attr.replace(f"{self.key['side']}_",self.simple_side,1)
+                            # new_attr_name = f"master_{self.side}{attr[8:]}"
+                            new_attr_name = attr.replace(f"{self.key['side']}",self.side,1)
                         except:
                             pass
-                        cmds.addAttr(self.proxy_obj_list,ln=f"{new_attr_name}", proxy=f"{self.key['master_guide']}.{attr}")
+                        cmds.addAttr(proxy_obj_list,ln=f"{new_attr_name}", proxy=f"{self.key['master_guide']}.{attr}")
                     else:
                         pass
                 except:
@@ -79,8 +93,8 @@ class mirror_data():
         for guide in self.key["guide_list"]:
             for attr in cmds.listAttr(guide, r=1,ud=1):
                 if "_control_shape" in attr:
-                    new_attr_name = attr.replace(f"{self.key['side']}_",self.simple_side,1)
-                    mirrored_guide = guide.replace(f"{self.key['side']}_",self.simple_side,1)
+                    new_attr_name = attr.replace(f"{self.key['side']}",self.side,1)
+                    mirrored_guide = f"{self.side}{guide[1:]}"
                     enum_value = cmds.getAttr(f"{guide}.{attr}",asString=1)
                     cmds.addAttr(mirrored_guide,ln=f"{new_attr_name}",at="enum",en=enum_value)
 
@@ -89,7 +103,7 @@ class mirror_data():
             if self.key["rev_locators"]:
                 mirrored_rev_locators = []
                 for loc in self.key["rev_locators"]:
-                    new_loc_name = loc.replace(f"{self.key['side']}_",self.simple_side,1)
+                    new_loc_name = loc.replace(f"{self.key['side']}",self.side,1)
                     cmds.duplicate(loc, n=new_loc_name)
                     mirrored_rev_locators.append(new_loc_name)
 
@@ -112,12 +126,11 @@ class mirror_data():
             mirror_attribute = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_mirror_jnts", asString=1)
             if mirror_attribute == "Yes":  # YES
                 self.key = key
-                self.joint_list = self.mirror_joints()
                 self.get_mirrored_side()
-                self.mirrored_system_to_connect = self.get_mirrored_system_to_connect()
                 self.create_mirrored_guides()
-                self.master_guide = self.create_mirrored_master_guide()
                 self.copy_mirrored_attrs()
+                self.joint_list = self.mirror_joints()
+                self.mirrored_system_to_connect = self.get_mirrored_system_to_connect()
                 self.mirrored_rev_locators = self.mirror_reverse_foot()
 
                 temp_dict = {
