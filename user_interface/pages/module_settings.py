@@ -224,6 +224,7 @@ class AddModule():
             system_to_connect = guide["system_to_connect"]
             guide_list = guide["ui_guide_list"]
             data_guide = guide["data_guide"]
+            guide_number = guide["guide_number"]
             if "rev_locators" in guide: rev_locators = guide["rev_locators"]
             else: rev_locators = []
             self.created_guides.append(master_guide)
@@ -247,7 +248,9 @@ class AddModule():
                 "fk_ctrl_list": [],
                 "ik_joint_list": [],
                 "fk_joint_list": [],
-                "rev_locators": rev_locators
+                "rev_locators": rev_locators,
+
+                "guide_number": guide_number
             }
             # self.systems_to_be_made[master_guide] = temp_dict
             guide_data.setup(self.temp_dict, data_guide)

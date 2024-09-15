@@ -14,13 +14,17 @@ dict_var_types = {
                 "fk_ctrl_list": "list",
                 "ik_joint_list": "list",
                 "fk_joint_list": "list",
-                "rev_locators": "list"
+                "rev_locators": "list",
+                "guide_number": "float"
             }
 
 
 def setup(temp_dict, data_guide):
     for key in temp_dict.keys():
-        if isinstance(temp_dict[key], str):
+        if temp_dict.keys() == "guide_number":
+            cmds.addAttr(data_guide, ln=key, at="float",k=1)
+            cmds.setAttr(f"{data_guide}.{key}", temp_dict[key])
+        elif isinstance(temp_dict[key], str):
             cmds.addAttr(data_guide, ln=key, at="enum", en=temp_dict[key], k=1)
         elif isinstance(temp_dict[key], list):
             if len(temp_dict[key]) == 0: enum_list = "empty"
@@ -48,7 +52,8 @@ def init_data():
         temp_dict = {}
         attr_list = cmds.listAttr(guide, r=1,k=1)
         for attr in attr_list:
-            if dict_var_types[attr] == "list":
+            if dict_var_types[attr] == "guide_number": pass
+            elif dict_var_types[attr] == "list":
                 value_list = cmds.attributeQuery(attr, node=guide, le=1)
                 value = value_list[0].split(":")
             elif dict_var_types[attr] == "string":

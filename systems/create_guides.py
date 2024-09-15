@@ -74,13 +74,35 @@ class Guides():
         else:
             side = self.module.side
 
+        number = "0"
+        tmp_list = []
+        module_list = cmds.ls("data*")
+        for object in module_list:
+            if "Shape" in object:
+                pass
+            elif accessed_module in object:
+                tmp_list.append(object)
+            elif accessed_module == "basic_root" and "root" in object:
+                tmp_list.append(object)
+
+        numbers_unfiltered = []
+        for data_guide in tmp_list:
+            if cmds.attributeQuery("guide_number", node=data_guide, exists=True):
+                numbers_unfiltered.append(cmds.getAttr(f"{data_guide}.guide_number"))
+            else:
+                cmds.warning("guide_number attr doesnt exist on this node, guide setup might not work as expected.")
+
+        if numbers_unfiltered:
+            numbers_unfiltered.sort()
+            number = numbers_unfiltered[-1] + 1
+
         # create master guide for module
         if "root" in self.module.system:
-            master_guide = f"{side}_root"
+            master_guide = "root"
         elif "proximal" in self.module.system:
             master_guide = "proximal"
         else:
-            master_guide = utils.create_cube(f"master_{side}_{accessed_module}#", scale=[5, 5, 5])
+            master_guide = utils.create_cube(f"master_{side}{number}_{accessed_module}", scale=[5, 5, 5])
             pos = self.module.system_pos[self.module.system[0]]
             rot = self.module.system_rot[self.module.system[0]]
             cmds.xform(master_guide, ws=1, t=[pos[0], pos[1], pos[2]])
@@ -92,11 +114,11 @@ class Guides():
                 if "root" in x:
                     imported = cmds.circle(r=50, nr=[0, 1, 0])
                     root_exists = True
-                    guide = cmds.rename(imported[0], f"{x}{side}")
+                    guide = cmds.rename(imported[0], f"{side}{number}_{x}")
                 else:
                     imported = cmds.file(ABC_FILE, i=1, namespace="test", rnn=1)
                     cmds.scale(self.module.guide_scale, self.module.guide_scale, self.module.guide_scale, imported)
-                    guide = cmds.rename(imported[0], f"{x}{side}_#")
+                    guide = cmds.rename(imported[0], f"{side}{number}_{x}")
                 if "root" in x and root_exists is True:
                     master_guide = guide
                 elif "proximal" in x:
@@ -174,7 +196,8 @@ class Guides():
             "master_guide": master_guide,
             "connector_list": connector_list,
             "ui_guide_list": ui_guide_list,
-            "data_guide": data_guide_name
+            "data_guide": data_guide_name,
+            "guide_number": number
         }
         return ui_dict  # [master_guide, connector_list, ui_guide_list]
 
