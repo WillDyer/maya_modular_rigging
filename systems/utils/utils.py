@@ -59,7 +59,6 @@ def find_substring_in_list(string, substrings):
 
 def colour_controls(ctrl_list,colour_dict):
     def set_drawing_override_color(nurbs_curve, rgb_colour,side):
-        print(side)
         if side == "green": colour = rgb_colour["root"]
         elif side == "L": colour = rgb_colour["L_colour"]
         elif side == "R": colour = rgb_colour["R_colour"]
@@ -73,7 +72,6 @@ def colour_controls(ctrl_list,colour_dict):
         cmds.setAttr(f"{nurbs_curve}.overrideColorB", colour[2])
     # COLOR_CONFIG = {'l': 6, 'r': 13, 'default': 22}
     for ctrl in ctrl_list:
-        print(ctrl)
         if ctrl == "ctrl_root" or ctrl == "ctrl_COG":
             set_drawing_override_color(ctrl, colour_dict,side="green")
         elif ctrl[:4] == "ctrl":

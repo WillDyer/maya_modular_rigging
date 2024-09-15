@@ -136,7 +136,7 @@ class mirror_data():
                 temp_dict = {
                     "module": key["module"],
                     "master_guide": self.master_guide,
-                    "guide_list": self.locator_list,
+                    "guide_list": self.guide_list,
                     "guide_scale": key["guide_scale"],
                     "joints": self.joint_list,
                     "side": self.side,

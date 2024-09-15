@@ -145,7 +145,6 @@ class create_ik():
                 self.to_be_parented.append(ctrl_crv_tmp)
                 cmds.matchTransform(ctrl_crv_tmp,joint)
                 cmds.parentConstraint(ctrl_crv_tmp, joint,mo=1,n=f"pConst_{joint[7:]}")
-            print(f"parenting: {self.start_ctrl_crv} to {self.to_be_parented[0]}")
             cmds.parent(self.start_ctrl_crv,self.to_be_parented[0])
             for ctrl in range(len(self.to_be_parented)):
                 if ctrl == 0:
