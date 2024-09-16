@@ -35,13 +35,16 @@ class PrepSkeleton():
                 self.joint2 = self.joint_list[x+1]
                 num_joints = cmds.getAttr(f"{self.key['master_guide']}.{self.key['master_guide']}_twist_amount")
                 num_joints = int(num_joints)
-                self.tween_joint_list = self.insert_joints_between(num_joints)
+                returned_values = self.insert_joints_between(num_joints)
+                self.tween_joint_list = returned_values["tween_joint_list"]
+                self.tweak_joint_list = returned_values["tweak_joint_list"]
                 self.twist_joint_dict = {
                     "joint1": self.joint1,
                     "joint1_twist": self.joint1_twist,
                     "joint2": self.joint2,
                     "joint2_twist": self.joint2_twist,
-                    "tween_joints": self.tween_joint_list
+                    "tween_joints": self.tween_joint_list,
+                    "tweak_joints": self.tweak_joint_list
                 }
 
                 self.return_data_list.extend(self.tween_joint_list)
@@ -59,6 +62,7 @@ class PrepSkeleton():
         if num_joints <= 0:
             return
         tween_joint_list = []
+        tweak_joint_list = []
 
         # Get the positions of the existing joints
         pos1 = cmds.xform(self.joint1, q=True, ws=True, t=True)
@@ -114,7 +118,19 @@ class PrepSkeleton():
             cmds.parent(joint, self.joint1_twist)
         cmds.parent(self.joint2_twist, self.joint1_twist)
 
-        return tween_joint_list
+        # tweak joints
+        for joint in tween_joint_list:
+            tweak_joint_name = joint.replace("tween","tweak")
+            cmds.select(joint)
+            cmds.joint(n=tweak_joint_name,r=0.5)
+            cmds.select(clear=1)
+            tweak_joint_list.append(tweak_joint_name)
+
+        return_dict = {
+            "tween_joint_list": tween_joint_list,
+            "tweak_joint_list": tweak_joint_list
+        }
+        return return_dict
 
     def return_data(self):
         return self.return_data_list
@@ -130,11 +146,13 @@ class CreateTwist():
         self.joint2 = twist_joint_dict["joint2"]
         self.joint2_twist = twist_joint_dict["joint2_twist"]
         self.tween_joints = twist_joint_dict["tween_joints"]
+        self.tweak_joints = twist_joint_dict["tweak_joints"]
 
         if system == "rig":
             self.ik_handle()
             self.correct_orientation()
             self.twist_constraints()
+            self.tweak_constraints()
             self.parent_to_heirachy()
         elif system == "skn":
             self.parent_to_heirachy()
@@ -176,6 +194,44 @@ class CreateTwist():
         if cmds.getAttr(f"{self.key['master_guide']}.{self.key['master_guide']}_squash_stretch", asString=1) == "Yes":
             cmds.pointConstraint(self.joint1, self.joint1_twist, n=f"pointConst_{self.joint1_twist}")
             cmds.pointConstraint(self.joint2, self.joint2_twist, n=f"pointConst_{self.joint2_twist}")
+
+    def tweak_constraints(self):
+        if len(self.tween_joints) > 3:
+            cmds.error("self.tween_joints var cannot be greater than 3")
+        else:
+            for joint in self.tweak_joints:
+                if "jnt_rig" in joint:
+                    guide_name = joint.replace("jnt_rig_","")
+                elif "jnt_skn" in joint:
+                    guide_name = joint.replace("jnt_skn", "")
+                else: guide_name = joint
+
+                driver_grp = cmds.group(n=f"driver_{guide_name}",em=1)
+                offset_grp = cmds.group(n=f"offset_{guide_name}", p=driver_grp, em=True)
+                ctrl_crv = cmds.curve(n=f"ctrl_tweak_{joint}",d=1,p=[(0,12,12),(0,-12,12),(0,-12,-12),(0,12,-12),(0,12,12)])
+                cmds.parent(ctrl_crv, offset_grp)
+                cmds.matchTransform(driver_grp, joint)
+
+                cmds.orientConstraint([self.joint1_twist, self.joint2_twist], driver_grp, n=f"orientConst_{joint}")
+                cmds.pointConstraint([self.joint1_twist, self.joint2_twist], driver_grp, n=f"pointConst_{joint}")
+
+                for trs in ["translate","rotate","scale"]:
+                    cmds.connectAttr(f"{ctrl_crv}.{trs}", f"{joint}.{trs}")
+
+            if len(self.tween_joints) == 1:
+                pass
+            elif len(self.tween_joints) == 2:
+                cmds.setAttr(f"orientConst_{self.tweak_joints[0]}.{self.joint1_twist}W0",2)
+                cmds.setAttr(f"pointConst_{self.tweak_joints[0]}.{self.joint1_twist}W0",2)
+
+                cmds.setAttr(f"orientConst_{self.tweak_joints[1]}.{self.joint2_twist}W1",2)
+                cmds.setAttr(f"pointConst_{self.tweak_joints[1]}.{self.joint2_twist}W1",2)
+            elif len(self.tween_joints) == 3:
+                cmds.setAttr(f"orientConst_{self.tweak_joints[0]}.{self.joint1_twist}W0",3)
+                cmds.setAttr(f"pointConst_{self.tweak_joints[0]}.{self.joint1_twist}W0",3)
+
+                cmds.setAttr(f"orientConst_{self.tweak_joints[2]}.{self.joint2_twist}W1",3)
+                cmds.setAttr(f"pointConst_{self.tweak_joints[2]}.{self.joint2_twist}W1",3)
 
     def parent_to_heirachy(self):
         parent_joint = cmds.listRelatives(self.joint1, parent=True)
