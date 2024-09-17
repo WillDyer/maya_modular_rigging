@@ -219,7 +219,6 @@ class CreateTwist():
 
 class CreateTweaks():
     def __init__(self, tweak_joint_dict):
-        print(tweak_joint_dict)
         for key in tweak_joint_dict.values():
             self.driver_grps = []
             self.master_guide = key["master_guide"]

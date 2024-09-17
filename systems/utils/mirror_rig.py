@@ -1,8 +1,11 @@
 import maya.cmds as cmds
 import importlib
+import os
 
 from systems import joints
+from systems.utils import utils
 importlib.reload(joints)
+importlib.reload(utils)
 
 
 class mirror_data():
@@ -12,19 +15,29 @@ class mirror_data():
         self.mirror_data()
 
     def create_mirrored_guides(self):  # Create guide locators
+        ABC_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),"..","imports","guide_shape.abc")
         tmp_guide_list = []
+        connector_list = []
         for guide in self.key["guide_list"]:
-            if "master" in guide:
-                guide_name = f"master_{self.side}{guide[8:]}"
-            else:
-                guide_name = f"{self.side}{guide[1:]}"
-
             loc = cmds.xform(guide, r=True, ws=True, q=True, t=True)
             rot = cmds.xform(guide, r=True, ws=True, q=True, ro=True)
 
-            tmp = cmds.spaceLocator(n=guide_name)[0]
-            cmds.xform(tmp, t=loc, ro=rot)
-            tmp_guide_list.append(tmp)
+            if "master" in guide:
+                guide_name = f"master_{self.side}{guide[8:]}"
+                imported_guide = utils.create_cube(guide_name, scale=[5,5,5])
+            else:
+                guide_name = f"{self.side}{guide[1:]}"
+                # tmp = cmds.spaceLocator(n=guide_name)[0]
+                tmp = cmds.file(ABC_FILE, i=1, namespace="test", rnn=1)
+                imported_guide = cmds.rename(tmp[0], guide_name)
+                cmds.setAttr(f"{imported_guide}.overrideEnabled", 1)
+                cmds.setAttr(f"{imported_guide}.overrideColor", 22)
+                for shape in tmp[1:]:
+                    shape = shape.split("|")[-1]
+                    cmds.rename(shape, f"{guide}_shape_#")
+
+            cmds.xform(imported_guide, t=loc, ro=rot)
+            tmp_guide_list.append(imported_guide)
 
         grp_name = cmds.group(n="mirroring_transform", em=1)
         cmds.parent(tmp_guide_list, grp_name)
@@ -36,8 +49,16 @@ class mirror_data():
         for guide in range(len(tmp_guide_list)):
             try:
                 cmds.parent(tmp_guide_list[guide], tmp_guide_list[guide+1])
+                connector = utils.connector(tmp_guide_list[guide], tmp_guide_list[guide+1])
+                connector_list.append(connector)
             except:
                 pass
+
+        if "grp_connector_clusters" in cmds.ls("grp_connector_clusters"):
+            cmds.parent(connector_list, "grp_connector_clusters")
+        else:
+            cmds.group(connector_list, n="grp_connector_clusters",w=1)
+            cmds.setAttr("grp_connector_clusters.hiddenInOutliner", True)
 
         self.master_guide = tmp_guide_list[-1]
         self.guide_list = tmp_guide_list
@@ -56,7 +77,6 @@ class mirror_data():
 
     def get_mirrored_system_to_connect(self):  # Mirrored system to connect
         system_to_connect = self.key["system_to_connect"]
-        print(system_to_connect)
         # mirrored_system_to_connect = [item.replace(f"{self.key['side']}_", self.simple_side) if f"{self.key['side']}_" in item else item for item in system_to_connect]
         mirrored_system_to_connect = []
         for item in system_to_connect:
@@ -129,7 +149,7 @@ class mirror_data():
                 self.get_mirrored_side()
                 self.create_mirrored_guides()
                 self.copy_mirrored_attrs()
-                self.joint_list = self.mirror_joints()
+                # self.joint_list = self.mirror_joints()
                 self.mirrored_system_to_connect = self.get_mirrored_system_to_connect()
                 self.mirrored_rev_locators = self.mirror_reverse_foot()
 
@@ -138,7 +158,7 @@ class mirror_data():
                     "master_guide": self.master_guide,
                     "guide_list": self.guide_list,
                     "guide_scale": key["guide_scale"],
-                    "joints": self.joint_list,
+                    "joints": [],  # self.joint_list,
                     "side": self.side,
                     "connectors": [],
                     "system_to_connect": self.mirrored_system_to_connect,
@@ -153,6 +173,8 @@ class mirror_data():
                     temp_dict.update({"rev_locators": self.mirrored_rev_locators})
 
                 temp_systems_to_be_made[self.master_guide] = temp_dict
+
+                cmds.setAttr(f"{key['master_guide']}.{key['master_guide']}_mirror_jnts", 0)
 
         self.data_to_be_checked.update(temp_systems_to_be_made)
 

@@ -154,19 +154,21 @@ class Interface(QWidget):
         self.systems_to_be_made[module_dict["master_guide"]] = module_dict
 
     def create_joints(self):
-        print(f"created_guides: {self.created_guides}")
         orientation = "xyz"
-        rig_jnt_list = joints.get_joint_list(orientation,self.created_guides, system="rig")
-        num = 0
-        for dict in self.systems_to_be_made.values():
-            dict["joints"] = rig_jnt_list[num]
-            num = num+1
 
         mirror_module = mirror_rig.mirror_data(self.systems_to_be_made, orientation)
         self.systems_to_be_made = mirror_module.get_mirror_data()
 
-        skn_created_guides = [key["master_guide"] for key in self.systems_to_be_made.values()]
-        self.skn_jnt_list = joints.get_joint_list(orientation,skn_created_guides, system="skn")
+        created_guides = [key["master_guide"] for key in self.systems_to_be_made.values()]
+
+        rig_jnt_list = joints.get_joint_list(orientation,created_guides, system="rig")
+        num = 0
+        for dict in self.systems_to_be_made.values():
+            if not dict["joints"]:
+                dict["joints"] = rig_jnt_list[num]
+            num = num+1
+
+        self.skn_jnt_list = joints.get_joint_list(orientation,created_guides, system="skn")
 
         for key in self.systems_to_be_made.values():
             twist_joint = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_twist_jnts", asString=1)
