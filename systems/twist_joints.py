@@ -8,6 +8,7 @@ importlib.reload(utils)
 
 class PrepSkeleton():
     def __init__(self,orientation,key,system):
+        self.tweak_joint_dict = {}
         self.orientation = orientation
         self.key = key
         self.system = system
@@ -47,6 +48,14 @@ class PrepSkeleton():
                     "tweak_joints": self.tweak_joint_list
                 }
 
+                tmp_tweak_joint_dict = {
+                    "master_guide": self.key["master_guide"],
+                    "tween_joints": self.tween_joint_list,
+                    "tweak_joints": self.tweak_joint_list,
+                    "joint1_twist": self.joint1_twist,
+                    "joint2_twist": self.joint2_twist
+                }
+                self.tweak_joint_dict[self.joint1] = tmp_tweak_joint_dict
                 self.return_data_list.extend(self.tween_joint_list)
                 self.return_data_list.append(self.joint1_twist)
                 self.return_data_list.append(self.joint2_twist)
@@ -133,7 +142,12 @@ class PrepSkeleton():
         return return_dict
 
     def return_data(self):
-        return self.return_data_list
+        return_data_dict = {
+            "return_data_list": self.return_data_list,
+            "tweak_joint_dict": self.tweak_joint_dict
+        }
+
+        return return_data_dict
 
 
 class CreateTwist():
@@ -152,7 +166,6 @@ class CreateTwist():
             self.ik_handle()
             self.correct_orientation()
             self.twist_constraints()
-            self.tweak_constraints()
             self.parent_to_heirachy()
         elif system == "skn":
             self.parent_to_heirachy()
@@ -195,6 +208,28 @@ class CreateTwist():
             cmds.pointConstraint(self.joint1, self.joint1_twist, n=f"pointConst_{self.joint1_twist}")
             cmds.pointConstraint(self.joint2, self.joint2_twist, n=f"pointConst_{self.joint2_twist}")
 
+    def parent_to_heirachy(self):
+        parent_joint = cmds.listRelatives(self.joint1, parent=True)
+        if parent_joint is None:
+            parent_joint = self.joint1
+        cmds.parent(self.joint1_twist, parent_joint)
+        if self.system == "rig":
+            cmds.parent(self.ik_hdl, parent_joint)
+
+
+class CreateTweaks():
+    def __init__(self, tweak_joint_dict):
+        print(tweak_joint_dict)
+        for key in tweak_joint_dict.values():
+            self.driver_grps = []
+            self.master_guide = key["master_guide"]
+            self.tween_joints = key["tween_joints"]
+            self.tweak_joints = key["tweak_joints"]
+            self.joint1_twist = key["joint1_twist"]
+            self.joint2_twist = key["joint2_twist"]
+            self.tweak_constraints()
+            self.grouping()
+
     def tweak_constraints(self):
         if len(self.tween_joints) > 3:
             cmds.error("self.tween_joints var cannot be greater than 3")
@@ -207,6 +242,7 @@ class CreateTwist():
                 else: guide_name = joint
 
                 driver_grp = cmds.group(n=f"driver_{guide_name}",em=1)
+                self.driver_grps.append(driver_grp)
                 offset_grp = cmds.group(n=f"offset_{guide_name}", p=driver_grp, em=True)
                 ctrl_crv = cmds.curve(n=f"ctrl_tweak_{joint}",d=1,p=[(0,12,12),(0,-12,12),(0,-12,-12),(0,12,-12),(0,12,12)])
                 cmds.parent(ctrl_crv, offset_grp)
@@ -233,13 +269,14 @@ class CreateTwist():
                 cmds.setAttr(f"orientConst_{self.tweak_joints[2]}.{self.joint2_twist}W1",3)
                 cmds.setAttr(f"pointConst_{self.tweak_joints[2]}.{self.joint2_twist}W1",3)
 
-    def parent_to_heirachy(self):
-        parent_joint = cmds.listRelatives(self.joint1, parent=True)
-        if parent_joint is None:
-            parent_joint = self.joint1
-        cmds.parent(self.joint1_twist, parent_joint)
-        if self.system == "rig":
-            cmds.parent(self.ik_hdl, parent_joint)
+    def grouping(self):
+        # check if group exists
+        existing_grp = cmds.ls(f"grp_tweak_{self.master_guide}")
+        if existing_grp:
+            cmds.parent(self.driver_grps, existing_grp)
+        else:
+            group = cmds.group(n=f"grp_tweak_{self.master_guide}",em=1)
+            cmds.parent(self.driver_grps, group)
 
 
 def rig_to_skn(list):

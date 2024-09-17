@@ -85,6 +85,7 @@ def heirachy_parenting(systems_dict):
             grp_ik_ctrl = f"grp_ik_ctrls_{master_guide}"
             grp_fk_jnts = f"grp_fk_jnts_{master_guide}"
             grp_ik_jnts = f"grp_ik_jnts_{master_guide}"
+            grp_tweaks_ctrl = f"grp_tweak_{master_guide}"
 
             if "master" in master_guide:
                 master_guide = master_guide.replace("master_","")
@@ -100,6 +101,8 @@ def heirachy_parenting(systems_dict):
             try: cmds.parent(grp_fk_ctrl, master_guide)
             except ValueError: pass
             try: cmds.parent(grp_ik_ctrl, master_guide)
+            except ValueError: pass
+            try: cmds.parent(grp_tweaks_ctrl, master_guide)
             except ValueError: pass
 
     hdl_list = cmds.ls("hdl_ik_*")

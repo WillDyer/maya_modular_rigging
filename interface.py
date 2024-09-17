@@ -174,10 +174,13 @@ class Interface(QWidget):
                 twist_amount = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_twist_amount")
                 if twist_amount > 0:
                     rig_twist_instance = twist_joints.PrepSkeleton(orientation,key,system="rig")
-                    rig_twist_list = rig_twist_instance.return_data()
+                    rig_twist_data = rig_twist_instance.return_data()
+                    rig_twist_list = rig_twist_data["return_data_list"]
+                    tweak_joint_dict = rig_twist_data["tweak_joint_dict"]
                     twist_joints.PrepSkeleton(orientation,key,system="skn")
                     twist_joints.rig_to_skn(rig_twist_list)
                     key.update({"twist_dict": rig_twist_list})
+                    key.update({"tweak_dict": tweak_joint_dict})
 
         connect_modules.attach_joints(self.systems_to_be_made,system="rig")
         connect_modules.attach_joints(self.systems_to_be_made,system="skn")
@@ -244,9 +247,12 @@ class Interface(QWidget):
                             reverse_foot_instance = reverse_foot.CreateReverseFoot(key["module"],key)
                     except KeyError:
                         print(f"Didnt find rev_locators in key not making reverse foot for: {key}")
-                    squash_stretch_attr = cmds.getAttr(f"{master_guide}.{master_guide}_squash_stretch", asString=1)
+                    squash_stretch_attr = cmds.getAttr(f"{master_guide}.{master_guide}_squash_stretch", asString=True)
                     if squash_stretch_attr == "Yes":
                         squash_and_stretch_instance = squash_and_stretch.CreateSquashAndStretch(key, module.ik_joints)
+
+                if cmds.getAttr(f"{master_guide}.{master_guide}_twist_jnts", asString=True) == "Yes":
+                    twist_joints.CreateTweaks(tweak_joint_dict=key["tweak_dict"])
 
         rig_name = self.sidebar_widget.findChild(QLineEdit, "rig_name")
         system_group.grpSetup(rig_name.text())
