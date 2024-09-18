@@ -42,6 +42,7 @@ mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QWidget)
 class Interface(QWidget):
     def __init__(self, *args, **kwargs):
         super(Interface,self).__init__(*args, **kwargs)
+        self.systems_to_be_made = {}
         self.setParent(mayaMainWindow)
         self.setWindowFlags(Qt.Window)
         self.initUI()
@@ -49,7 +50,6 @@ class Interface(QWidget):
         self.setFixedHeight(700)
         self.setWindowTitle("Maya_Modular_Rigging")
 
-        self.systems_to_be_made = {}
         self.created_guides = []
         self.systems_to_be_deleted_polished = []
         self.last_selected_button = "guides"
@@ -128,8 +128,32 @@ class Interface(QWidget):
         self.scroll_area.setWidgetResizable(True)
         self.module_layout.addWidget(self.scroll_area)
 
+        self.init_existingguides()
+
+    def init_existingguides(self):
+        guide_data_dict = guide_data.init_data()
+
+        for data_guide in guide_data_dict.values():
+            page = QWidget()
+            page.setObjectName(f"parentWidget_{data_guide['master_guide']}")
+            page.setStyleSheet(f"QWidget#parentWidget_{data_guide['master_guide']} {{ background-color: #25292c; }}")
+
+            if "master" in data_guide["master_guide"]:
+                module_name = data_guide["master_guide"].replace("master_","")
+            else: module_name = data_guide["master_guide"]
+            layout = QVBoxLayout(page)
+            button = QPushButton(module_name)
+            button.setCheckable(True)
+            button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            layout.addWidget(button)
+
+            settings_page_instance = module_settings.CreateModuleTab(self, module_name, button, page, self.scroll_area_layout, layout, data_guide)
+
+            self.scroll_area_layout.insertWidget(0,page)
+
+            self.systems_to_be_made[data_guide["master_guide"]] = data_guide
+
     def add_module(self, module):
-        print(f'Button clicked: {module}')
         createdmodule_instance = module_settings.AddModule(module)
         module_dict = createdmodule_instance.return_data()
         self.created_guides.append(module_dict["master_guide"])

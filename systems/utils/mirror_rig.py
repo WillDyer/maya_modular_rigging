@@ -3,7 +3,7 @@ import importlib
 import os
 
 from systems import joints
-from systems.utils import utils
+from systems.utils import utils, guide_data
 importlib.reload(joints)
 importlib.reload(utils)
 
@@ -62,6 +62,13 @@ class mirror_data():
 
         self.master_guide = tmp_guide_list[-1]
         self.guide_list = tmp_guide_list
+
+        # create data guide
+        if "root" in self.module.system or "proximal" in self.module.system: data_guide_name = f"data_{self.master_guide}"
+        else: data_guide_name = self.master_guide.replace("master_", "data_")
+        self.data_guide = cmds.spaceLocator(n=data_guide_name)[0]
+        cmds.matchTransform(self.data_guide, self.master_guide)
+        cmds.parent(self.data_guide, self.master_guide)
 
     def mirror_joints(self):
         joint_list = joints.joint("xyz",self.master_guide,system="rig")
@@ -143,6 +150,9 @@ class mirror_data():
         temp_systems_to_be_made = {}
         for key in self.data_to_be_checked.values():
             self.locator_list = []
+            accessed_module = key["module"]
+            self.module = importlib.import_module(f"systems.modules.{accessed_module}")
+            importlib.reload(self.module)
             mirror_attribute = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_mirror_jnts", asString=1)
             if mirror_attribute == "Yes":  # YES
                 self.key = key
@@ -175,6 +185,7 @@ class mirror_data():
                 temp_systems_to_be_made[self.master_guide] = temp_dict
 
                 cmds.setAttr(f"{key['master_guide']}.{key['master_guide']}_mirror_jnts", 0)
+                guide_data.setup(temp_dict, self.data_guide)
 
         self.data_to_be_checked.update(temp_systems_to_be_made)
 
