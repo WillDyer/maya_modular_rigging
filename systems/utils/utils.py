@@ -1,5 +1,8 @@
 import maya.cmds as cmds
-from PySide2.QtWidgets import *
+try:
+    from PySide2.QtWidgets import *
+except ModuleNotFoundError:
+    from PySide6.QtWidgets import *
 
 
 def create_cube(name, scale):
