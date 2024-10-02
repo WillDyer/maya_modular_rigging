@@ -178,7 +178,13 @@ class CreateTwist():
         cmds.pointConstraint(self.joint2, f"hdl_{self.joint1_twist}")
 
     def correct_orientation(self):
-        cmds.orientConstraint(self.joint1, self.joint2_twist)
+        orient_constraint = cmds.orientConstraint(self.joint1, self.joint2_twist)
+        cmds.delete(orient_constraint)
+        multiply_divide_node = cmds.shadingNode("multiplyDivide",au=1, n=f"{self.joint2_twist}_orient")
+        cmds.connectAttr(f"{self.joint1}.rotateX", f"{multiply_divide_node}.input1X", f=True)
+        cmds.connectAttr(f"{multiply_divide_node}.outputX", f"{self.joint2_twist}.rotateX", f=True)
+        for input in ["input2X", "input2Y", "input2Z"]:
+            cmds.setAttr(f"{multiply_divide_node}.{input}", 0.5)
 
     def twist_constraints(self):
         if len(self.tween_joints) > 3:
