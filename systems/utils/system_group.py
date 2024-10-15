@@ -4,7 +4,7 @@ from systems.utils import OPM
 
 attrs = {
     'visibility_divider': ['VISIBILITY','------------',True,False,'not needed'],
-    'vis_geometry': ['Geometry','Shown:Hidden',False,True,'grp_mesh.visibility'],
+    'vis_geometry': ['Geometry','Shown:Hidden',False,True,'geo.visibility'],
     'lock_divider': ['LOCK','------------',True,False,'not needed'],
     'export_geometry': ['Export Geometry','Unlocked:Locked:Wireframe',False,False,'not needed'],
     'debug_divider': ['DEBUG','------------',True,False,'not needed'],
@@ -44,7 +44,7 @@ def grpSetup(rig_name):
     OPM.offsetParentMatrix(ctrl="ctrl_COG")
 
     # try:
-    grpList = ['grp_mesh','grp_controls','grp_joints']
+    grpList = ['geo','grp_controls','grp_joints']
     jntList = ['grp_ik_handles','grp_rig_jnts','grp_skn_jnts']
     # ctrlList = ['grp_ctrls_head','grp_ctrls_spine','grp_ctrls_arms','grp_ctrls_legs']
 
@@ -68,6 +68,9 @@ def grpSetup(rig_name):
     cmds.parent('ctrl_COG','grp_COG')
 
     cmds.group(n='modules',p='ctrl_COG',em=True)
+
+    for type in ["render", "muscle", "bone"]:
+        cmds.group(n=type, p="geo", em=True)
 
     sys_attr()
 

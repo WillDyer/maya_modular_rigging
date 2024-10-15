@@ -40,7 +40,10 @@ def joint(orientation,top_skeleton_joint, system):
     cmds.select(clear=1)
     for locator in list_ctrls:
         loc = cmds.xform(locator, r=True, ws=True, q=True, t=True)  # Gather locator location
+        rot = cmds.xform(locator, r=True, ws=True, q=True, ro=True)
         jnt_name = cmds.joint(n=f"{joint_tag}{locator}", p=loc)  # create joint based off the location
+        cmds.xform(jnt_name, r=True, ro=rot)
+        cmds.makeIdentity(jnt_name, apply=True, t=False, r=True, s=False)
         jnt_names.append(jnt_name)
 
     mirror_attribute = cmds.getAttr(f"{top_skeleton_joint}.mirror_orientation", asString=1)
