@@ -1,4 +1,4 @@
 Bug List:
 List of current bugs that will be fixed in a updated patch:
 
-- reopening saved guides cannot remove them. (self.created_guides does not update)
+-

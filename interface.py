@@ -51,16 +51,16 @@ class Interface(QWidget):
     def __init__(self, *args, **kwargs):
         super(Interface,self).__init__(*args, **kwargs)
         self.systems_to_be_made = {}
+        self.created_guides = []
+        self.systems_to_be_deleted_polished = []
+        self.last_selected_button = "guides"
+
         self.setParent(mayaMainWindow)
         self.setWindowFlags(Qt.Window)
         self.initUI()
         self.setFixedWidth(600)
         self.setFixedHeight(700)
         self.setWindowTitle("Maya_Modular_Rigging")
-
-        self.created_guides = []
-        self.systems_to_be_deleted_polished = []
-        self.last_selected_button = "guides"
 
     def initUI(self):
         # layout
@@ -142,6 +142,7 @@ class Interface(QWidget):
         guide_data_dict = guide_data.init_data()
 
         for data_guide in guide_data_dict.values():
+            self.created_guides.append(data_guide["master_guide"])
             page = QWidget()
             page.setObjectName(f"parentWidget_{data_guide['master_guide']}")
             page.setStyleSheet(f"QWidget#parentWidget_{data_guide['master_guide']} {{ background-color: #25292c; }}")
