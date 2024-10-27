@@ -49,7 +49,7 @@ mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QWidget)
 
 class Interface(QWidget):
     def __init__(self, *args, **kwargs):
-        super(Interface,self).__init__(*args, **kwargs)
+        super(Interface, self).__init__(*args, **kwargs)
         self.systems_to_be_made = {}
         self.created_guides = []
         self.systems_to_be_deleted_polished = []
