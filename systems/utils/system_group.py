@@ -40,8 +40,9 @@ def grpSetup(rig_name):
         cmds.circle(n="ctrl_root",r=50,nr=(0, 1, 0))
         cmds.circle(n="ctrl_COG",r=25,nr=(0, 1, 0))
     cog_jnt = [item for item in cmds.ls("jnt_rig*") if "COG" in item]
-    cmds.matchTransform("ctrl_COG", cog_jnt[0],pos=1)
-    OPM.offsetParentMatrix(ctrl="ctrl_COG")
+    if cog_jnt in cmds.ls("jnt_rig_COG"):
+        cmds.matchTransform("ctrl_COG", cog_jnt[0],pos=1)
+        OPM.offsetParentMatrix(ctrl="ctrl_COG")
 
     # try:
     grpList = ['geo','grp_controls','grp_joints']
@@ -124,12 +125,26 @@ def heirachy_parenting(systems_dict):
         try: cmds.parent(parent_ribbon_list, "grp_ribbons")
         except RuntimeError: pass
 
-    rig_root_jnt = next(item for item in cmds.ls("jnt_rig_*") if "root" in item)
-    skn_root_jnt = next(item for item in cmds.ls("jnt_skn_*") if "root" in item)
-    cog_jnt = next(item for item in cmds.ls("jnt_rig_*") if "COG" in item)
+    cog_jnt = [item for item in cmds.ls("jnt_rig*") if "cog" in item]
+    if cog_jnt in cmds.ls("jnt_rig_COG"):
+        rig_root_jnt = next(item for item in cmds.ls("jnt_rig_*") if "root" in item)
+        skn_root_jnt = next(item for item in cmds.ls("jnt_skn_*") if "root" in item)
 
-    cmds.parent(rig_root_jnt, "grp_rig_jnts")
-    cmds.parent(skn_root_jnt, "grp_skn_jnts")
+        cmds.parent(rig_root_jnt, "grp_rig_jnts")
+        cmds.parent(skn_root_jnt, "grp_skn_jnts")
+    else:
+        all_joints = cmds.ls(type='joint')
+        world_parented_joints = [joint for joint in all_joints if not cmds.listRelatives(joint, parent=True)]
+        for joint in world_parented_joints:
+            if "rig" in joint:
+                cmds.parent(joint, "grp_rig_jnts")
+            elif "skn" in joint:
+                cmds.parent(joint, "grp_skn_jnts")
+            else: pass
 
-    cmds.parentConstraint("ctrl_root",rig_root_jnt,mo=1)
-    cmds.parentConstraint("ctrl_COG",cog_jnt,mo=1)
+    root_jnt = [item for item in cmds.ls("jnt_rig*") if "root" in item]
+    if root_jnt in cmds.ls("jnt_rig_COG"):
+        root_jnt = next(item for item in cmds.ls("jnt_rig_*") if "COG" in item)
+
+        cmds.parentConstraint("ctrl_root",rig_root_jnt,mo=1)
+        cmds.parentConstraint("ctrl_COG",cog_jnt,mo=1)
