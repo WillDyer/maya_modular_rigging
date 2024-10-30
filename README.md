@@ -125,7 +125,7 @@ is_preset = true
 modules_to_be_made = {"basic_root": ["basic_root", "parent"],
                       "biped_spine": ["biped_spine", "COG"]}
 
-# This variable is required if is_preset is True
+# This variable is REQUIRED
 # Note all keys in the dictionary must exist in module path
 
 ```
