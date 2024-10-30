@@ -173,7 +173,16 @@ class Interface(QWidget):
             self.systems_to_be_made[data_guide["master_guide"]] = data_guide
 
     def add_module(self, module):
-        createdmodule_instance = module_settings.AddModule(module)
+        module_path = importlib.import_module(module)
+        importlib.reload(module_path)
+        if module_path.is_preset is True:
+            for module in module_path.module_to_be_made.keys():
+                self.add_module_instance(module, preset=module_path)
+        else:
+            self.add_module_instance(module, preset=None)
+
+    def add_module_instance(self, module, preset):
+        createdmodule_instance = module_settings.AddModule(module, preset)
         module_dict = createdmodule_instance.return_data()
         self.created_guides.append(module_dict["master_guide"])
         if "master" in module_dict["master_guide"]:
@@ -201,7 +210,7 @@ class Interface(QWidget):
 
         mirror_module = mirror_rig.mirror_data(self.systems_to_be_made, orientation)
         self.systems_to_be_made = mirror_module.get_mirror_data()
-
+        print(self.systems_to_be_made)
         created_guides = [key["master_guide"] for key in self.systems_to_be_made.values()]
 
         rig_jnt_list = joints.get_joint_list(orientation,created_guides, system="rig")

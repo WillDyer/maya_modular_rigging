@@ -220,12 +220,12 @@ class CreateModuleTab(QWidget):
 
 
 class AddModule():
-    def __init__(self, module):
+    def __init__(self, module, preset):
         self.created_guides = []
         self.systems_to_be_made = {}
-        self.add_module(module)
+        self.add_module(module, preset)
 
-    def add_module(self, module):
+    def add_module(self, module, preset):
         # module = self.ui.available_modules.currentText()
         # sys.path.append("/home/will/maya/scripts/maya_modular_rigging/systems/modules")
         print(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'systems', 'modules'))
@@ -235,15 +235,15 @@ class AddModule():
         offset = [
             0,0,0
         ]
-        if module_path.is_preset is True:
-            for module in module_path.module_to_be_made.keys():
-                module_path = importlib.import_module(module)
-                importlib.reload(module_path)
-                self.guides = create_guides.Guides(module, offset,module_path.side,to_connect_to=[],use_existing_attr=[])
-                self.add_module_properties(module_path, module)        
-        else:
-            self.guides = create_guides.Guides(module,offset,module_path.side,to_connect_to=[],use_existing_attr=[])
-            self.add_module_properties(module_path, module)
+        
+        attach_to = []
+        if preset:
+            if preset.module_to_be_made[module] == "world": pass
+            else:
+                attach_to = [cmds.ls(f"*{preset.module_to_be_made[module]}*", type="transform")[0]]
+        
+        self.guides = create_guides.Guides(module,offset,module_path.side,to_connect_to=attach_to,use_existing_attr=[])
+        self.add_module_properties(module_path, module)
 
     def add_module_properties(self, module_path, module):
         guide = self.guides.collect_guides()

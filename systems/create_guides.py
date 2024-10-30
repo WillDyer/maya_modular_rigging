@@ -17,7 +17,7 @@ class Guides():
         if accessed_module == "hand":
             self.create_guide = self.guides_hand(accessed_module, offset, side, to_connect_to, use_existing_attr)
         else:
-            self.create_guide = self.guides(accessed_module, offset, side, use_existing_attr)
+            self.create_guide = self.guides(accessed_module, offset, side, to_connect_to, use_existing_attr)
         try:
             self.module.reverse_foot
             rev_loc_module = reverse_foot.CreateReverseLocators(self.create_guide, accessed_module)
@@ -28,10 +28,16 @@ class Guides():
     def collect_guides(self):
         return self.create_guide
 
-    def guides(self, accessed_module, offset, side, use_existing_attr):
+    def guides(self, accessed_module, offset, side, to_connect_to, use_existing_attr):
         connector_list = []
         self.system_to_connect = []
-        selection = cmds.ls(sl=1)
+        if to_connect_to:
+            if "world" in to_connect_to:
+                selection = cmds.ls(sl=1)
+            else: 
+                selection = [cmds.ls(f"*{to_connect_to[0]}*", type="transform")[0]]
+                print(selection)
+        else: selection = cmds.ls(sl=1)
         if selection:
             if "master" in selection[0]:
                 cmds.warning("Cant attach a new module to a master control please select a guide.")
