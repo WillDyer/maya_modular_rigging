@@ -235,9 +235,18 @@ class AddModule():
         offset = [
             0,0,0
         ]
+        if module_path.is_preset is True:
+            for module in module_path.module_to_be_made.keys():
+                module_path = importlib.import_module(module)
+                importlib.reload(module_path)
+                self.guides = create_guides.Guides(module, offset,module_path.side,to_connect_to=[],use_existing_attr=[])
+                self.add_module_properties(module_path, module)        
+        else:
+            self.guides = create_guides.Guides(module,offset,module_path.side,to_connect_to=[],use_existing_attr=[])
+            self.add_module_properties(module_path, module)
 
-        guides = create_guides.Guides(module,offset,module_path.side,to_connect_to=[],use_existing_attr=[])
-        guide = guides.collect_guides()
+    def add_module_properties(self, module_path, module):
+        guide = self.guides.collect_guides()
         if guide:
             master_guide = guide["master_guide"]
             guide_connector_list = guide["connector_list"]
