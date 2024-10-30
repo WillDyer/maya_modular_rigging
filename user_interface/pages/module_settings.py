@@ -1,25 +1,25 @@
 try:
-    from PySide6.QtCore import Qt
-    from PySide6.QtGui import QIcon
+    from PySide6.QtCore import Qt, QObject, SIGNAL
     from PySide6.QtWidgets import (QWidget,
-                                   QVBoxLayout,
                                    QHBoxLayout,
                                    QPushButton,
-                                   QScrollArea,
                                    QLabel,
                                    QSizePolicy,
-                                   QLineEdit)
+                                   QFormLayout,
+                                   QComboBox,
+                                   QSpinBox,
+                                   QCheckBox)
 except ModuleNotFoundError:
-    from PySide2.QtCore import Qt
-    from PySide2.QtGui import QIcon
+    from PySide2.QtCore import Qt, QObject, SIGNAL
     from PySide2.QtWidgets import (QWidget,
-                                   QVBoxLayout,
                                    QHBoxLayout,
                                    QPushButton,
-                                   QScrollArea,
                                    QLabel,
                                    QSizePolicy,
-                                   QLineEdit)
+                                   QFormLayout,
+                                   QComboBox,
+                                   QSpinBox,
+                                   QCheckBox)
 
 import maya.cmds as cmds
 import sys
