@@ -108,3 +108,24 @@ default_ctrl_shape = {
 # This dictionary is not required.
 # Note: dictionary key needs to be equal to type ik or fk _ guide name from system. Objects only need to be added if the default isnt a circle.
 ```
+
+#### is_preset: module check.
+
+```python
+is_preset = true
+
+# This variable is not required.
+# Note: This is only required and set to true if you need a preset arragment.
+```
+
+#### modules_to_be_made: configuration of modules in preset
+
+```python
+modules_to_be_made = {"basic_root": ["basic_root", "parent"],
+                      "biped_spine": ["biped_spine", "COG"]}
+
+# This variable is required if is_preset is True
+# Note all keys in the dictionary must exist in module path
+
+```
+
