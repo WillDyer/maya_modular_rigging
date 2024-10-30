@@ -3,8 +3,8 @@
     <img src="https://img.shields.io/badge/Maya-37A5CC?style=for-the-badge&logo=autodeskmaya&logoColor=white">
     <img src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue">
     <img src="https://img.shields.io/badge/Qt-41CD52?style=for-the-badge&logo=Qt&logoColor=white">
-    <img src="https://img.shields.io/badge/Windows-03AFFF?style=for-the-badge&logo=Windows&logoColor=blue">
-    <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=Linux&logoColour=black">
+    <img src="https://img.shields.io/badge/Windows-03AFFF?style=for-the-badge&logo=windows&logoColor=blue">
+    <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColour=black">
 </p>
 
 
