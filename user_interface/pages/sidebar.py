@@ -1,15 +1,23 @@
 try:
-    from PySide6.QtCore import *
+    from PySide6.QtCore import QObject, SIGNAL
     from PySide6.QtGui import *
-    from PySide6.QtWidgets import QWidget
-    from PySide6.QtWidgets import *
-    from PySide6.QtUiTools import *
+    from PySide6.QtWidgets import (QWidget,
+                                   QSpacerItem,
+                                   QLineEdit,
+                                   QSizePolicy,
+                                   QLabel,
+                                   QPushButton,
+                                   QHBoxLayout)
 except ModuleNotFoundError:
-    from PySide2.QtCore import *
+    from PySide2.QtCore import QObject, SIGNAL
     from PySide2.QtGui import *
-    from PySide2.QtWidgets import QWidget
-    from PySide2.QtWidgets import *
-    from PySide2.QtUiTools import *
+    from PySide2.QtWidgets import (QWidget,
+                                   QSpacerItem,
+                                   QLineEdit,
+                                   QSizePolicy,
+                                   QLabel,
+                                   QPushButton,
+                                   QHBoxLayout)
 
 import importlib
 import os.path
