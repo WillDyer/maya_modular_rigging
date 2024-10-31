@@ -235,13 +235,13 @@ class AddModule():
         offset = [
             0,0,0
         ]
-        
+
         attach_to = []
         if preset:
             if preset.module_to_be_made[module] == "world": pass
             else:
                 attach_to = [cmds.ls(f"*{preset.module_to_be_made[module]}*", type="transform")[0]]
-        
+
         self.guides = create_guides.Guides(module,offset,module_path.side,to_connect_to=attach_to,use_existing_attr=[])
         self.add_module_properties(module_path, module)
 
