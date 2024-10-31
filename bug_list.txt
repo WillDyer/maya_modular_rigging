@@ -1,7 +1,7 @@
 Bug List:
 List of current bugs that will be fixed in a updated patch:
 
-- presets only add one button currently.
-- ensure presets work with mirroring
-- presets cause a crash on some laptops(mine...)
-- add connections between preset modules
+- presets only add one button currently - FIXED
+- ensure presets work with mirroring - WORKING
+- presets cause a crash on some laptops(mine...) - FIXED
+- add connections between preset modules - WORKING
