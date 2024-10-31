@@ -173,6 +173,7 @@ class Interface(QWidget):
             self.systems_to_be_made[data_guide["master_guide"]] = data_guide
 
     def add_module(self, module):
+        sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "systems", "modules"))
         module_path = importlib.import_module(module)
         importlib.reload(module_path)
         if module_path.is_preset is True:
