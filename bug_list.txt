@@ -7,8 +7,8 @@ List of current bugs that will be fixed in a updated patch:
 - add connections between preset modules - WORKING
 - quadruped arm position of guides broken
 - reopening the ui when rig created sets to guide mode meaning you cannot go back and forth - Fixed(will be checked long term)
-- removing module does not remove rev foot guides
+- removing module does not remove rev foot guides - FIXED
 - fix squash and stretch
 - From fixing cog being required the cog itself isnt parented correctly anymore/translated correctly
 - creating ik spine needs ik kneck integrated
-- space locator if one already exists in location use the existing or have them added to a group for neetness
+- space locator if one already exists in location use the existing or have them added to a group for neetness - Working(added groups for now)

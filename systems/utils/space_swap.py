@@ -36,7 +36,11 @@ class SpaceSwapping():
     def parent_to_location(self):
         def move_and_parent(locator, target):
             cmds.matchTransform(locator, self.handle_ctrl[0])
-            cmds.parent(locator, target)
+            if cmds.objExists(f"space_{target}"):
+                cmds.parent(locator, f"space_{target}")
+            else:
+                cmds.group(n=f"space_{target}", em=True, p=target)
+                cmds.parent(locator, f"space_{target}")
 
         for locator in self.space_swap_locators:
             if any(item in locator for item in self.locator_list):
