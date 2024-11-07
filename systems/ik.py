@@ -78,7 +78,7 @@ class create_ik():
             cmds.parent(single_chain, f"{self.end_joint}_driver")
             cmds.parentConstraint(root_ctrl, self.driver_joint_list[-1], mo=1, n=f"pConst_{self.driver_joint_list[-1]}")
             OPM.offsetParentMatrix(hock_ctrl)
-            above_ctrls = None
+            above_ctrls = self.above_root_ctrl()
             cmds.setAttr(f"{hock_ctrl}.translate", lock=True)
             for xyz in ["X","Y","Z"]: cmds.setAttr(f"{hock_ctrl}.translate{xyz}", keyable=False, cb=False)
             cmds.hide(self.driver_joint_list[-1])
