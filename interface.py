@@ -63,7 +63,10 @@ class Interface(QWidget):
         self.systems_to_be_made = {}
         self.created_guides = []
         self.systems_to_be_deleted_polished = []
-        self.last_selected_button = "guides"
+        if cmds.objExists("ui_data"):
+            self.last_selected_button = cmds.getAttr("ui_data.ui_status", asString=1)
+        else:
+            self.last_selected_button = "guides"
 
         self.setParent(mayaMainWindow)
         self.setWindowFlags(Qt.Window)
@@ -73,6 +76,10 @@ class Interface(QWidget):
         self.setWindowTitle("Maya_Modular_Rigging")
 
     def initUI(self):
+        if not cmds.objExists("ui_data"):
+            cmds.spaceLocator(n="ui_data")
+            cmds.addAttr("ui_data", ln="ui_status", at="enum", enumName="guides:skeleton:rig:polish", k=True)
+            # cmds.addAttr("ui_data", ln="last_selected_button", at="enum", enumName="guides:skeleton:rig:polish", k=True)
         # layout
         self.vertical_layout = QVBoxLayout(self)
         self.vertical_layout.setContentsMargins(0, 0, 0, 0)
@@ -383,6 +390,11 @@ class Interface(QWidget):
                 cmds.warning("Rig has been polished past data has been deleted")
 
         self.last_selected_button = button
+        enum_options = cmds.attributeQuery("ui_status", node="ui_data", listEnum=True)
+        enum_list = enum_options[0].split(":")
+        if button in enum_list:
+            index = enum_list.index(button)
+            cmds.setAttr("ui_data.ui_status", index)
 
 
 def main():

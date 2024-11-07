@@ -10,6 +10,7 @@ except ModuleNotFoundError:
     from PySide2.QtWidgets import QWidget
     from PySide2.QtWidgets import *
     from PySide2.QtUiTools import *
+import maya.cmds as cmds
 
 
 class RigProgression(QWidget):
@@ -36,7 +37,7 @@ class RigProgression(QWidget):
         self.guides_button = QPushButton("Guides")
         self.guides_button.setObjectName("button_guides")
         self.guides_button.setCheckable(True)
-        self.guides_button.setChecked(True)
+        # self.guides_button.setChecked(True)
         self.button_group.addButton(self.guides_button)
 
         self.skeleton_button = QPushButton("Skeleton")
@@ -58,6 +59,11 @@ class RigProgression(QWidget):
         self.rig_layout.addWidget(self.skeleton_button)
         self.rig_layout.addWidget(self.rig_button)
         self.rig_layout.addWidget(self.polish_button)
+
+        if cmds.objExists("ui_data"):
+            active_button = cmds.getAttr("ui_data.ui_status", asString=True)
+            button = getattr(self, f"{active_button}_button", None)
+            button.setChecked(True)
 
         QObject.connect(self.guides_button, SIGNAL("clicked()"), lambda: self.interface_class.update_rig(button="guides"))
         QObject.connect(self.skeleton_button, SIGNAL("clicked()"), lambda: self.interface_class.update_rig(button="skeleton"))
