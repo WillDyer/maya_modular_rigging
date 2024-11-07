@@ -79,6 +79,7 @@ class Interface(QWidget):
         if not cmds.objExists("ui_data"):
             cmds.spaceLocator(n="ui_data")
             cmds.addAttr("ui_data", ln="ui_status", at="enum", enumName="guides:skeleton:rig:polish", k=True)
+            cmds.select(clear=True)
             # cmds.addAttr("ui_data", ln="last_selected_button", at="enum", enumName="guides:skeleton:rig:polish", k=True)
         # layout
         self.vertical_layout = QVBoxLayout(self)
