@@ -348,13 +348,16 @@ class Interface(QWidget):
     def remove_module(self, master_guide, settings_page):
         for key in list(self.systems_to_be_made.values()):
             if master_guide in key['master_guide']:
-                self.systems_to_be_made.pop(master_guide)
-                self.created_guides.remove(master_guide)
+                if self.systems_to_be_made[master_guide]["rev_locators"]:
+                    cmds.delete(self.systems_to_be_made[master_guide]["rev_locators"])
                 if cmds.ls(master_guide):
                     cmds.delete(master_guide, key['connectors'])
                 else:
                     cmds.warning(f"{master_guide} not found proceeding to remove module.")
                     cmds.delete(key['connectors'])
+
+                self.systems_to_be_made.pop(master_guide)
+                self.created_guides.remove(master_guide)
 
         self.settings_page_widget = self.findChild(QWidget, settings_page)
         self.settings_page_widget.deleteLater()
