@@ -140,6 +140,8 @@ class mirror_data():
                 cmds.parent(mirrored_rev_locators,w=1)
                 cmds.delete("tmp_mirror")
 
+                cmds.group(mirrored_rev_locators, n=f"grp_{mirrored_rev_locators[3]}")
+
                 return mirrored_rev_locators
             else:
                 return None
