@@ -51,16 +51,19 @@ class AddAvailableModules(QWidget):
         self.sidebar_layout.addWidget(module_label)
 
         for module in files:
-            button_name = module.replace("_", " ")
-            button_name = string.capwords(button_name)
-            # button_name = button_name.title()
-            button = QPushButton(button_name)
-            # button.setFixedSize(150,20)
-            button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-            button.setObjectName(f"button_{module}")
-            self.sidebar_layout.addWidget(button)
+            module_path = importlib.import_module(module)
+            importlib.reload(module_path)
+            if module_path.hide is False:
+                button_name = module.replace("_", " ")
+                button_name = string.capwords(button_name)
+                # button_name = button_name.title()
+                button = QPushButton(button_name)
+                # button.setFixedSize(150,20)
+                button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                button.setObjectName(f"button_{module}")
+                self.sidebar_layout.addWidget(button)
 
-            QObject.connect(button, SIGNAL("clicked()"), lambda m=module: self.interface_class.add_module(m))
+                QObject.connect(button, SIGNAL("clicked()"), lambda m=module: self.interface_class.add_module(m))
 
         spacer = QSpacerItem(20,40,QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.sidebar_layout.addSpacerItem(spacer)

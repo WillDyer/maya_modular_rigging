@@ -1,4 +1,5 @@
 is_preset = True
+hide = False
 module_to_be_made = {"basic_root": "world",
                      "quadruped_spine": "COG",
                      "quadruped_leg": "COG",
