@@ -4,6 +4,7 @@ import importlib
 import math
 
 from systems.utils import (OPM, utils)
+from systems import fk
 
 importlib.reload(OPM)
 importlib.reload(utils)
@@ -13,6 +14,8 @@ class create_ribbon():
     def __init__(self, system, accessed_module, ctrl_amount, ribbon_type, start_joint, end_joint, joint_list):
         self.module = importlib.import_module(f"systems.modules.{accessed_module}")
         importlib.reload(self.module)
+        self.above_root_joints = []
+        self.below_root_joints = []
         self.ribbon_type = ribbon_type
         self.ctrl_amount = ctrl_amount
         self.system = system
@@ -23,6 +26,7 @@ class create_ribbon():
         self.end_joint = end_joint
         self.joint_list = joint_list
         self.create_ribbon()
+        self.collect_other_controls()
 
     def create_ribbon(self):
         self.nurbs_curve = self.create_nurbs_curve()
@@ -239,3 +243,19 @@ class create_ribbon():
             "grp_fol": self.fol_grp
         }
         return ribbon_dict
+
+    def collect_other_controls(self):
+        self.other_joints = []
+        for joint in self.system["ik_joint_list"]:
+            print(joint)
+            if joint not in self.joint_chain:
+                self.other_joints.append(joint)
+        print(self.other_joints)
+
+        for joint in range(len(self.other_joints)):
+            try:
+                cmds.parent(self.other_joints[joint]. self.other_joints[joint+1])
+            except: pass
+        fk_instance = fk.create_fk(self.other_joints, self.system["master_guide"], scale=1, delete_end=False)
+        print(f"parenting: grp_fk_jnts_{self.system['master_guide']} to {self.ctrl_list[-1]}")
+        cmds.parentConstraint(self.ctrl_list[-1], f"grp_fk_ctrls_{self.system['master_guide']}", mo=True)
