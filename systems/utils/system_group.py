@@ -40,7 +40,8 @@ def grpSetup(rig_name):
         cmds.circle(n="ctrl_root",r=50,nr=(0, 1, 0))
         cmds.circle(n="ctrl_COG",r=25,nr=(0, 1, 0))
     cog_jnt = [item for item in cmds.ls("jnt_rig*") if "COG" in item]
-    if cog_jnt in cmds.ls("jnt_rig_COG"):
+
+    if cog_jnt:
         cmds.matchTransform("ctrl_COG", cog_jnt[0],pos=1)
         OPM.offsetParentMatrix(ctrl="ctrl_COG")
 
@@ -143,8 +144,7 @@ def heirachy_parenting(systems_dict):
             else: pass
 
     root_jnt = [item for item in cmds.ls("jnt_rig*") if "root" in item]
-    if root_jnt in cmds.ls("jnt_rig_COG"):
-        root_jnt = next(item for item in cmds.ls("jnt_rig_*") if "COG" in item)
+    cog_jnt = [item for item in cmds.ls("jnt_rig_*") if "COG" in item]
 
-        cmds.parentConstraint("ctrl_root",rig_root_jnt,mo=1)
-        cmds.parentConstraint("ctrl_COG",cog_jnt,mo=1)
+    cmds.parentConstraint("ctrl_root",root_jnt,mo=1)
+    cmds.parentConstraint("ctrl_COG",cog_jnt,mo=1)

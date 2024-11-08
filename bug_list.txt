@@ -7,6 +7,6 @@ List of current bugs that will be fixed in a updated patch:
 - removing module does not remove rev foot guides - FIXED
 - returning to guide stage if rig made with ik before doesnt return the rev foot locators - FIXED
 - fix squash and stretch
-- From fixing cog being required the cog itself isnt parented correctly anymore/translated correctly
+- From fixing cog being required the cog itself isnt parented correctly anymore/translated correctly - FIXED
 - creating ik spine needs ik kneck integrated
 - space locator if one already exists in location use the existing or have them added to a group for neetness - Working(added groups for now)
