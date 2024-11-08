@@ -12,7 +12,7 @@
 
 A assortment of tools I've integrated into a modular auto limb/rigging tool to speed up my workflow
 > [!NOTE]
-> - Many of the tools are made for my own hardware, in this repository I've tried my best to make the code work on any machine however there might be some cases where you might have to edit the code slightly.<br>
+> - Rigging tool for the Twelvefold Studio student film.<br>
 > - This tool is also still in WIP and in some instances won't work due to me changing things, if you have any questions if you do use it feel free to reach out to me.
 
 ### Running The Tool
