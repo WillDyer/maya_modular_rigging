@@ -51,7 +51,7 @@ class AddAvailableModules(QWidget):
         self.sidebar_layout.addWidget(module_label)
 
         for module in files:
-            module_path = importlib.import_module(module)
+            module_path = importlib.import_module(f"systems.modules.{module}")
             importlib.reload(module_path)
             if module_path.hide is False:
                 button_name = module.replace("_", " ")

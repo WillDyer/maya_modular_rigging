@@ -34,9 +34,9 @@ class Guides():
         if to_connect_to:
             if "world" in to_connect_to:
                 selection = cmds.ls(sl=1)
-            else: 
+            else:
                 selection = [cmds.ls(f"*{to_connect_to[0]}*", type="transform")[0]]
-                print(selection)
+
         else: selection = cmds.ls(sl=1)
         if selection:
             if "master" in selection[0]:
@@ -51,7 +51,8 @@ class Guides():
 
                 if "root" not in accessed_module:
                     pos = cmds.xform(selection, r=True, ws=True, q=True, t=True)
-                    cmds.xform(master_guide, ws=1, t=[pos[0]+offset[0], pos[1]+offset[1], pos[2]+offset[2]])
+                    if self.module.ignore_transforms is False:
+                        cmds.xform(master_guide, ws=1, t=[pos[0]+offset[0], pos[1]+offset[1], pos[2]+offset[2]])
                 return guide
         else:
             guide = self.creation(accessed_module, offset, side, connector_list, use_existing_attr)
