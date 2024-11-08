@@ -266,7 +266,7 @@ class Interface(QWidget):
             sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules"))
             module = importlib.import_module(key["module"])
             importlib.reload(module)
-            if key["module"] == "basic_root": pass
+            if "root" in key["module"]: pass
             else:
                 if rig_type == "FK":
                     fk_joint_list = joints.joint(orientation, master_guide, system="fk", )
