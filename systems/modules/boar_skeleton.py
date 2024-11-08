@@ -1,6 +1,6 @@
 is_preset = True
 hide = False
-module_to_be_made = {"basic_root": "world",
+module_to_be_made = {"boar_root": "world",
                      "boar_spine": "COG",
                      "boar_leg": "COG",
                      "boar_arm": "spine_4",
