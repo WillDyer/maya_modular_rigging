@@ -73,7 +73,7 @@ class Interface(QWidget):
         self.initUI()
         self.setFixedWidth(600)
         self.setFixedHeight(700)
-        self.setWindowTitle("Maya_Modular_Rigging")
+        self.setWindowTitle("MMR")
 
     def initUI(self):
         if not cmds.objExists("ui_data"):

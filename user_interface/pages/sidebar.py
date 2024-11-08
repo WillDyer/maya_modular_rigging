@@ -141,7 +141,7 @@ class RigNameWidget(QWidget):
                 font-size: 20px;
             }
         """)
-        rig_widget = QLineEdit("WD_Rig_Master")
+        rig_widget = QLineEdit("MMR_Rig")
         rig_widget.setObjectName("rig_name")
         rig_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         rig_widget.setContentsMargins(0, 5, 5, 0)
