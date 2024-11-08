@@ -84,7 +84,7 @@ class CreateModuleTab(QWidget):
         def set_ikfk_attr(ikfk_combobox):
             value = ikfk_combobox.currentText()
             value = self.module_path.available_rig_types.index(value)
-            cmds.setAttr(f"{self.master_guide}.{self.master_guide}_rig_type", value)
+            # cmds.setAttr(f"{self.master_guide}.{self.master_guide}_rig_type", value)
 
         # IKFK Default
         ikfk_label = QLabel("IKFK Default:")
