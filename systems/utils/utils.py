@@ -125,11 +125,17 @@ def hide_guides(systems_to_be_made, created_guides, module_widget, hidden):
         for key in systems_to_be_made.values():
             cmds.hide(key["master_guide"])
             cmds.setAttr(f"{key['master_guide']}.hiddenInOutliner", True)
+            if key["rev_locators"]:
+                cmds.hide(f"grp_{key['rev_locators'][3]}")
+                cmds.setAttr(f"grp_{key['rev_locators'][3]}.hiddenInOutliner", True)
         cmds.hide("grp_connector_clusters")
     else:
         for key in systems_to_be_made.values():
             cmds.showHidden(key["master_guide"])
             cmds.setAttr(f"{key['master_guide']}.hiddenInOutliner", False)
+            if key["rev_locators"]:
+                cmds.showHidden(f"grp_{key['rev_locators'][3]}")
+                cmds.setAttr(f"grp_{key['rev_locators'][3]}.hiddenInOutliner", False)
         cmds.showHidden("grp_connector_clusters")
         for module in created_guides:
             pushButton = module_widget.findChild(QPushButton, f"button_remove_{module}")

@@ -21,15 +21,15 @@ class CreateReverseLocators():
     def create_loc(self):
         side = self.side()
         rev_locators = self.module.rev_locators
-        loc_prefix = "loc_rev"
+        loc_prefix = "rev"
 
-        if f"loc_{rev_locators['ankle']}{side}" in cmds.ls(f"loc_{rev_locators['ankle']}{side}"):
+        if f"{rev_locators['ankle']}{side}" in cmds.ls(f"{rev_locators['ankle']}{side}"):
             cmds.error("ERROR: Item with the same name already exists.")
 
         # loc_name = [f"rev_{rev_locators['toe']}{side}",f"rev_{rev_locators['ball']}{side}",f"rev_{rev_locators['ankle']}{side}"]
         locators_keys = rev_locators.values()
         jnt_name = [item for item in self.guides["ui_guide_list"] if any(key in item for key in locators_keys)]
-        loc_name = [f"loc_rev_{item}" for item in self.guides["ui_guide_list"] if any(key in item for key in locators_keys)]
+        loc_name = [f"rev_{item}" for item in self.guides["ui_guide_list"] if any(key in item for key in locators_keys)]
         # list order needs to be: toe, ball, ankle
         loc_toe = loc_name[0]
         loc_ball = loc_name[1]
@@ -41,8 +41,8 @@ class CreateReverseLocators():
                 cmds.matchTransform(loc_name[x],jnt_name[x])
             except:
                 cmds.error("Error: jnt_name cant be found check backend.")
-        bank_in = f"loc_rev_{side}_{rev_locators['bank_in']}_#"
-        bank_out = f"loc_rev_{side}_{rev_locators['bank_out']}_#"
+        bank_in = f"rev_{side}_{rev_locators['bank_in']}_#"
+        bank_out = f"rev_{side}_{rev_locators['bank_out']}_#"
         for x in [bank_in,bank_out]:
             tmp = cmds.spaceLocator(n=f"{x}")[0]
             cmds.matchTransform(tmp, loc_ball)
@@ -66,7 +66,7 @@ class CreateReverseLocators():
 
         loc_list = [loc_heel,loc_toe,loc_ball,loc_ankle,bank_in, bank_out]
         ankle_guide = [guide for guide in self.guides["ui_guide_list"] if self.module.rev_locators["ankle"] in guide][0]
-        grp = cmds.group(loc_list, n=f"grp_rev_loc_{ankle_guide}")
+        grp = cmds.group(loc_list, n=f"grp_rev_{ankle_guide}")
         constraint_name = cmds.parentConstraint(ankle_guide, grp, mo=1, n=f"pConst_{ankle_guide}")[0]
         cmds.setAttr(f"{constraint_name}.hiddenInOutliner", True)
         return loc_list
@@ -81,13 +81,19 @@ class CreateReverseFoot():
         self.module = importlib.import_module(f"systems.modules.{accessed_module}")
         importlib.reload(self.module)
         self.system = system
+        self.tmp_locator_list = []
+        for locator in self.system["rev_locators"]:
+            loc = cmds.spaceLocator(n=f"loc_{locator}")[0]
+            cmds.matchTransform(loc, locator)
+            self.tmp_locator_list.append(loc)
+
         self.reverse_foot_data = {
-            "loc_heel": self.system["rev_locators"][0],
-            "loc_toe": self.system["rev_locators"][1],
-            "loc_ball": self.system["rev_locators"][2],
-            "loc_ankle": self.system["rev_locators"][3],
-            "bank_in": self.system["rev_locators"][4],
-            "bank_out": self.system["rev_locators"][5],
+            "loc_heel": self.tmp_locator_list[0],
+            "loc_toe": self.tmp_locator_list[1],
+            "loc_ball": self.tmp_locator_list[2],
+            "loc_ankle": self.tmp_locator_list[3],
+            "bank_in": self.tmp_locator_list[4],
+            "bank_out": self.tmp_locator_list[5],
         }
 
         self.create_system()
