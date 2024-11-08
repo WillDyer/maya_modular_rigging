@@ -6,14 +6,12 @@
     <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=Linux&logoColour=black">
 </p>
 
+<h3 align="center">Rigging tool for the Twelvefold Studio student film.</h3>
 
-[Example Video](https://www.youtube.com/watch?v=ecIqxUa3Tns)
+<div align="center">
+    <img src="user_interface/images/MOD.png" alt="Project Screenshot" width="700"/>
+</div>
 
-
-A assortment of tools I've integrated into a modular auto limb/rigging tool to speed up my workflow
-> [!NOTE]
-> - Rigging tool for the Twelvefold Studio student film.<br>
-> - This tool is also still in WIP and in some instances won't work due to me changing things, if you have any questions if you do use it feel free to reach out to me.
 
 ### Running The Tool
 
