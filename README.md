@@ -6,8 +6,6 @@
     <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=Linux&logoColour=black">
 </p>
 
-<h3 align="center">Rigging tool for the Twelvefold Studio student film.</h3>
-
 <div align="center">
     <img src="user_interface/images/MOD.png" alt="Project Screenshot" width="700"/>
 </div>
