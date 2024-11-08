@@ -266,11 +266,13 @@ class Interface(QWidget):
             sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules"))
             module = importlib.import_module(key["module"])
             importlib.reload(module)
+            try: delete_end = module.delete_end
+            except AttributeError: delete_end = False
             if "root" in key["module"]: pass
             else:
                 if rig_type == "FK":
                     fk_joint_list = joints.joint(orientation, master_guide, system="fk", )
-                    fk_module = fk.create_fk(fk_joint_list,master_guide,key["guide_scale"],delete_end=False)
+                    fk_module = fk.create_fk(fk_joint_list,master_guide,key["guide_scale"],delete_end=delete_end)
                     fk_ctrls = fk_module.get_ctrls()
                     utils.constraint_from_lists_1to1(fk_joint_list, key["joints"],maintain_offset=1)
                     key.update({"fk_joint_list": fk_joint_list, "fk_ctrl_list": fk_ctrls})
@@ -289,7 +291,7 @@ class Interface(QWidget):
                     utils.constraint_from_lists_1to1(ik_joint_list, key["joints"],maintain_offset=1)
                 elif rig_type == "FKIK":
                     fk_joint_list = joints.joint(orientation, master_guide, system="fk")
-                    fk_module = fk.create_fk(fk_joint_list,master_guide,key["guide_scale"],delete_end=False)
+                    fk_module = fk.create_fk(fk_joint_list,master_guide,key["guide_scale"],delete_end=delete_end)
                     fk_ctrls = fk_module.get_ctrls()
                     key.update({"fk_joint_list": fk_joint_list, "fk_ctrl_list": fk_ctrls})
 

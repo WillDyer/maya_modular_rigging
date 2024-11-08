@@ -27,14 +27,19 @@ class create_fk():
             ctrl_shape = control_module.return_ctrl()
             cmds.matchTransform(f"ctrl_fk_{fk_joint_list[i][7:]}",
                                 fk_joint_list[i])
+
+            self.ctrls_fk.append(f"ctrl_fk_{fk_joint_list[i][7:]}")
+            jnt_ctrls_fk.append(fk_joint_list[i])
+
             if delete_end is True:
                 if cmds.listRelatives(fk_joint_list[i], c=True) is None:
                     cmds.delete(f"ctrl_fk_{fk_joint_list[i][7:]}")
+                    self.ctrls_fk.remove(f"ctrl_fk_{fk_joint_list[i][7:]}")
+                    jnt_ctrls_fk.remove(fk_joint_list[i])
             elif "root" in fk_joint_list[i]:
                 cmds.delete(f"ctrl_fk_{fk_joint_list[i][7:]}")
-            else:
-                self.ctrls_fk.append(f"ctrl_fk_{fk_joint_list[i][7:]}")
-                jnt_ctrls_fk.append(fk_joint_list[i])
+                self.ctrls_fk.remove(f"ctrl_fk_{fk_joint_list[i][7:]}")
+                jnt_ctrls_fk.remove(fk_joint_list[i])
 
         for ctrl in range(len(self.ctrls_fk)):
             try:

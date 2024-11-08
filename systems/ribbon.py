@@ -247,15 +247,12 @@ class create_ribbon():
     def collect_other_controls(self):
         self.other_joints = []
         for joint in self.system["ik_joint_list"]:
-            print(joint)
             if joint not in self.joint_chain:
                 self.other_joints.append(joint)
-        print(self.other_joints)
 
         for joint in range(len(self.other_joints)):
             try:
                 cmds.parent(self.other_joints[joint]. self.other_joints[joint+1])
             except: pass
         fk_instance = fk.create_fk(self.other_joints, self.system["master_guide"], scale=1, delete_end=False)
-        print(f"parenting: grp_fk_jnts_{self.system['master_guide']} to {self.ctrl_list[-1]}")
         cmds.parentConstraint(self.ctrl_list[-1], f"grp_fk_ctrls_{self.system['master_guide']}", mo=True)

@@ -28,7 +28,7 @@ rev_locators = {  # items foot_ctrl, ankle, ball, toe must be the same
 }
 twist_joint = {
     "start": "humerus",
-    "end": "wrist"
+    "end": "metacarpal"
 }
 default_ctrl_shape = {
     "ik_wrist": "cube"
