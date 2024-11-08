@@ -39,6 +39,7 @@ class AddAvailableModules(QWidget):
         try: files.remove("")
         except ValueError: pass
         files = [f for f in files if f not in ["__init__", "hand"]]
+        files = sorted(files)
 
         module_label = QLabel("MODULES:")
         module_label.setFixedSize(200,25)
