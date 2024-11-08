@@ -1,14 +1,11 @@
 Bug List:
 List of current bugs that will be fixed in a updated patch:
 
-- presets only add one button currently - FIXED
-- ensure presets work with mirroring - WORKING
-- presets cause a crash on some laptops(mine...) - FIXED
-- add connections between preset modules - WORKING
-- quadruped arm position of guides broken - Fixed
+
+- quadruped arm position of guides broken - FIXED
 - reopening the ui when rig created sets to guide mode meaning you cannot go back and forth - Fixed(will be checked long term)
 - removing module does not remove rev foot guides - FIXED
-- returning to guide stage if rig made with ik before doesnt return the rev foot locators
+- returning to guide stage if rig made with ik before doesnt return the rev foot locators - FIXED
 - fix squash and stretch
 - From fixing cog being required the cog itself isnt parented correctly anymore/translated correctly
 - creating ik spine needs ik kneck integrated
