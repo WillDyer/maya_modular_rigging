@@ -8,6 +8,7 @@
 <div align="center">
     <img src="user_interface/images/MOD.png" alt="Project Screenshot" width="700"/>
 </div>
+
 ### Running The Tool
 
 > [!WARNING]
