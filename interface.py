@@ -327,6 +327,7 @@ class Interface(QWidget):
             twist_joint = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_twist_jnts", asString=1)
             if key['system_to_connect']:
                 systems_to_connect = key['system_to_connect']
+                print(systems_to_connect)
                 connect_modules.connect_polished(systems_to_connect)
             if rig_type == "FKIK":
                 space_swap_module = space_swap.SpaceSwapping(key)
