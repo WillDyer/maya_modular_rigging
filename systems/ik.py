@@ -18,6 +18,7 @@ class create_ik():
         self.below_root_joints = []
         self.validation_joints = validation_joints
         self.ik_system(ik_joint_list)
+
         cmds.group(self.grouped_ctrls,n=f"grp_ik_ctrls_{master_guide}",w=1)
         cmds.group(ik_joint_list[0],n=f"grp_ik_jnts_{master_guide}",w=1)
         if self.validation_joints["ik_type"] == "quadruped":
@@ -87,10 +88,17 @@ class create_ik():
 
         if above_ctrls:
             self.ik_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl] + above_ctrls
-            self.grouped_ctrls = [pv_ctrl, hdl_ctrl, above_ctrls[0]]
+            # self.grouped_ctrls = [pv_ctrl, hdl_ctrl, above_ctrls[0]]
+            offset = self.ik_ctrls[-1].replace("ctrl_","offset_")
         else:
             self.ik_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl]
-            self.grouped_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl]
+            # self.grouped_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl]
+            offset = self.ik_ctrls[-1].replace("ctrl_","offset_")
+
+        self.offset = cmds.group(n=offset, em=1)
+        cmds.matchTransform(self.offset, self.ik_ctrls[-1])
+        cmds.parent(self.ik_ctrls[-1], self.offset)
+        self.grouped_ctrls = [pv_ctrl,hdl_ctrl,self.offset]
         OPM.offsetParentMatrix(self.ik_ctrls)
 
     def create_pv(self):

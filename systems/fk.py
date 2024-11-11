@@ -9,7 +9,7 @@ class create_fk():
         self.scale = scale
         self.fk_system(joint_list,delete_end)
         try:
-            cmds.group(self.ctrls_fk[-1], n=f"grp_fk_ctrls_{master_guide}",w=1)
+            cmds.group(self.offset, n=f"grp_fk_ctrls_{master_guide}",w=1)
             cmds.group(joint_list[0],n=f"grp_fk_jnts_{master_guide}",w=1)
         except IndexError:
             pass
@@ -49,6 +49,12 @@ class create_fk():
 
         for ctrl in self.ctrls_fk:
             OPM.offsetParentMatrix(ctrl)
+
+        offset = self.ctrls_fk[-1].replace("ctrl_","offset_")
+        self.offset = cmds.group(n=offset, em=True)
+        cmds.matchTransform(self.offset, self.ctrls_fk[-1])
+        cmds.parent(self.ctrls_fk[-1], self.offset)
+        OPM.offsetParentMatrix(self.ctrls_fk[-1])
 
         self.fk_system_to_joint(jnt_ctrls_fk)
         fk_joint_list.reverse()  # debug

@@ -53,9 +53,9 @@ def connect_to_ikfk_switch(p_object, constraint):
 
 def connect_polished(systems_to_connect):
     ikfk_mapping = {
-        "IK": "ctrl_ik",
-        "FK": "ctrl_fk",
-        "FKIK": ["ctrl_ik", "ctrl_fk"],
+        "IK": "offset_ik",
+        "FK": "offset_fk",
+        "FKIK": ["offset_ik", "offset_fk"],
         "IK_Ribbon": "jnt_ik"
     }
 
@@ -67,9 +67,20 @@ def connect_polished(systems_to_connect):
         mapped_value = ikfk_mapping.get(ikfk, ikfk)
 
         if isinstance(mapped_value, list):
-            system_values = [f"{value}_{system}" for value in mapped_value]
+            # system_values = [f"{value}_{system}" for value in mapped_value]
+            system_values = []
+            for value in mapped_value:
+                if not cmds.ls(f"{value}_{system}"):
+                    value = value.replace("offset_","ctrl_")
+                    system_values.append(f"{value}_{system}")
+                else: system_values.append(f"{value}_{system}")
+
         else:
-            system_values = [f"{mapped_value}_{system}"]
+            if not cmds.ls(f"{mapped_value}_{system}"):
+                mapped_value = mapped_value.replace("offset_","ctrl_")
+                system_values = [f"{mapped_value}_{system}"]
+            else:
+                system_values = [f"{mapped_value}_{system}"]
 
         systems_ikfk.append(system_values)
 
