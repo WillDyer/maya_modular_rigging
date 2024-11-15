@@ -6,7 +6,7 @@ attrs = {
     'visibility_divider': ['VISIBILITY','------------',True,False,'not needed'],
     'vis_geometry': ['Geometry','Shown:Hidden',False,True,'geo.visibility'],
     'lock_divider': ['LOCK','------------',True,False,'not needed'],
-    'export_geometry': ['Export Geometry','Unlocked:Locked:Wireframe',False,False,'not needed'],
+    'export_geometry': ['Export Geometry','Unlocked:Wireframe:Locked',False,False,'not needed'],
     'debug_divider': ['DEBUG','------------',True,False,'not needed'],
     'rig_system': ['Rig System','Shown:Hidden',False,True,'grp_rig_jnts.visibility'],
     'skn_system': ['Skin System','Shown:Hidden',False,True,'grp_skn_jnts.visibility'],
