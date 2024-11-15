@@ -11,3 +11,4 @@ List of current bugs that will be fixed in a updated patch:
 - creating ik spine needs ik kneck integrated - FIXED
 - space locator if one already exists in location use the existing or have them added to a group for neetness - Working(added groups for now)
 - need to add fk support after a ik handle
+- fix reverse foot orientation with quadruped driver joints
