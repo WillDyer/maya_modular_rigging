@@ -105,7 +105,6 @@ default_ctrl_shape = {
 ```
 
 #### is_preset: module check.
-
 ```python
 is_preset = true
 
@@ -114,7 +113,6 @@ is_preset = true
 ```
 
 #### modules_to_be_made: configuration of modules in preset
-
 ```python
 modules_to_be_made = {"basic_root": ["basic_root", "parent"],
                       "biped_spine": ["biped_spine", "COG"]}
@@ -124,3 +122,23 @@ modules_to_be_made = {"basic_root": ["basic_root", "parent"],
 
 ```
 
+#### ignore_transforms: guide location
+```python
+ignore_transforms = True
+
+# This variable is REQUIRED
+```
+
+#### hide: hide in ui
+```python
+hide = True
+
+# This variable is REQURED
+```
+
+#### delete_end: fk ctrl end
+```python
+delete_end = True
+
+# This variable is OPTIONAL
+```
