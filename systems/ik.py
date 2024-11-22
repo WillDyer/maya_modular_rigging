@@ -66,7 +66,12 @@ class create_ik():
             single_chain = cmds.ikHandle(sj=hock_joint, ee=self.end_joint, solver="ikSCsolver", n=f"ik_hdl_sc_{self.end_joint}")[0]
 
             hdl_ctrl = self.create_handle(f"{self.start_joint}_driver", f"{self.end_joint}_driver", solver="ikSpringSolver", pv=False, constrain=True)
-            cmds.parent(hock_ctrl, hdl_ctrl)
+            # cmds.parent(hock_ctrl, hdl_ctrl)
+            
+            hock_grp = cmds.group(n=f"offset_{hock_ctrl}", em=True)
+            cmds.matchTransform(hock_grp, hdl_ctrl)
+            cmds.parent(hock_ctrl, hock_grp)
+            cmds.parentConstraint(hdl_ctrl, hock_grp, mo=True, sr=["x","y","z"]) 
 
             loc = cmds.xform(hdl_ctrl, r=True, ws=True, q=True, t=True)
             cmds.xform(hock_ctrl, pivots=loc, ws=True)
@@ -87,18 +92,21 @@ class create_ik():
             cmds.error("ik_type is invalid. Ik rig not made")
 
         if above_ctrls:
-            self.ik_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl] + above_ctrls
+            if hock_grp: self.ik_ctrls = [pv_ctrl, hdl_ctrl, hock_grp, root_ctrl] + above_ctrls
+            else: self.ik_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl] + above_ctrls
             # self.grouped_ctrls = [pv_ctrl, hdl_ctrl, above_ctrls[0]]
             offset = self.ik_ctrls[-1].replace("ctrl_","offset_")
         else:
-            self.ik_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl]
+            if hock_grp: self.ik_ctrls = [pv_ctrl,hdl_ctrl,hock_grp,root_ctrl]
+            else: self.ik_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl]
             # self.grouped_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl]
             offset = self.ik_ctrls[-1].replace("ctrl_","offset_")
 
         self.offset = cmds.group(n=offset, em=1)
         cmds.matchTransform(self.offset, self.ik_ctrls[-1])
         cmds.parent(self.ik_ctrls[-1], self.offset)
-        self.grouped_ctrls = [pv_ctrl,hdl_ctrl,self.offset]
+        if hock_grp: self.grouped_ctrls = [pv_ctrl, hdl_ctrl, hock_grp, self.offset]
+        else: self.grouped_ctrls = [pv_ctrl,hdl_ctrl,self.offset]
         OPM.offsetParentMatrix(self.ik_ctrls)
 
     def create_pv(self):
