@@ -38,7 +38,7 @@ class AddAvailableModules(QWidget):
         files = [".".join(f.split(".")[:-1]) for f in os.listdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'systems', 'modules'))]
         try: files.remove("")
         except ValueError: pass
-        files = [f for f in files if f not in ["__init__", "hand"]]
+        files = [f for f in files if f not in ["__init__"]]
         files = sorted(files)
 
         module_label = QLabel("MODULES:")

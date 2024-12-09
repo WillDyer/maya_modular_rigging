@@ -39,7 +39,7 @@ system_util = [guide_data, mirror_rig, connect_modules, system_group, ikfk_switc
 for module_list in [ui_pages, systems, system_util]:
     for module in module_list:    
         importlib.reload(module)
-        print(f"DEBUG: reloaded {module}")
+        #print(f"DEBUG: reloaded {module}")
 
 mayaMainWindowPtr = omui.MQtUtil.mainWindow()
 mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QWidget)

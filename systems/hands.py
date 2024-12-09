@@ -46,12 +46,13 @@ class create_hands():
                 system_to_connect = guide["system_to_connect"]
                 guide_list = guide["ui_guide_list"]
                 data_guide = guide["data_guide"]
+                guide_number = guide["guide_number"]
 
                 temp_dict = {
                     "module": self.module,
                     "master_guide": master_guide,
                     "guide_list": guide_list,
-                    "scale": module.guide_scale,
+                    "guide_scale": module.guide_scale,
                     "joints": [],
                     "side": module.side,
                     "connectors": guide_connector_list,
@@ -60,7 +61,8 @@ class create_hands():
                     "ik_ctrl_list": [],
                     "fk_ctrl_list": [],
                     "ik_joint_list": [],
-                    "fk_joint_list": []
+                    "fk_joint_list": [],
+                    "guide_number": guide_number
                 }
                 self.systems_to_be_made[master_guide] = temp_dict
                 self.created_guides.append(temp_dict["master_guide"])
