@@ -1,12 +1,16 @@
 import maya.cmds as cmds
 import importlib
+
 from systems import create_guides
-from systems.utils import OPM
+from systems.utils import OPM, guide_data
+
 importlib.reload(create_guides)
+importlib.reload(guide_data)
 
 
 class create_hands():
     def __init__(self, guide_list,systems_to_be_made, created_guides, finger_amount):
+        print("create_hands ran")
         self.systems_to_be_made = systems_to_be_made
         self.created_guides = created_guides
         self.finger_amount = finger_amount
@@ -41,6 +45,7 @@ class create_hands():
                 guide_connector_list = guide["connector_list"]
                 system_to_connect = guide["system_to_connect"]
                 guide_list = guide["ui_guide_list"]
+                data_guide = guide["data_guide"]
 
                 temp_dict = {
                     "module": self.module,
@@ -60,6 +65,7 @@ class create_hands():
                 self.systems_to_be_made[master_guide] = temp_dict
                 self.created_guides.append(temp_dict["master_guide"])
                 self.hand_master_guides.append(temp_dict["master_guide"])
+                guide_data.setup(temp_dict, data_guide)
 
         self.hand_grp = cmds.group(n=f"grp_{self.module}{module.side}_#",em=1,w=1)
         return self.systems_to_be_made

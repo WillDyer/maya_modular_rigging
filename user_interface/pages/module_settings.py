@@ -26,10 +26,11 @@ import sys
 import os
 import importlib
 
-from systems import create_guides
+from systems import create_guides, hands
 from systems.utils import guide_data
 
 importlib.reload(create_guides)
+importlib.reload(hands)
 importlib.reload(guide_data)
 
 
@@ -241,9 +242,13 @@ class AddModule():
             if preset.module_to_be_made[module] == "world": pass
             else:
                 attach_to = [cmds.ls(f"*{preset.module_to_be_made[module]}*", type="transform")[0]]
-
-        self.guides = create_guides.Guides(module,offset,module_path.side,to_connect_to=attach_to,use_existing_attr=[])
-        self.add_module_properties(module_path, module)
+        
+        if module == "hand":
+            selection = cmds.ls(sl=1)[0]
+            self.guides = hands.create_hands(selection, self.systems_to_be_made, self.created_guides, 5)
+        else:
+            self.guides = create_guides.Guides(module,offset,module_path.side,to_connect_to=attach_to,use_existing_attr=[])
+            self.add_module_properties(module_path, module)
 
     def add_module_properties(self, module_path, module):
         guide = self.guides.collect_guides()
