@@ -17,9 +17,7 @@
 > - As I have switched to linux recently you might need to check the pathing if you are running a windows based machine.
 
 ```python
-from maya_modular_rigging import main
-
-main.run_ui()
+import maya_modular_rigging
 ```
 ### New Module Setup & Parameters
 

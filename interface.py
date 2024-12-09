@@ -33,26 +33,13 @@ from user_interface.pages import module_settings, sidebar, page_utils
 from systems import create_guides, hands, joints, twist_joints, ik, fk, ribbon, squash_and_stretch
 from systems.utils import guide_data, mirror_rig, connect_modules, system_group, ikfk_switch, utils, reverse_foot, space_swap, reverse_foot_tmp
 
-importlib.reload(module_settings)
-importlib.reload(sidebar)
-importlib.reload(page_utils)
-importlib.reload(create_guides)
-importlib.reload(hands)
-importlib.reload(guide_data)
-importlib.reload(joints)
-importlib.reload(twist_joints)
-importlib.reload(mirror_rig)
-importlib.reload(connect_modules)
-importlib.reload(ik)
-importlib.reload(fk)
-importlib.reload(system_group)
-importlib.reload(ikfk_switch)
-importlib.reload(utils)
-importlib.reload(reverse_foot)
-importlib.reload(ribbon)
-importlib.reload(space_swap)
-importlib.reload(squash_and_stretch)
-importlib.reload(reverse_foot_tmp)
+ui_pages = [module_settings, sidebar, page_utils]
+systems = [create_guides, hands, joints, twist_joints, ik, fk, ribbon, squash_and_stretch]
+system_util = [guide_data, mirror_rig, connect_modules, system_group, ikfk_switch, utils, reverse_foot, space_swap, reverse_foot_tmp]
+for module_list in [ui_pages, systems, system_util]:
+    for module in module_list:    
+        importlib.reload(module)
+        print(f"DEBUG: reloaded {module}")
 
 mayaMainWindowPtr = omui.MQtUtil.mainWindow()
 mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QWidget)
