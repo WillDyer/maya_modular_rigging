@@ -95,7 +95,8 @@ class Guides():
         numbers_unfiltered = []
         for data_guide in tmp_list:
             if cmds.attributeQuery("guide_number", node=data_guide, exists=True):
-                numbers_unfiltered.append(cmds.getAttr(f"{data_guide}.guide_number"))
+                attr_num = int(cmds.getAttr(f"{data_guide}.guide_number"))
+                numbers_unfiltered.append(attr_num)
             else:
                 cmds.warning("guide_number attr doesnt exist on this node, guide setup might not work as expected.")
 
@@ -169,7 +170,8 @@ class Guides():
             cmds.setAttr("grp_connector_clusters.hiddenInOutliner", True)
 
         # create data guide
-        if "root" in self.module.system or "proximal" in self.module.system: data_guide_name = f"data_{master_guide}"
+        #if "root" in self.module.system or "proximal" in self.module.system: data_guide_name = f"data_{master_guide}"
+        if "root" in self.module.system or "proximal" in self.module.system: data_guide_name = f"data_{side}{number}_{accessed_module}"
         else: data_guide_name = master_guide.replace("master_", "data_")
         cmds.spaceLocator(n=data_guide_name)
         cmds.matchTransform(data_guide_name, master_guide)

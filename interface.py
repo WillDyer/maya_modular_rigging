@@ -39,7 +39,7 @@ system_util = [guide_data, mirror_rig, connect_modules, system_group, ikfk_switc
 for module_list in [ui_pages, systems, system_util]:
     for module in module_list:    
         importlib.reload(module)
-        print(f"DEBUG: reloaded {module}")
+        #print(f"DEBUG: reloaded {module}")
 
 mayaMainWindowPtr = omui.MQtUtil.mainWindow()
 mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QWidget)
@@ -181,8 +181,11 @@ class Interface(QWidget):
     def add_module_instance(self, module, preset):
         createdmodule_instance = module_settings.AddModule(module, preset)
         module_dict = createdmodule_instance.return_data()
+        count_nested_dicts = sum(1 for value in module_dict.values() if isinstance(value, dict))
         self.created_guides.append(module_dict["master_guide"])
-        if "master" in module_dict["master_guide"]:
+        if "hand" in module_dict["module"]:
+            module_name = module_dict["name"]
+        elif "master" in module_dict["master_guide"]:
             module_name = module_dict["master_guide"].replace("master_","")
         else: module_name = module_dict["master_guide"]
 
@@ -199,15 +202,19 @@ class Interface(QWidget):
         settings_page_instance = module_settings.CreateModuleTab(self, module_name, button, page, self.scroll_area_layout, layout, module_dict)
 
         self.scroll_area_layout.insertWidget(0,page)
-
-        self.systems_to_be_made[module_dict["master_guide"]] = module_dict
+        
+        if count_nested_dicts > 1:
+            for sub_dict in module_dict.values():
+                if isinstance(sub_dict, dict):
+                    self.systems_to_be_made[sub_dict["master_guide"]] = sub_dict
+        else:
+            self.systems_to_be_made[module_dict["master_guide"]] = module_dict
 
     def create_joints(self):
         orientation = "xyz"
 
         mirror_module = mirror_rig.mirror_data(self.systems_to_be_made, orientation)
         self.systems_to_be_made = mirror_module.get_mirror_data()
-        print(self.systems_to_be_made)
         created_guides = [key["master_guide"] for key in self.systems_to_be_made.values()]
 
         rig_jnt_list = joints.get_joint_list(orientation,created_guides, system="rig")
@@ -315,7 +322,6 @@ class Interface(QWidget):
             twist_joint = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_twist_jnts", asString=1)
             if key['system_to_connect']:
                 systems_to_connect = key['system_to_connect']
-                print(systems_to_connect)
                 connect_modules.connect_polished(systems_to_connect)
             if rig_type == "FKIK":
                 space_swap_module = space_swap.SpaceSwapping(key)

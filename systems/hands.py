@@ -10,13 +10,14 @@ importlib.reload(guide_data)
 
 class create_hands():
     def __init__(self, guide_list,systems_to_be_made, created_guides, finger_amount):
-        print("create_hands ran")
         self.systems_to_be_made = systems_to_be_made
         self.created_guides = created_guides
         self.finger_amount = finger_amount
+
         self.module_hand(guide_list)
         self.make_guides()
         self.space_out()
+
         cmds.parent(self.hand_master_guides, self.hand_grp)
         cmds.matchTransform(self.hand_grp,self.to_connect_to)
         OPM.offsetParentMatrix(self.hand_grp)
@@ -26,7 +27,6 @@ class create_hands():
         self.module = "hand"
         self.to_connect_to = [guide_list]
         self.offset = [0,0,0]
-        # phalanx
 
     def make_guides(self):
         self.hand_dict = {}
@@ -34,10 +34,11 @@ class create_hands():
         module = importlib.import_module(f"systems.modules.{self.module}")
         importlib.reload(module)
         cmds.select(clear=1)
+        self.hand_grp = cmds.group(n=f"grp_{self.module}_{module.side}#",em=1,w=1)
+        cmds.select(clear=1)
 
         for x in range(int(self.finger_amount)):
             use_existing_attr = [cmds.getAttr(f"{self.to_connect_to[0]}.master_guide",asString=1)]
-            print(f"user_existing_attr: {use_existing_attr}")
             guides = create_guides.Guides(self.module,self.offset,module.side,self.to_connect_to,use_existing_attr)
             guide = guides.collect_guides()
             if guide:
@@ -46,12 +47,13 @@ class create_hands():
                 system_to_connect = guide["system_to_connect"]
                 guide_list = guide["ui_guide_list"]
                 data_guide = guide["data_guide"]
+                guide_number = guide["guide_number"]
 
-                temp_dict = {
+                self.temp_dict = {
                     "module": self.module,
                     "master_guide": master_guide,
                     "guide_list": guide_list,
-                    "scale": module.guide_scale,
+                    "guide_scale": module.guide_scale,
                     "joints": [],
                     "side": module.side,
                     "connectors": guide_connector_list,
@@ -60,14 +62,21 @@ class create_hands():
                     "ik_ctrl_list": [],
                     "fk_ctrl_list": [],
                     "ik_joint_list": [],
-                    "fk_joint_list": []
+                    "fk_joint_list": [],
+                    "guide_number": guide_number,
+                    "hand_grp_num": self.hand_grp[-1],
+                    "hidden_obj": self.hand_grp
                 }
-                self.systems_to_be_made[master_guide] = temp_dict
-                self.created_guides.append(temp_dict["master_guide"])
-                self.hand_master_guides.append(temp_dict["master_guide"])
-                guide_data.setup(temp_dict, data_guide)
+                self.systems_to_be_made[master_guide] = self.temp_dict
+                self.created_guides.append(self.temp_dict["master_guide"])
+                self.hand_master_guides.append(self.temp_dict["master_guide"])
+                guide_data.setup(self.temp_dict, data_guide)
 
-        self.hand_grp = cmds.group(n=f"grp_{self.module}{module.side}_#",em=1,w=1)
+        #self.hand_grp = cmds.group(n=f"grp_{self.module}_{module.side}#",em=1,w=1)
+        self.systems_to_be_made["name"] = f"{self.hand_grp[-2:]}_{self.module}"
+        self.systems_to_be_made["master_guide"] = self.hand_grp
+        self.systems_to_be_made["module"] = self.module
+        self.systems_to_be_made["system_to_connect"] = ["tmp_value", self.to_connect_to[0]]
         return self.systems_to_be_made
 
     def space_out(self):
@@ -93,3 +102,6 @@ class create_hands():
 
     def get_hand_grp_to_delete(self):
         return self.hand_grp
+
+    def return_data(self):
+        return self.temp_dict

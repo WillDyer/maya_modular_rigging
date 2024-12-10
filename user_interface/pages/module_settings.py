@@ -39,7 +39,6 @@ class CreateModuleTab(QWidget):
         super().__init__()
 
         # sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules"))
-        print(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'systems', 'modules'))
         sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'systems', 'modules'))
         self.module_path = importlib.import_module(module_dict["module"])
         importlib.reload(self.module_path)
@@ -229,7 +228,6 @@ class AddModule():
     def add_module(self, module, preset):
         # module = self.ui.available_modules.currentText()
         # sys.path.append("/home/will/maya/scripts/maya_modular_rigging/systems/modules")
-        print(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'systems', 'modules'))
         sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'systems', 'modules'))
         module_path = importlib.import_module(module)
         importlib.reload(module_path)
@@ -246,6 +244,7 @@ class AddModule():
         if module == "hand":
             selection = cmds.ls(sl=1)[0]
             self.guides = hands.create_hands(selection, self.systems_to_be_made, self.created_guides, 5)
+            self.temp_dict = self.guides.get_dict()
         else:
             self.guides = create_guides.Guides(module,offset,module_path.side,to_connect_to=attach_to,use_existing_attr=[])
             self.add_module_properties(module_path, module)
@@ -283,7 +282,7 @@ class AddModule():
                 "ik_joint_list": [],
                 "fk_joint_list": [],
                 "rev_locators": rev_locators,
-
+                "hidden_obj": master_guide,
                 "guide_number": guide_number
             }
             # self.systems_to_be_made[master_guide] = temp_dict
