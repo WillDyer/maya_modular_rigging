@@ -123,8 +123,8 @@ def get_joints_between(start_joint, end_joint):
 def hide_guides(systems_to_be_made, created_guides, module_widget, hidden):
     if hidden is True:
         for key in systems_to_be_made.values():
-            cmds.hide(key["master_guide"])
-            cmds.setAttr(f"{key['master_guide']}.hiddenInOutliner", True)
+            cmds.hide(key["hidden_obj"])
+            cmds.setAttr(f"{key['hidden_obj']}.hiddenInOutliner", True)
             try:
                 if key["rev_locators"]:
                     cmds.hide(f"grp_{key['rev_locators'][3]}")
@@ -133,8 +133,8 @@ def hide_guides(systems_to_be_made, created_guides, module_widget, hidden):
         cmds.hide("grp_connector_clusters")
     else:
         for key in systems_to_be_made.values():
-            cmds.showHidden(key["master_guide"])
-            cmds.setAttr(f"{key['master_guide']}.hiddenInOutliner", False)
+            cmds.showHidden(key["hidden_obj"])
+            cmds.setAttr(f"{key['hidden_obj']}.hiddenInOutliner", False)
             try:
                 if key["rev_locators"]:
                     cmds.showHidden(f"grp_{key['rev_locators'][3]}")

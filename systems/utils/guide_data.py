@@ -21,7 +21,6 @@ dict_var_types = {
 
 def setup(temp_dict, data_guide):
     for key in temp_dict.keys():
-        print(f"DEBUG data_guide: {key}")
         if temp_dict.keys() == "guide_number":
             cmds.addAttr(data_guide, ln=key, at="float",k=1)
             cmds.setAttr(f"{data_guide}.{key}", temp_dict[key])

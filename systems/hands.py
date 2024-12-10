@@ -10,7 +10,6 @@ importlib.reload(guide_data)
 
 class create_hands():
     def __init__(self, guide_list,systems_to_be_made, created_guides, finger_amount):
-        print("create_hands ran")
         self.systems_to_be_made = systems_to_be_made
         self.created_guides = created_guides
         self.finger_amount = finger_amount
@@ -34,6 +33,8 @@ class create_hands():
         self.hand_master_guides = []
         module = importlib.import_module(f"systems.modules.{self.module}")
         importlib.reload(module)
+        cmds.select(clear=1)
+        self.hand_grp = cmds.group(n=f"grp_{self.module}_{module.side}#",em=1,w=1)
         cmds.select(clear=1)
 
         for x in range(int(self.finger_amount)):
@@ -62,14 +63,20 @@ class create_hands():
                     "fk_ctrl_list": [],
                     "ik_joint_list": [],
                     "fk_joint_list": [],
-                    "guide_number": guide_number
+                    "guide_number": guide_number,
+                    "hand_grp_num": self.hand_grp[-1],
+                    "hidden_obj": self.hand_grp
                 }
                 self.systems_to_be_made[master_guide] = self.temp_dict
                 self.created_guides.append(self.temp_dict["master_guide"])
                 self.hand_master_guides.append(self.temp_dict["master_guide"])
                 guide_data.setup(self.temp_dict, data_guide)
 
-        self.hand_grp = cmds.group(n=f"grp_{self.module}_{module.side}#",em=1,w=1)
+        #self.hand_grp = cmds.group(n=f"grp_{self.module}_{module.side}#",em=1,w=1)
+        self.systems_to_be_made["name"] = f"{self.hand_grp[-2:]}_{self.module}"
+        self.systems_to_be_made["master_guide"] = self.hand_grp
+        self.systems_to_be_made["module"] = self.module
+        self.systems_to_be_made["system_to_connect"] = ["tmp_value", self.to_connect_to[0]]
         return self.systems_to_be_made
 
     def space_out(self):

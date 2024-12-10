@@ -78,12 +78,8 @@ def grpSetup(rig_name):
 
 
 def heirachy_parenting(systems_dict):
-    master_guide_list = []
-    for key in systems_dict.values(): master_guide_list.append(key["master_guide"])
-
-    print(f"master_guide_list: {master_guide_list}")
-
-    for master_guide in master_guide_list:
+    for key in systems_dict.values():
+        master_guide = key["master_guide"]
         if "root" in master_guide: pass
         else:
             grp_fk_ctrl = f"grp_fk_ctrls_{master_guide}"
@@ -92,9 +88,14 @@ def heirachy_parenting(systems_dict):
             grp_ik_jnts = f"grp_ik_jnts_{master_guide}"
             grp_tweaks_ctrl = f"grp_tweak_{master_guide}"
 
+            if cmds.getAttr(f"{master_guide}.base_module", asString=1) == "hand":
+                master_guide = f"{key['side']}{[key['hand_grp_num']][0]}_{cmds.getAttr(f'{master_guide}.base_module', asString=1)}"
+
             if "master" in master_guide:
                 master_guide = master_guide.replace("master_","")
-            cmds.group(n=master_guide,p="modules",em=1)
+            
+            if not cmds.objExists(master_guide):
+                cmds.group(n=master_guide,p="modules",em=1)
             try:
                 cmds.parent(cmds.listRelatives(grp_fk_jnts,c=1), master_guide)
                 cmds.delete(grp_fk_jnts)

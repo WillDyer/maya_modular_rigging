@@ -246,7 +246,7 @@ class AddModule():
         if module == "hand":
             selection = cmds.ls(sl=1)[0]
             self.guides = hands.create_hands(selection, self.systems_to_be_made, self.created_guides, 5)
-            self.temp_dict = self.guides.return_data()
+            self.temp_dict = self.guides.get_dict()
         else:
             self.guides = create_guides.Guides(module,offset,module_path.side,to_connect_to=attach_to,use_existing_attr=[])
             self.add_module_properties(module_path, module)
@@ -284,7 +284,7 @@ class AddModule():
                 "ik_joint_list": [],
                 "fk_joint_list": [],
                 "rev_locators": rev_locators,
-
+                "hidden_obj": master_guide,
                 "guide_number": guide_number
             }
             # self.systems_to_be_made[master_guide] = temp_dict

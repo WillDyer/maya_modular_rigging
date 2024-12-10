@@ -181,8 +181,11 @@ class Interface(QWidget):
     def add_module_instance(self, module, preset):
         createdmodule_instance = module_settings.AddModule(module, preset)
         module_dict = createdmodule_instance.return_data()
+        count_nested_dicts = sum(1 for value in module_dict.values() if isinstance(value, dict))
         self.created_guides.append(module_dict["master_guide"])
-        if "master" in module_dict["master_guide"]:
+        if "hand" in module_dict["module"]:
+            module_name = module_dict["name"]
+        elif "master" in module_dict["master_guide"]:
             module_name = module_dict["master_guide"].replace("master_","")
         else: module_name = module_dict["master_guide"]
 
@@ -199,8 +202,13 @@ class Interface(QWidget):
         settings_page_instance = module_settings.CreateModuleTab(self, module_name, button, page, self.scroll_area_layout, layout, module_dict)
 
         self.scroll_area_layout.insertWidget(0,page)
-
-        self.systems_to_be_made[module_dict["master_guide"]] = module_dict
+        
+        if count_nested_dicts > 1:
+            for sub_dict in module_dict.values():
+                if isinstance(sub_dict, dict):
+                    self.systems_to_be_made[sub_dict["master_guide"]] = sub_dict
+        else:
+            self.systems_to_be_made[module_dict["master_guide"]] = module_dict
 
     def create_joints(self):
         orientation = "xyz"
