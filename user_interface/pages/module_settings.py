@@ -246,6 +246,7 @@ class AddModule():
         if module == "hand":
             selection = cmds.ls(sl=1)[0]
             self.guides = hands.create_hands(selection, self.systems_to_be_made, self.created_guides, 5)
+            self.temp_dict = self.guides.return_data()
         else:
             self.guides = create_guides.Guides(module,offset,module_path.side,to_connect_to=attach_to,use_existing_attr=[])
             self.add_module_properties(module_path, module)
