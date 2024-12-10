@@ -55,7 +55,6 @@ class create_ribbon():
         positions = []
         offset_positions_left = []
         offset_positions_right = []
-        print(self.joint_chain)
         for joint in self.joint_chain:
             # pos = cmds.xform(joint, query=True, worldSpace=True, translation=True)
             loc_left = cmds.spaceLocator(n="loc_tmp_left")[0]

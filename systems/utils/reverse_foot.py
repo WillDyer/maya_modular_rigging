@@ -97,7 +97,6 @@ class CreateReverseFoot():
         }
 
         self.create_system()
-        print(self.reverse_foot_data["loc_toe"])
         ik_toe = self.reverse_foot_data["loc_toe"].replace("loc_rev_","jnt_ik_")
         rev_toe = self.reverse_foot_data["loc_toe"].replace("loc_rev_","jnt_rev_")
         # cmds.pointConstraint(rev_toe, ik_toe,mo=False, n=f"pConst_{rev_toe}")

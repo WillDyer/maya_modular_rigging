@@ -98,7 +98,6 @@ class CreateReverseFoot():
         }
 
         self.create_system()
-        print(self.reverse_foot_data["loc_toe"])
         ik_toe = self.reverse_foot_data["loc_toe"].replace("loc_rev_","jnt_ik_")
         rev_toe = self.reverse_foot_data["loc_toe"].replace("loc_rev_","jnt_rev_")
         # cmds.pointConstraint(rev_toe, ik_toe,mo=False, n=f"pConst_{rev_toe}")
@@ -140,7 +139,6 @@ class CreateReverseFoot():
         cmds.makeIdentity(f"{self.jnt_list[1]}_driver", apply=True, t=False, r=True, s=False)
         cmds.makeIdentity(f"{self.jnt_list[2]}_driver", apply=True, t=False, r=True, s=False)
         for rev_loc in self.reverse_foot_data.keys():
-            print(self.reverse_foot_data[rev_loc])
             ctrl = cmds.circle(n=f"ctrl_{self.reverse_foot_data[rev_loc]}", nr=(0,1,0))[0]
             cmds.matchTransform(ctrl, self.reverse_foot_data[rev_loc])
             grp = cmds.group(n=f"offst_{self.reverse_foot_data[rev_loc]}", em=True)

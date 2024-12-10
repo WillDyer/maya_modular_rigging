@@ -82,7 +82,6 @@ class ribbon_twist():
     def __init__(self,systems_to_be_made):
         for key in systems_to_be_made.values():
             if "twist_dict" in key.keys():
-                print(key["twist_dict"])
                 twist_dict = key["twist_dict"]
                 self.nurbs_surface = twist_dict["nurbs_curve"]
                 self.grp = twist_dict["top_level_grp"]
