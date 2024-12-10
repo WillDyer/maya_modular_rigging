@@ -84,9 +84,7 @@ class Guides():
         number = "0"
         tmp_list = []
         module_list = cmds.ls("data*")
-        print(f"module_list: {module_list}")
         for object in module_list:
-            print(f"object in module_list: {object}")
             if "Shape" in object:
                 pass
             elif accessed_module in object:

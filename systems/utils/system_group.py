@@ -16,7 +16,6 @@ attrs = {
 
 def sys_attr():
     for item in attrs.keys():
-        # print(attrs[item][0])
         cmds.addAttr("ctrl_root",sn=item,nn=attrs[item][0],k=True,at="enum",en=attrs[item][1])
         cmds.setAttr(f"ctrl_root.{item}",lock=attrs[item][2])
         if attrs[item][3] is True:

@@ -215,7 +215,6 @@ class Interface(QWidget):
 
         mirror_module = mirror_rig.mirror_data(self.systems_to_be_made, orientation)
         self.systems_to_be_made = mirror_module.get_mirror_data()
-        print(self.systems_to_be_made)
         created_guides = [key["master_guide"] for key in self.systems_to_be_made.values()]
 
         rig_jnt_list = joints.get_joint_list(orientation,created_guides, system="rig")
@@ -323,7 +322,6 @@ class Interface(QWidget):
             twist_joint = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_twist_jnts", asString=1)
             if key['system_to_connect']:
                 systems_to_connect = key['system_to_connect']
-                print(systems_to_connect)
                 connect_modules.connect_polished(systems_to_connect)
             if rig_type == "FKIK":
                 space_swap_module = space_swap.SpaceSwapping(key)

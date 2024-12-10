@@ -157,6 +157,7 @@ class mirror_data():
             importlib.reload(self.module)
             mirror_attribute = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_mirror_jnts", asString=1)
             if mirror_attribute == "Yes":  # YES
+                print(f"mirroing: {key['master_guide']}")
                 self.key = key
                 self.get_mirrored_side()
                 self.create_mirrored_guides()
@@ -178,18 +179,26 @@ class mirror_data():
                     "ik_ctrl_list": [],
                     "fk_ctrl_list": [],
                     "ik_joint_list": [],
-                    "fk_joint_list": []
+                    "fk_joint_list": [],
+                    "hidden_obj": self.master_guide
                 }
 
                 if self.mirrored_rev_locators:
                     temp_dict.update({"rev_locators": self.mirrored_rev_locators})
+                
+                if key["module"] == "hand":
+                    temp_dict.update({"hand_grp_num": key['hand_grp_num']})
 
                 temp_systems_to_be_made[self.master_guide] = temp_dict
 
-                cmds.setAttr(f"{key['master_guide']}.{key['master_guide']}_mirror_jnts", 0)
+                # cmds.setAttr(f"{key['master_guide']}.{key['master_guide']}_mirror_jnts", 0)
                 guide_data.setup(temp_dict, self.data_guide)
 
         self.data_to_be_checked.update(temp_systems_to_be_made)
+        
+        for key in self.data_to_be_checked.values():
+            if cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_mirror_jnts", asString=1) == "Yes":
+                cmds.setAttr(f"{key['master_guide']}.{key['master_guide']}_mirror_jnts", 0)
 
     def get_mirror_data(self):
         return self.data_to_be_checked

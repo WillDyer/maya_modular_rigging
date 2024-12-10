@@ -15,7 +15,9 @@ dict_var_types = {
                 "ik_joint_list": "list",
                 "fk_joint_list": "list",
                 "rev_locators": "list",
-                "guide_number": "float"
+                "guide_number": "float",
+                "hidden_obj": "string",
+                "hand_grp_num": "float"
             }
 
 
