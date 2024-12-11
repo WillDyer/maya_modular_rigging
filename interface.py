@@ -304,7 +304,10 @@ class Interface(QWidget):
                 if rig_type == "FKIK" or rig_type == "IK":
                     try:
                         if key["rev_locators"]:
-                            reverse_foot_instance = reverse_foot_tmp.CreateReverseFoot(key["module"],key)
+                            if module.ik_joints["ik_type"] == "quadruped":
+                                reverse_foot_instance = reverse_foot_tmp.CreateReverseFootQuadruped(key["module"],key)
+                            if module.ik_joints["ik_type"] == "biped":
+                                reverse_foot_instance = reverse_foot_tmp.CreateReverseFootBiped(key["module"],key)
                     except KeyError:
                         print(f"Didnt find rev_locators in key not making reverse foot for: {key}")
                     squash_stretch_attr = cmds.getAttr(f"{master_guide}.{master_guide}_squash_stretch", asString=True)
