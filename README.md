@@ -1,4 +1,4 @@
-<h1 align="center">WD-Modular-Auto-Rigging</h1>
+<h1 align="center">Modular-Auto-Rigging aka MOD</h1>
 <p align="center">
     <img src="https://img.shields.io/badge/Maya-37A5CC?style=for-the-badge&logo=autodeskmaya&logoColor=white">
     <img src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue">
