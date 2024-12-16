@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from systems.utils import OPM
+from mod.systems.utils import OPM
 
 
 class SpaceSwapping():

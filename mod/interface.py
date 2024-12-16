@@ -29,9 +29,9 @@ import importlib
 import os.path
 import sys
 
-from user_interface.pages import module_settings, sidebar, page_utils
-from systems import create_guides, hands, joints, twist_joints, ik, fk, ribbon, squash_and_stretch
-from systems.utils import guide_data, mirror_rig, connect_modules, system_group, ikfk_switch, utils, reverse_foot, space_swap, reverse_foot_tmp
+from mod.user_interface.pages import module_settings, sidebar, page_utils
+from mod.systems import create_guides, hands, joints, twist_joints, ik, fk, ribbon, squash_and_stretch
+from mod.systems.utils import guide_data, mirror_rig, connect_modules, system_group, ikfk_switch, utils, reverse_foot, space_swap, reverse_foot_tmp
 
 ui_pages = [module_settings, sidebar, page_utils]
 systems = [create_guides, hands, joints, twist_joints, ik, fk, ribbon, squash_and_stretch]
@@ -48,27 +48,29 @@ mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QWidget)
 class Interface(QWidget):
     def __init__(self, *args, **kwargs):
         super(Interface, self).__init__(*args, **kwargs)
+        UI_NAME = "MOD"
         self.systems_to_be_made = {}
         self.created_guides = []
         self.systems_to_be_deleted_polished = []
-        if cmds.objExists("ui_data"):
-            self.last_selected_button = cmds.getAttr("ui_data.ui_status", asString=1)
-        else:
-            self.last_selected_button = "guides"
-
+        
+        self.check_existing_uis(UI_NAME)
         self.setParent(mayaMainWindow)
         self.setWindowFlags(Qt.Window)
         self.initUI()
         self.setFixedWidth(600)
         self.setFixedHeight(700)
-        self.setWindowTitle("MMR")
+        self.setWindowTitle(UI_NAME)
+        self.setObjectName(UI_NAME)
 
     def initUI(self):
-        if not cmds.objExists("ui_data"):
+        if cmds.objExists("ui_data"):
+            self.last_selected_button = cmds.getAttr("ui_data.ui_status", asString=True)
+        else:
             cmds.spaceLocator(n="ui_data")
             cmds.addAttr("ui_data", ln="ui_status", at="enum", enumName="guides:skeleton:rig:polish", k=True)
             cmds.select(clear=True)
-            # cmds.addAttr("ui_data", ln="last_selected_button", at="enum", enumName="guides:skeleton:rig:polish", k=True)
+            self.last_selected_button = "guides"
+
         # layout
         self.vertical_layout = QVBoxLayout(self)
         self.vertical_layout.setContentsMargins(0, 0, 0, 0)
@@ -111,6 +113,10 @@ class Interface(QWidget):
         # set ui icon
         icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"interface","images","UI_Logo.png")
         self.setWindowIcon(QIcon(icon_path))
+
+    def check_existing_uis(self, UI_NAME):
+        if cmds.window(UI_NAME, exists=True):
+            cmds.deleteUI(UI_NAME, window=True)
 
     def init_mainsettings(self):
         settings_label = QLabel("SETTINGS:")

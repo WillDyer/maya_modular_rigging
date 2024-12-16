@@ -2,11 +2,9 @@ from importlib import reload
 import sys
 import os
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-print(f"Adding to MAYA_SCRIPT_PATH ENV {os.path.dirname(os.path.abspath(__file__))}")
+dir_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(dir_path)
+print(f"Adding to MAYA_script_PATH ENV {dir_path}")
 
-from . import interface
-reload(interface)
-
-interface.main()
-print("init ran")
+import mod
+reload(mod)

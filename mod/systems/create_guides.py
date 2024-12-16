@@ -1,7 +1,7 @@
 import maya.cmds as cmds
 import importlib
 import os
-from systems.utils import (connect_modules, utils, reverse_foot, control_shape)
+from mod.systems.utils import (connect_modules, utils, reverse_foot, control_shape)
 importlib.reload(connect_modules)
 importlib.reload(utils)
 importlib.reload(reverse_foot)

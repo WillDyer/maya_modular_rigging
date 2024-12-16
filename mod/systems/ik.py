@@ -1,7 +1,7 @@
 import maya.cmds as cmds
 import maya.mel as mel
 import importlib
-from systems.utils import (OPM, utils, pole_vector,control_shape)
+from mod.systems.utils import (OPM, utils, pole_vector,control_shape)
 
 importlib.reload(OPM)
 importlib.reload(pole_vector)

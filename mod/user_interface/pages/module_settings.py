@@ -26,8 +26,8 @@ import sys
 import os
 import importlib
 
-from systems import create_guides, hands
-from systems.utils import guide_data
+from mod.systems import create_guides, hands
+from mod.systems.utils import guide_data
 
 importlib.reload(create_guides)
 importlib.reload(hands)

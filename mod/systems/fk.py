@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from systems.utils import OPM, control_shape
+from mod.systems.utils import OPM, control_shape
 import importlib
 importlib.reload(control_shape)
 

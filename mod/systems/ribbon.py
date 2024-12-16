@@ -3,8 +3,8 @@ import maya.OpenMaya as om
 import importlib
 import math
 
-from systems.utils import (OPM, utils)
-from systems import fk
+from mod.systems.utils import (OPM, utils)
+from mod.systems import fk
 
 importlib.reload(OPM)
 importlib.reload(utils)

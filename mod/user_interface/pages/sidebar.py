@@ -23,7 +23,7 @@ import importlib
 import os.path
 import string
 
-from user_interface.pages import module_settings
+from mod.user_interface.pages import module_settings
 importlib.reload(module_settings)
 
 
@@ -52,7 +52,7 @@ class AddAvailableModules(QWidget):
         self.sidebar_layout.addWidget(module_label)
 
         for module in files:
-            module_path = importlib.import_module(f"systems.modules.{module}")
+            module_path = importlib.import_module(f"mod.systems.modules.{module}")
             importlib.reload(module_path)
             if module_path.hide is False:
                 button_name = module.replace("_", " ")
