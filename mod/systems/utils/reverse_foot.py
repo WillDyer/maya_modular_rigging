@@ -6,7 +6,7 @@ class CreateReverseLocators():
     def __init__(self, guides,accessed_module):
         self.guides = guides
         self.accessed_module = accessed_module
-        self.module = importlib.import_module(f"systems.modules.{accessed_module}")
+        self.module = importlib.import_module(f"mod.systems.modules.{accessed_module}")
         importlib.reload(self.module)
         self.locator_list = self.create_loc()
 

@@ -65,11 +65,15 @@ class Interface(QWidget):
     def initUI(self):
         if cmds.objExists("ui_data"):
             self.last_selected_button = cmds.getAttr("ui_data.ui_status", asString=True)
+            self.rig_name_str = cmds.getAttr("ui_data.rig_name", asString=True)
         else:
             cmds.spaceLocator(n="ui_data")
             cmds.addAttr("ui_data", ln="ui_status", at="enum", enumName="guides:skeleton:rig:polish", k=True)
+            cmds.addAttr("ui_data", ln="rig_name", dt="string", k=True)
+            cmds.setAttr("ui_data.rig_name", "MMR_Rig", type="string")
             cmds.select(clear=True)
             self.last_selected_button = "guides"
+            self.rig_name_str = "MMR_Rig"
 
         # layout
         self.vertical_layout = QVBoxLayout(self)
@@ -92,7 +96,7 @@ class Interface(QWidget):
         self.sidebar_layout.setSizeConstraint(QVBoxLayout.SetMinimumSize)
         self.sidebar_layout.setSpacing(2)
         add_available_modules_instance = sidebar.AddAvailableModules(self, self.sidebar_layout)
-        rig_name_instance = sidebar.RigNameWidget(self.sidebar_layout)
+        rig_name_instance = sidebar.RigNameWidget(self.sidebar_layout, self.rig_name_str)
         colour_widget_instance = sidebar.RigColourWidget(self.sidebar_layout)
         self.main_layout.addWidget(self.sidebar_widget)
 
@@ -152,6 +156,10 @@ class Interface(QWidget):
 
     def init_existingguides(self):
         guide_data_dict = guide_data.init_data()
+        for key in guide_data_dict.values():
+            print(key)
+            try: print(key['hidden_obj'])
+            except KeyError: print(f"hidden_obj dont exist on {key['master_guide']}")
 
         for data_guide in guide_data_dict.values():
             self.created_guides.append(data_guide["master_guide"])
@@ -325,6 +333,7 @@ class Interface(QWidget):
 
         rig_name = self.sidebar_widget.findChild(QLineEdit, "rig_name")
         system_group.grpSetup(rig_name.text())
+        cmds.setAttr("ui_data.rig_name", str(rig_name.text()), type="string")
 
         for key in self.systems_to_be_made.values():  # seperate loop to be sure systems are made before connecting
             rig_type = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_rig_type", asString=1)

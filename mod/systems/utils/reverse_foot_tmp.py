@@ -7,7 +7,7 @@ class CreateReverseLocators():
     def __init__(self, guides,accessed_module):
         self.guides = guides
         self.accessed_module = accessed_module
-        self.module = importlib.import_module(f"systems.modules.{accessed_module}")
+        self.module = importlib.import_module(f"mod.systems.modules.{accessed_module}")
         importlib.reload(self.module)
         self.locator_list = self.create_loc()
 
@@ -79,7 +79,7 @@ class CreateReverseLocators():
 class CreateReverseFootQuadruped():
     def __init__(self, accessed_module, system):
         self.attr_list = ["Rev_Foot_Dvdr","Roll","Bank","Heel_Twist","Toe_Twist"]
-        self.module = importlib.import_module(f"systems.modules.{accessed_module}")
+        self.module = importlib.import_module(f"mod.systems.modules.{accessed_module}")
         importlib.reload(self.module)
         self.system = system
         self.tmp_locator_list = []

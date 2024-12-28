@@ -128,9 +128,10 @@ class RigColourWidget(QWidget):
 
 
 class RigNameWidget(QWidget):
-    def __init__(self, sidebar_layout):
+    def __init__(self, sidebar_layout, rig_name_str):
         super().__init__()
         self.sidebar_layout = sidebar_layout
+        self.rig_name_str = rig_name_str
         self.rig_name()
 
     def rig_name(self):
@@ -141,7 +142,7 @@ class RigNameWidget(QWidget):
                 font-size: 20px;
             }
         """)
-        rig_widget = QLineEdit("MMR_Rig")
+        rig_widget = QLineEdit(self.rig_name_str)
         rig_widget.setObjectName("rig_name")
         rig_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         rig_widget.setContentsMargins(0, 5, 5, 0)
