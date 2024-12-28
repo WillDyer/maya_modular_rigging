@@ -31,7 +31,7 @@ class create_hands():
     def make_guides(self):
         self.hand_dict = {}
         self.hand_master_guides = []
-        module = importlib.import_module(f"systems.modules.{self.module}")
+        module = importlib.import_module(f"mod.systems.modules.{self.module}")
         importlib.reload(module)
         cmds.select(clear=1)
         self.hand_grp = cmds.group(n=f"grp_{self.module}_{module.side}#",em=1,w=1)
