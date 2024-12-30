@@ -1,8 +1,8 @@
 import maya.cmds as cmds
 import importlib
 
-from mod.systems import create_guides
-from mod.systems.utils import OPM, guide_data
+from mod.guides import create_guides, guide_data
+from mod.systems.utils import OPM
 
 importlib.reload(create_guides)
 importlib.reload(guide_data)
