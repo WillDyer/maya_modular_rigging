@@ -1,7 +1,8 @@
 import maya.cmds as cmds
 import importlib
 import os
-from mod.systems.utils import connect_modules, utils, reverse_foot, control_shape
+from mod.rig.utils import connect_modules, utils, control_shape
+from mod.rig.sub_systems import reverse_foot
 importlib.reload(connect_modules)
 importlib.reload(utils)
 importlib.reload(reverse_foot)
@@ -132,6 +133,8 @@ class Guides():
                 elif "proximal" in x:
                     master_guide = guide
                 else:
+                    if "|" in guide:
+                        guide = guide.replace("|","")
                     guide_list.append(guide)
                 for shape in imported[1:]:
                     shape = shape.split("|")[-1]
@@ -142,7 +145,7 @@ class Guides():
             except RuntimeError:
                 print("Couldnt load file using basic shapes instead")
                 cmds.spaceLocator(n=x)
-
+            print(guide_list)
             # set location of guide crvs then OPM
             pos = self.module.system_pos[x]
             rot = self.module.system_rot[x]

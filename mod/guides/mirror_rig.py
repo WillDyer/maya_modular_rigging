@@ -2,8 +2,8 @@ import maya.cmds as cmds
 import importlib
 import os
 
-from mod.systems import joints
-from mod.systems.utils import utils
+from mod.rig.systems import joints
+from mod.rig.utils import utils
 from mod.guides import guide_data
 importlib.reload(joints)
 importlib.reload(utils)

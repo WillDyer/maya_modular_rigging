@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from mod.systems.utils import OPM
+from mod.rig.utils import OPM
 
 
 attrs = {

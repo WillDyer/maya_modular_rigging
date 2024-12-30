@@ -1,7 +1,7 @@
 import maya.cmds as cmds
 import importlib
-from mod.systems.utils import OPM, utils
-from mod.systems import ribbon
+from mod.rig.utils import OPM, utils
+from mod.rig.systems import ribbon
 
 importlib.reload(OPM)
 importlib.reload(utils)

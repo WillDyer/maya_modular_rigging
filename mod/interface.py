@@ -18,8 +18,9 @@ from PySide.QtWidgets import (QWidget,
                                QLineEdit)
 
 from mod.user_interface.pages import module_settings, sidebar, page_utils
-from mod.systems import hands, joints, twist_joints, ik, fk, ribbon, squash_and_stretch
-from mod.systems.utils import connect_modules, system_group, ikfk_switch, utils, reverse_foot, space_swap, reverse_foot_tmp
+from mod.rig.systems import joints, ik, fk, ribbon
+from mod.rig.sub_systems import reverse_foot, reverse_foot_tmp, twist_joints, squash_and_stretch, space_swap
+from mod.rig.utils import connect_modules, system_group, ikfk_switch, utils, hands
 from mod.guides import create_guides, guide_data, mirror_rig
 
 ui_pages = [module_settings, sidebar, page_utils]

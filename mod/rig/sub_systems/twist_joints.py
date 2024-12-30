@@ -1,6 +1,6 @@
 import maya.cmds as cmds
 import importlib
-from mod.systems.utils import OPM, utils
+from mod.rig.utils import OPM, utils
 
 importlib.reload(OPM)
 importlib.reload(utils)

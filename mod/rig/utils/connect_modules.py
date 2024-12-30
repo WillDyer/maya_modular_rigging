@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from mod.systems.utils import utils
+from mod.rig.utils import utils
 import importlib
 importlib.reload(utils)
 

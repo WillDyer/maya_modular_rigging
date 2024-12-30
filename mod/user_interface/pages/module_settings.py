@@ -14,7 +14,7 @@ from PySide.QtWidgets import (QWidget,
 import maya.cmds as cmds
 import importlib
 
-from mod.systems import hands
+from mod.rig.utils import hands
 from mod.guides import create_guides, guide_data
 
 importlib.reload(create_guides)

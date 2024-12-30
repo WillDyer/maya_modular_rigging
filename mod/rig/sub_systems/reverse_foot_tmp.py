@@ -1,6 +1,6 @@
 import maya.cmds as cmds
 import importlib
-from mod.systems.utils import OPM
+from mod.rig.utils import OPM
 importlib.reload(OPM)
 
 class CreateReverseLocators():
