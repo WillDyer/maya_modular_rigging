@@ -12,7 +12,7 @@ class PrepSkeleton():
         self.orientation = orientation
         self.key = key
         self.system = system
-        self.module = importlib.import_module(self.key['module'])
+        self.module = importlib.import_module(f"mod.modules.{self.key['module']}")
         importlib.reload(self.module)
         try:
             if self.module.twist_joint:

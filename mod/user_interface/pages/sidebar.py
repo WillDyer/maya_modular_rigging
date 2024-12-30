@@ -35,7 +35,7 @@ class AddAvailableModules(QWidget):
         self.update_modules()
 
     def update_modules(self):
-        files = [".".join(f.split(".")[:-1]) for f in os.listdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'systems', 'modules'))]
+        files = [".".join(f.split(".")[:-1]) for f in os.listdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'modules'))]
         try: files.remove("")
         except ValueError: pass
         files = [f for f in files if f not in ["__init__"]]
@@ -52,7 +52,7 @@ class AddAvailableModules(QWidget):
         self.sidebar_layout.addWidget(module_label)
 
         for module in files:
-            module_path = importlib.import_module(f"mod.systems.modules.{module}")
+            module_path = importlib.import_module(f"mod.modules.{module}")
             importlib.reload(module_path)
             if module_path.hide is False:
                 button_name = module.replace("_", " ")

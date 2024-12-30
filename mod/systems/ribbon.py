@@ -12,7 +12,7 @@ importlib.reload(utils)
 
 class create_ribbon():
     def __init__(self, system, accessed_module, ctrl_amount, ribbon_type, start_joint, end_joint, joint_list):
-        self.module = importlib.import_module(f"mod.systems.modules.{accessed_module}")
+        self.module = importlib.import_module(f"mod.modules.{accessed_module}")
         importlib.reload(self.module)
         self.above_root_joints = []
         self.below_root_joints = []

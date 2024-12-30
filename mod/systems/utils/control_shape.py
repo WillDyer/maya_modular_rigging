@@ -8,7 +8,7 @@ class ControlShapeList():
 
     def return_filtered_list(self, type, object):
         module = cmds.getAttr(f"{object}.base_module", asString=True)
-        module_path = importlib.import_module(module)
+        module_path = importlib.import_module(f"mod.modules.{module}")
         importlib.reload(module_path)
 
         base_guide = cmds.getAttr(f"{object}.original_guide", asString=True)

@@ -39,7 +39,7 @@ def joint(orientation,top_skeleton_joint, system):
         rot = cmds.xform(locator, q=True, ws=True, ro=True) # gather worldspace rotation
         jnt_name = cmds.joint(n=f"{joint_tag}{locator}", p=loc)  # create joint based off the location
         cmds.xform(jnt_name, ws=True, ro=rot)
-        # cmds.makeIdentity(jnt_name, apply=True, t=False, r=True, s=False)
+        cmds.makeIdentity(jnt_name, apply=True, t=False, r=True, s=False)
         jnt_names.append(jnt_name)
 
     mirror_attribute = cmds.getAttr(f"{top_skeleton_joint}.mirror_orientation", asString=1)

@@ -12,7 +12,7 @@ scale = 1
 
 class Guides():
     def __init__(self, accessed_module, offset, side, to_connect_to, use_existing_attr):
-        self.module = importlib.import_module(f"mod.systems.modules.{accessed_module}")
+        self.module = importlib.import_module(f"mod.modules.{accessed_module}")
         importlib.reload(self.module)
         if accessed_module == "hand":
             self.create_guide = self.guides_hand(accessed_module, offset, side, to_connect_to, use_existing_attr)

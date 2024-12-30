@@ -153,7 +153,7 @@ class mirror_data():
         for key in self.data_to_be_checked.values():
             self.locator_list = []
             accessed_module = key["module"]
-            self.module = importlib.import_module(f"mod.systems.modules.{accessed_module}")
+            self.module = importlib.import_module(f"mod.modules.{accessed_module}")
             importlib.reload(self.module)
             mirror_attribute = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_mirror_jnts", asString=1)
             if mirror_attribute == "Yes":  # YES

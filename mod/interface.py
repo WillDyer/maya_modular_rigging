@@ -183,8 +183,8 @@ class Interface(QWidget):
             self.systems_to_be_made[data_guide["master_guide"]] = data_guide
 
     def add_module(self, module):
-        sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "systems", "modules"))
-        module_path = importlib.import_module(module)
+        # sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "modules"))
+        module_path = importlib.import_module(f"mod.modules.{module}")
         importlib.reload(module_path)
         if module_path.is_preset is True:
             for module in module_path.module_to_be_made.keys():
@@ -272,8 +272,8 @@ class Interface(QWidget):
             rig_type = cmds.getAttr(f"{master_guide}.{master_guide}_rig_type", asString=1)
             orientation = "xyz"
 
-            sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules"))
-            module = importlib.import_module(key["module"])
+            # sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules"))
+            module = importlib.import_module(f"mod.modules.{key['module']}")
             importlib.reload(module)
             try: delete_end = module.delete_end
             except AttributeError: delete_end = False

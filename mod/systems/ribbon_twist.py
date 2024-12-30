@@ -11,7 +11,7 @@ importlib.reload(ribbon)
 class prep_skeleton():
     def __init__(self,key,system):
         self.key = key
-        module = importlib.import_module(self.key['module'])
+        module = importlib.import_module(f"mod.modules.{self.key['module']}")
         importlib.reload(module)
         for guide in self.key["guide_list"]:
             rig_joint = f"jnt_{system}_{guide}"

@@ -22,8 +22,6 @@ except ModuleNotFoundError:
                                    QCheckBox)
 
 import maya.cmds as cmds
-import sys
-import os
 import importlib
 
 from mod.systems import create_guides, hands
@@ -37,10 +35,7 @@ importlib.reload(guide_data)
 class CreateModuleTab(QWidget):
     def __init__(self, interface_class, module, button, page, scroll_area_layout, layout, module_dict):
         super().__init__()
-
-        # sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules"))
-        sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'systems', 'modules'))
-        self.module_path = importlib.import_module(module_dict["module"])
+        self.module_path = importlib.import_module(f"mod.modules.{module_dict['module']}")
         importlib.reload(self.module_path)
 
         self.module = module
@@ -226,10 +221,7 @@ class AddModule():
         self.add_module(module, preset)
 
     def add_module(self, module, preset):
-        # module = self.ui.available_modules.currentText()
-        # sys.path.append("/home/will/maya/scripts/maya_modular_rigging/systems/modules")
-        sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'systems', 'modules'))
-        module_path = importlib.import_module(module)
+        module_path = importlib.import_module(f"mod.modules.{module}")
         importlib.reload(module_path)
         offset = [
             0,0,0
