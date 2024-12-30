@@ -215,7 +215,7 @@ class CreateReverseFootQuadruped():
 class CreateReverseFootBiped():
     def __init__(self, accessed_module, system):
         self.attr_list = ["Rev_Foot_Dvdr","Roll","Bank","Heel_Twist","Toe_Twist"]
-        self.module = importlib.import_module(f"systems.modules.{accessed_module}")
+        self.module = importlib.import_module(f"mod.systems.modules.{accessed_module}")
         importlib.reload(self.module)
         self.system = system
         self.tmp_locator_list = []
