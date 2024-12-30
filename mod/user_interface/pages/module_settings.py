@@ -1,31 +1,21 @@
-try:
-    from PySide6.QtCore import Qt, QObject, SIGNAL
-    from PySide6.QtWidgets import (QWidget,
-                                   QHBoxLayout,
-                                   QPushButton,
-                                   QLabel,
-                                   QSizePolicy,
-                                   QFormLayout,
-                                   QComboBox,
-                                   QSpinBox,
-                                   QCheckBox)
-except ModuleNotFoundError:
-    from PySide2.QtCore import Qt, QObject, SIGNAL
-    from PySide2.QtWidgets import (QWidget,
-                                   QHBoxLayout,
-                                   QPushButton,
-                                   QLabel,
-                                   QSizePolicy,
-                                   QFormLayout,
-                                   QComboBox,
-                                   QSpinBox,
-                                   QCheckBox)
+from mod.user_interface.utils import qtpyside
+PySide, wrapInstance = qtpyside.get_version()
 
+from PySide.QtCore import Qt, QObject, SIGNAL
+from PySide.QtWidgets import (QWidget,
+                               QHBoxLayout,
+                               QPushButton,
+                               QLabel,
+                               QSizePolicy,
+                               QFormLayout,
+                               QComboBox,
+                               QSpinBox,
+                               QCheckBox)
 import maya.cmds as cmds
 import importlib
 
-from mod.systems import create_guides, hands
-from mod.systems.utils import guide_data
+from mod.systems import hands
+from mod.guides import create_guides, guide_data
 
 importlib.reload(create_guides)
 importlib.reload(hands)

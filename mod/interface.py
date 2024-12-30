@@ -1,37 +1,26 @@
 import maya.cmds as cmds
 from maya import OpenMayaUI as omui
-
-try:
-    from PySide6.QtCore import Qt
-    from PySide6.QtGui import QIcon
-    from PySide6.QtWidgets import (QWidget,
-                                   QVBoxLayout,
-                                   QHBoxLayout,
-                                   QPushButton,
-                                   QScrollArea,
-                                   QLabel,
-                                   QSizePolicy,
-                                   QLineEdit)
-    from shiboken6 import wrapInstance
-except ModuleNotFoundError:
-    from PySide2.QtCore import Qt
-    from PySide2.QtGui import QIcon
-    from PySide2.QtWidgets import (QWidget,
-                                   QVBoxLayout,
-                                   QHBoxLayout,
-                                   QPushButton,
-                                   QScrollArea,
-                                   QLabel,
-                                   QSizePolicy,
-                                   QLineEdit)
-    from shiboken2 import wrapInstance
 import importlib
 import os.path
-import sys
+
+from mod.user_interface.utils import qtpyside
+PySide, wrapInstance = qtpyside.get_version()
+
+from PySide.QtCore import Qt
+from PySide.QtGui import QIcon
+from PySide.QtWidgets import (QWidget,
+                               QVBoxLayout,
+                               QHBoxLayout,
+                               QPushButton,
+                               QScrollArea,
+                               QLabel,
+                               QSizePolicy,
+                               QLineEdit)
 
 from mod.user_interface.pages import module_settings, sidebar, page_utils
-from mod.systems import create_guides, hands, joints, twist_joints, ik, fk, ribbon, squash_and_stretch
-from mod.systems.utils import guide_data, mirror_rig, connect_modules, system_group, ikfk_switch, utils, reverse_foot, space_swap, reverse_foot_tmp
+from mod.systems import hands, joints, twist_joints, ik, fk, ribbon, squash_and_stretch
+from mod.systems.utils import connect_modules, system_group, ikfk_switch, utils, reverse_foot, space_swap, reverse_foot_tmp
+from mod.guides import create_guides, guide_data, mirror_rig
 
 ui_pages = [module_settings, sidebar, page_utils]
 systems = [create_guides, hands, joints, twist_joints, ik, fk, ribbon, squash_and_stretch]
@@ -183,7 +172,6 @@ class Interface(QWidget):
             self.systems_to_be_made[data_guide["master_guide"]] = data_guide
 
     def add_module(self, module):
-        # sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "modules"))
         module_path = importlib.import_module(f"mod.modules.{module}")
         importlib.reload(module_path)
         if module_path.is_preset is True:

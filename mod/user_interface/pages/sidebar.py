@@ -1,23 +1,15 @@
-try:
-    from PySide6.QtCore import QObject, SIGNAL
-    from PySide6.QtWidgets import (QWidget,
-                                   QSpacerItem,
-                                   QLineEdit,
-                                   QSizePolicy,
-                                   QLabel,
-                                   QPushButton,
-                                   QHBoxLayout,
-                                   QColorDialog)
-except ModuleNotFoundError:
-    from PySide2.QtCore import QObject, SIGNAL
-    from PySide2.QtWidgets import (QWidget,
-                                   QSpacerItem,
-                                   QLineEdit,
-                                   QSizePolicy,
-                                   QLabel,
-                                   QPushButton,
-                                   QHBoxLayout,
-                                   QColorDialog)
+from mod.user_interface.utils import qtpyside
+PySide, wrapInstance = qtpyside.get_version()
+
+from PySide.QtCore import QObject, SIGNAL
+from PySide.QtWidgets import (QWidget,
+                               QSpacerItem,
+                               QLineEdit,
+                               QSizePolicy,
+                               QLabel,
+                               QPushButton,
+                               QHBoxLayout,
+                               QColorDialog)
 
 import importlib
 import os.path
