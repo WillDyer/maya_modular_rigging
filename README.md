@@ -23,119 +23,21 @@ import maya_modular_rigging
 > [!IMPORTANT]
 > New modules must be placed within their own .py file within [~/mod/systems/modules](https://github.com/WillDyer/maya_modular_rigging/tree/main/mod/systems/modules)
 
-#### system: a list of the joint names used in module.
+| Parameter           | Type        | Default     | Description|
+|---------------------|-------------|-------------|------------|
+| is_preset           | boolean     | False       | Adds module to preset pool and hides it to the UI |
+| hide                | boolean     | False       | Hide a module to the UI |
+| ignore_transforms   | boolean     | True        | Ignores matching a new module to that of whats just been created |
+| system              | list        | none        | List of guide names, has to be in order |
+| system_pos          | dictionary  | none        | Dictionary that includes the name as the key and a value that is a list with the XYZ world space location |
+| system_pos          | dictionary  | none        | Dictionary that includes the name as the key and a value that is a list with the XYZ world space rotation |
+| ik_joints           | dictionary  | none        | Dictionary that includes 'start_joint', 'end_joint', 'pv_joint', 'hock', world_orientation'(bool), 'ik_type' as keys  and the values include the name of the guide that describes each item |
+| side                | string      | 'L'         | Side of rig the module was made on can be custom but recommended use is 'L' or 'R' |
+| space_swapping      | list        | 'root', 'cog', 'Custom' | list of items that are available space swapping locations |
+| guide_scale         | float       | 1           | scale of the guide for display purposes |
+| available_rig_types | list        | 'FK'        | Systems that are available to create on the module |
+| reverse_foot        | boolean     | False       | Boolean option to create reverse foot system on a module |
+| rev_locators        | dictionary  | none        | Dictionary that includes 'foot_ctrl', 'ankle', 'ball', 'toe', 'heel', 'bank_in', 'bank_out', first 4 items must be guides from the system |
+| twist_joints        | dictionary  | none        | Dictionary that includes 'start' & 'end' which values are a string with the name of the guide |
+| default_ctrl_shape  | dictionary  | none        | includes the key as 'rigtype_guidename' example ik_ankle, available shapes are 'cube', 'circle', 'locator' |
 
-```python
-system = ["joint_1","joint_2","joint_3"]
-# This variable is REQUIRED
-```
-#### system_pos: a list of translations of each joint from system.
-```python
-system_pos = {"joint_1": [X, Y, Z],"joint_2": [X, Y, Z],"joint_3": [X, Y, Z]}
-# This variable is REQUIRED
-```
-#### system_rot: a list of rotations of each joint from system.
-```python
-system_rot = {"joint_1": [X, Y, Z],"joint_2": [X, Y, Z],"joint_3": [X, Y, Z]}
-# This variable is REQUIRED
-```
-#### available_rig_types: a list of rig types available for module. Options are below.
-```python
-available_rig_types = ["FK","IK","FKIK"]
-# This variable is REQUIRED however can be one or more types.
-```
-#### ik_joints: which joints are needed for the ik handle
-```python
-ik_joints = {
-    "start_joint": "joint_1",
-    "end_joint": "joint_2",
-    "pv_joint": "joint_3",
-    "world_orientation": False
-}
-# This dictionary is only required if available_rig_types include IK or FKIK
-```
-#### side: which side of the rig.
-```python
-side = "_l"
-# This variable is REQUIRED.
-# Note: Currently only available on _l.
-```
-#### space_swapping: objects to be space swapped.
-```python
-space_swapping = ["joint_1","root","COG","Custom"]
-# This list is REQUIRED is available_rig_types include IK or FKIK.
-# Note: All object but custom must exist within the rig to work.
-```
-#### guide_scale: scale of guide curves.
-```python
-guide_scale = 1
-# This variable is REQUIRED.
-```
-#### reverse_foot: if reverse foot is required.
-```python
-reverse_foot = True
-# This variable is REQUIRED.
-```
-```python
-rev_locators = {
-    "foot_ctrl": system[2],
-    "ankle": system[2],
-    "ball": system[3],
-    "toe": system[4],
-    "heel": "heel",
-    "bank_in": "bank_in",
-    "bank_out": "bank_out",
-}
-# This dictionary is REQUIRED if reverse_foot is True.
-# Note: foot_ctrl, ankkle, ball, toe must exist within system.
-```
-#### default_ctrl_shape: default shape configuration
-
-```python
-default_ctrl_shape = {
-    "fk_wrist": "circle",
-    "ik_wrist": "cube"
-}
-
-# This dictionary is not required.
-# Note: dictionary key needs to be equal to type ik or fk _ guide name from system. Objects only need to be added if the default isnt a circle.
-```
-
-#### is_preset: module check.
-```python
-is_preset = true
-
-# This variable is not required.
-# Note: This is only required and set to true if you need a preset arragment.
-```
-
-#### modules_to_be_made: configuration of modules in preset
-```python
-modules_to_be_made = {"basic_root": ["basic_root", "parent"],
-                      "biped_spine": ["biped_spine", "COG"]}
-
-# This variable is REQUIRED
-# Note all keys in the dictionary must exist in module path
-
-```
-
-#### ignore_transforms: guide location
-```python
-ignore_transforms = True
-
-# This variable is REQUIRED
-```
-
-#### hide: hide in ui
-```python
-hide = True
-
-# This variable is REQURED
-```
-
-#### delete_end: fk ctrl end
-```python
-delete_end = True
-
-# This variable is OPTIONAL
-```
