@@ -270,13 +270,6 @@ class AddModule():
             # self.systems_to_be_made[master_guide] = temp_dict
             guide_data.setup(self.temp_dict, data_guide)
 
-            """if self.ui.add_hand.isChecked():
-                hand_module = hands.create_hands(guide_list[0],self.systems_to_be_made, self.created_guides, self.ui.fingers_amount.value())
-                self.systems_to_be_made = hand_module.get_dict()
-                self.created_guides = hand_module.get_created_guides()
-                self.ui.add_hand.setChecked(False)
-                self.systems_to_be_deleted_polished.append(hand_module.get_hand_grp_to_delete())"""
-
         cmds.select(clear=1)
 
     def return_data(self):
