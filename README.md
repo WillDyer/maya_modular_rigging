@@ -35,7 +35,7 @@ import maya_modular_rigging
 | `side`                | True        | string      | 'L'         | Side of rig the module was made on can be custom but recommended use is `'L'`, `'R'`, `'C'` |
 | `space_swapping`      | False       | list        | 'root', 'cog', 'Custom' | list of items that are available space swapping locations |
 | `guide_scale`         | True        | float       | 1           | scale of the guide for display purposes |
-| `available_rig_types` | list        | 'FK'        | Systems that are available to create on the module |
+| `available_rig_types` | True        | list        | 'FK'        | Systems that are available to create on the module |
 | `reverse_foot`        | False       | boolean     | False       | Boolean option to create reverse foot system on a module |
 | `rev_locators`        | False       | dictionary  | none        | Dictionary that includes `'foot_ctrl', 'ankle', 'ball', 'toe', 'heel', 'bank_in', 'bank_out'`, first 4 items must be guides from the system |
 | `twist_joints`        | False       | dictionary  | none        | Dictionary that includes `'start'` & `'end'` which values are a string with the name of the guide |
