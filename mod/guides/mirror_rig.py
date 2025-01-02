@@ -20,8 +20,8 @@ class mirror_data():
         tmp_guide_list = []
         connector_list = []
         for guide in self.key["guide_list"]:
-            loc = cmds.xform(guide, r=True, ws=True, q=True, t=True)
-            rot = cmds.xform(guide, r=True, ws=True, q=True, ro=True)
+            loc = cmds.xform(guide, ws=True, q=True, t=True)
+            rot = cmds.xform(guide, ws=True, q=True, ro=True)
 
             if "master" in guide:
                 guide_name = f"master_{self.side}{guide[8:]}"
@@ -44,7 +44,7 @@ class mirror_data():
         cmds.parent(tmp_guide_list, grp_name)
         cmds.xform(grp_name, scale=[-1,1,1])
         cmds.parent(tmp_guide_list, w=True)
-        cmds.makeIdentity(tmp_guide_list[-1], apply=True, s=True)
+        cmds.makeIdentity(tmp_guide_list, apply=True, s=True)
         cmds.delete(grp_name)
 
         for guide in range(len(tmp_guide_list)):
