@@ -40,4 +40,5 @@ import maya_modular_rigging
 | `rev_locators`        | False       | dictionary  | none        | Dictionary that includes `'foot_ctrl', 'ankle', 'ball', 'toe', 'heel', 'bank_in', 'bank_out'`, first 4 items must be guides from the system |
 | `twist_joints`        | False       | dictionary  | none        | Dictionary that includes `'start'` & `'end'` which values are a string with the name of the guide |
 | `default_ctrl_shape`  | False       | dictionary  | none        | includes the key as 'rigtype_guidename' example ik_ankle, available shapes are `'cube', 'circle', 'locator'` |
+| `module_to_be_made`   | False       | dictionary  | none        | includes the key as the module name and value as guide to connect to. naming needs to be exact |
 
