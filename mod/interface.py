@@ -269,31 +269,31 @@ class Interface(QWidget):
             if "root" in key["module"]: pass
             else:
                 if rig_type == "FK":
-                    fk_joint_list = joints.joint(orientation, master_guide, system="fk", )
+                    fk_joint_list = joints.joint(orientation, master_guide, system="fk", hide=True)
                     fk_module = fk.create_fk(fk_joint_list,master_guide,key["guide_scale"],delete_end=delete_end)
                     fk_ctrls = fk_module.get_ctrls()
                     utils.constraint_from_lists_1to1(fk_joint_list, key["joints"],maintain_offset=1)
                     key.update({"fk_joint_list": fk_joint_list, "fk_ctrl_list": fk_ctrls})
                 elif rig_type == "IK":
-                    ik_joint_list = joints.joint(orientation, master_guide, system="ik")
+                    ik_joint_list = joints.joint(orientation, master_guide, system="ik", hide=True)
                     ik_module = ik.create_ik(ik_joint_list,master_guide,module.ik_joints)
                     ik_ctrls = ik_module.get_ctrls()
                     ik_handle = ik_module.get_ik_hdl()
                     utils.constraint_from_lists_1to1(ik_joint_list, key["joints"],maintain_offset=1)
                     key.update({"ik_joint_list": ik_joint_list, "ik_ctrl_list": ik_ctrls, "ik_handle": ik_handle})
                 elif rig_type == "IK_Ribbon":
-                    ik_joint_list = joints.joint(orientation, master_guide, system="ik")
+                    ik_joint_list = joints.joint(orientation, master_guide, system="ik", hide=True)
                     key.update({"ik_joint_list": ik_joint_list})
                     ik_module = ribbon.create_ribbon(key, key["module"],ctrl_amount=3, ribbon_type="ik_ribbon", start_joint="", end_joint="", joint_list="")
                     key.update({"ik_ctrl_list": ik_module.get_ribbon_ctrls()})
                     utils.constraint_from_lists_1to1(ik_joint_list, key["joints"],maintain_offset=1)
                 elif rig_type == "FKIK":
-                    fk_joint_list = joints.joint(orientation, master_guide, system="fk")
+                    fk_joint_list = joints.joint(orientation, master_guide, system="fk", hide=True)
                     fk_module = fk.create_fk(fk_joint_list,master_guide,key["guide_scale"],delete_end=delete_end)
                     fk_ctrls = fk_module.get_ctrls()
                     key.update({"fk_joint_list": fk_joint_list, "fk_ctrl_list": fk_ctrls})
 
-                    ik_joint_list = joints.joint(orientation, master_guide, system="ik")
+                    ik_joint_list = joints.joint(orientation, master_guide, system="ik", hide=True)
                     ik_module = ik.create_ik(ik_joint_list,master_guide,module.ik_joints)
                     ik_ctrls = ik_module.get_ctrls()
                     ik_handle = ik_module.get_ik_hdl()

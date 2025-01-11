@@ -57,6 +57,8 @@ class create_ik():
                 except: pass
                 self.driver_joint_list.append(driver_joint)
 
+            cmds.hide(self.driver_joint_list[0])
+
             self.driver_joint_list.reverse()
             for joint in range(len(self.driver_joint_list)):
                 try: cmds.parent(self.driver_joint_list[joint], self.driver_joint_list[joint+1])
