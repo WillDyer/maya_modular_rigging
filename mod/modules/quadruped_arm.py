@@ -31,5 +31,5 @@ twist_joint = {
     "end": "metacarpal"
 }
 default_ctrl_shape = {
-    "ik_wrist": "cube"
+    "ik_palm": "cube"
 }
