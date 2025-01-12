@@ -16,7 +16,12 @@
 > - As I have switched to linux recently you might need to check the pathing if you are running a windows based machine.
 
 ```python
+from importlib import reload
 import maya_modular_rigging
+reload(maya_modular_rigging)
+
+maya_modular_rigging.start_interface()
+
 ```
 ### New Module Setup & Parameters
 
