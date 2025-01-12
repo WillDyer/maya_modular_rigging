@@ -100,11 +100,6 @@ class PrepSkeleton():
         # Reparent the final joint to joint2
         cmds.parent(self.joint2, previous_joint)
         cmds.parent(first_joint, self.joint1)
-        mirror_attribute = cmds.getAttr(f"{self.key['master_guide']}.mirror_orientation", asString=1)
-        if mirror_attribute == "Yes": sao_axis = f"{self.orientation[0]}down"
-        else: sao_axis = f"{self.orientation[0]}up"
-        cmds.joint(first_joint, edit=True, zso=1, oj="xyz", sao=sao_axis, ch=True)
-
         cmds.parent(self.joint2, self.joint1)
 
         for joint in tween_joint_list:
@@ -112,13 +107,13 @@ class PrepSkeleton():
 
         # twist joint1 & joint2
         self.joint1_twist = f"{self.joint1}_twist"
-        cmds.duplicate(self.joint1, parentOnly=True, n=self.joint1_twist)
+        self.make_joint(joint_name=self.joint1_twist, locator=self.joint1)
         parent_joint = cmds.listRelatives(f"{self.joint1}_twist", parent=True)
         if parent_joint: cmds.parent(f"{self.joint1}_twist", w=True)
         joint2_split = self.joint1.split("_")
         joint2_split.insert(2, f"tween{num_joints + 1}")
         self.joint2_twist = '_'.join(joint2_split)
-        cmds.duplicate(self.joint2, parentOnly=True, n=self.joint2_twist)
+        self.make_joint(joint_name=self.joint2_twist, locator=self.joint2)
         cmds.parent(self.joint2_twist, w=True)
         # tween_joint_list.append(joint2_twist)
 
@@ -148,6 +143,13 @@ class PrepSkeleton():
         }
 
         return return_data_dict
+
+    def make_joint(self, joint_name=None, locator=None):
+        loc = cmds.xform(locator, q=True, ws=True, t=True)  # Gather worldspace location
+        rot = cmds.xform(locator, q=True, ws=True, ro=True) # gather worldspace rotation
+        jnt_name = cmds.joint(n=f"{joint_name}", p=loc)  # create joint based off the location
+        cmds.xform(jnt_name, ws=True, ro=rot)
+        cmds.makeIdentity(jnt_name, apply=True, t=False, r=True, s=False)
 
 
 class CreateTwist():
