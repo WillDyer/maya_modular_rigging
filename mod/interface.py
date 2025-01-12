@@ -105,7 +105,7 @@ class Interface(QWidget):
         self.setStyleSheet(stylesheet)
 
         # set ui icon
-        icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"interface","images","UI_Logo.png")
+        icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"interface","images","LOGO.png")
         self.setWindowIcon(QIcon(icon_path))
 
     def check_existing_uis(self, UI_NAME):
@@ -405,7 +405,8 @@ class Interface(QWidget):
             cmds.setAttr("ui_data.ui_status", index)
 
 
-def main():
+def start_interface():
+    # if __name__ == "__main__":
     ui = Interface()
     ui.show()
     return ui
