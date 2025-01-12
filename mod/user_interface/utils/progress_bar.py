@@ -21,6 +21,7 @@ class ProgressBar(QWidget):
         self.setWindowFlags(Qt.Window)
         self.setWindowTitle("Progress")
         self.setObjectName("mod_progress")
+        self.setAutoFillBackground(True)
         self.range = range*10
         
         self.layout = QVBoxLayout(self)
@@ -30,12 +31,14 @@ class ProgressBar(QWidget):
         self.progress_bar.setValue(0)
         self.layout.addWidget(self.progress_bar)
         
-        self.label = QLabel("Launching Processes...")
+        self.label = QLabel()
         self.layout.addWidget(self.label)
 
         self.setLayout(self.layout)
         self.timer = QTimer(self)
-
+    
+    def showEvent(self, event):
+        super().showEvent(event)
         stylesheet_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"..","style","style.css")
         with open(stylesheet_path, "r") as file:
             stylesheet = file.read()
@@ -43,6 +46,8 @@ class ProgressBar(QWidget):
 
 
     def start_progress(self):
+        self.progress_bar.setValue(0)
+        self.label.setText("Launching Processes...")
         self.show()
         self.timer.start(100)
         
@@ -53,7 +58,9 @@ class ProgressBar(QWidget):
     
     def stop_progress(self):
         self.timer.stop()
+        self.setParent(None)
         self.close()
+        self.deleteLater()
 
     def update_label(self, text=None):
         self.label.setText(text)
