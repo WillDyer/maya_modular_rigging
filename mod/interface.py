@@ -271,8 +271,10 @@ class Interface(QWidget):
 
             module = importlib.import_module(f"mod.modules.{key['module']}")
             importlib.reload(module)
+
             try: delete_end = module.delete_end
             except AttributeError: delete_end = False
+
             if "root" in key["module"]:
                 pass
             else:
