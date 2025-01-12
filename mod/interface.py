@@ -3,10 +3,10 @@ from maya import OpenMayaUI as omui
 import importlib
 import os.path
 
-from mod.user_interface.utils import qtpyside
+from mod.user_interface.utils import qtpyside, progress_bar
 PySide, wrapInstance = qtpyside.get_version()
 
-from PySide.QtCore import Qt
+from PySide.QtCore import Qt, QTimer
 from PySide.QtGui import QIcon
 from PySide.QtWidgets import (QWidget,
                                QVBoxLayout,
@@ -23,7 +23,7 @@ from mod.rig.sub_systems import reverse_foot, reverse_foot_tmp, twist_joints, sq
 from mod.rig.utils import connect_modules, system_group, ikfk_switch, utils, hands
 from mod.guides import create_guides, guide_data, mirror_rig
 
-ui_pages = [module_settings, sidebar, page_utils]
+ui_pages = [module_settings, sidebar, page_utils, progress_bar]
 systems = [create_guides, hands, joints, twist_joints, ik, fk, ribbon, squash_and_stretch]
 system_util = [guide_data, mirror_rig, connect_modules, system_group, ikfk_switch, utils, reverse_foot, space_swap, reverse_foot_tmp]
 for module_list in [ui_pages, systems, system_util]:
@@ -147,7 +147,6 @@ class Interface(QWidget):
     def init_existingguides(self):
         guide_data_dict = guide_data.init_data()
         for key in guide_data_dict.values():
-            print(key)
             try: print(key['hidden_obj'])
             except KeyError: print(f"hidden_obj dont exist on {key['master_guide']}")
 
@@ -176,10 +175,18 @@ class Interface(QWidget):
         module_path = importlib.import_module(f"mod.modules.{module}")
         importlib.reload(module_path)
         if module_path.is_preset is True:
-            for module in module_path.module_to_be_made.keys():
-                self.add_module_instance(module, preset=module_path)
+            progressbar = progress_bar.ProgressBar(range=len(module_path.module_to_be_made))
+            progressbar.start_progress()
+            QTimer.singleShot(1000, lambda: self.add_module_presets(module_path, progressbar))
         else:
             self.add_module_instance(module, preset=None)
+
+    def add_module_presets(self, module_path, progressbar):
+        for module in module_path.module_to_be_made.keys():
+            progressbar.update_label(text=f"Making guides: {module}")
+            self.add_module_instance(module, preset=module_path)
+            progressbar.update_progress()
+        progressbar.stop_progress()
 
     def add_module_instance(self, module, preset):
         createdmodule_instance = module_settings.AddModule(module, preset)
@@ -255,26 +262,29 @@ class Interface(QWidget):
 
         cmds.select(cl=1)
 
-    def create_rig(self):
+    def create_rig(self, progressbar):
         for key in self.systems_to_be_made.values():
+            progressbar.update_label(text=f"Making Module: {key['module']}")
             master_guide = key['master_guide']
             rig_type = cmds.getAttr(f"{master_guide}.{master_guide}_rig_type", asString=1)
             orientation = "xyz"
 
-            # sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),"systems","modules"))
             module = importlib.import_module(f"mod.modules.{key['module']}")
             importlib.reload(module)
             try: delete_end = module.delete_end
             except AttributeError: delete_end = False
-            if "root" in key["module"]: pass
+            if "root" in key["module"]:
+                pass
             else:
                 if rig_type == "FK":
+                    progressbar.update_label(text=f"Making FK {key['module']}...")
                     fk_joint_list = joints.joint(orientation, master_guide, system="fk", hide=True)
                     fk_module = fk.create_fk(fk_joint_list,master_guide,key["guide_scale"],delete_end=delete_end)
                     fk_ctrls = fk_module.get_ctrls()
                     utils.constraint_from_lists_1to1(fk_joint_list, key["joints"],maintain_offset=1)
                     key.update({"fk_joint_list": fk_joint_list, "fk_ctrl_list": fk_ctrls})
                 elif rig_type == "IK":
+                    progressbar.update_label(text=f"Making IK {key['module']}...")
                     ik_joint_list = joints.joint(orientation, master_guide, system="ik", hide=True)
                     ik_module = ik.create_ik(ik_joint_list,master_guide,module.ik_joints)
                     ik_ctrls = ik_module.get_ctrls()
@@ -282,17 +292,20 @@ class Interface(QWidget):
                     utils.constraint_from_lists_1to1(ik_joint_list, key["joints"],maintain_offset=1)
                     key.update({"ik_joint_list": ik_joint_list, "ik_ctrl_list": ik_ctrls, "ik_handle": ik_handle})
                 elif rig_type == "IK_Ribbon":
+                    progressbar.update_label(text=f"Making IK Ribbon {key['module']}...")
                     ik_joint_list = joints.joint(orientation, master_guide, system="ik", hide=True)
                     key.update({"ik_joint_list": ik_joint_list})
                     ik_module = ribbon.create_ribbon(key, key["module"],ctrl_amount=3, ribbon_type="ik_ribbon", start_joint="", end_joint="", joint_list="")
                     key.update({"ik_ctrl_list": ik_module.get_ribbon_ctrls()})
                     utils.constraint_from_lists_1to1(ik_joint_list, key["joints"],maintain_offset=1)
                 elif rig_type == "FKIK":
+                    progressbar.update_label(text=f"Making FK {key['module']}...")
                     fk_joint_list = joints.joint(orientation, master_guide, system="fk", hide=True)
                     fk_module = fk.create_fk(fk_joint_list,master_guide,key["guide_scale"],delete_end=delete_end)
                     fk_ctrls = fk_module.get_ctrls()
                     key.update({"fk_joint_list": fk_joint_list, "fk_ctrl_list": fk_ctrls})
-
+                    
+                    progressbar.update_label(text=f"Making IK {key['module']}...")
                     ik_joint_list = joints.joint(orientation, master_guide, system="ik", hide=True)
                     ik_module = ik.create_ik(ik_joint_list,master_guide,module.ik_joints)
                     ik_ctrls = ik_module.get_ctrls()
@@ -307,6 +320,7 @@ class Interface(QWidget):
                 if rig_type == "FKIK" or rig_type == "IK":
                     try:
                         if key["rev_locators"]:
+                            progressbar.update_label(text=f"Making reverse foot for {key['module']}...")
                             if module.ik_joints["ik_type"] == "quadruped":
                                 reverse_foot_instance = reverse_foot_tmp.CreateReverseFootQuadruped(key["module"],key)
                             if module.ik_joints["ik_type"] == "biped":
@@ -318,11 +332,17 @@ class Interface(QWidget):
                         squash_and_stretch_instance = squash_and_stretch.CreateSquashAndStretch(key, module.ik_joints)
 
                 if cmds.getAttr(f"{master_guide}.{master_guide}_twist_jnts", asString=True) == "Yes":
+                    progressbar.update_label(text=f"Creating twist joints for {key['module']}...")
                     twist_joints.CreateTweaks(tweak_joint_dict=key["tweak_dict"])
+            
+            progressbar.update_label(text=f"Completed {key['module']}")
+            progressbar.update_progress()
 
         rig_name = self.sidebar_widget.findChild(QLineEdit, "rig_name")
         system_group.grpSetup(rig_name.text())
         cmds.setAttr("ui_data.rig_name", str(rig_name.text()), type="string")
+        
+        progressbar.stop_progress()
 
         for key in self.systems_to_be_made.values():  # seperate loop to be sure systems are made before connecting
             rig_type = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_rig_type", asString=1)
@@ -388,12 +408,14 @@ class Interface(QWidget):
                 self.create_joints()
 
         elif button == "rig":
+            progress = progress_bar.ProgressBar(range=len(self.systems_to_be_made))
+            progress.start_progress()
             if self.last_selected_button == "guides":
-                self.create_joints()
-                utils.hide_guides(self.systems_to_be_made, self.created_guides, module_widget=self.module_widget, hidden=True)
-                self.create_rig()
+                QTimer.singleShot(100, lambda: self.create_joints())
+                QTimer.singleShot(100, lambda: utils.hide_guides(self.systems_to_be_made, self.created_guides, module_widget=self.module_widget, hidden=True))
+                QTimer.singleShot(800, lambda: self.create_rig(progressbar=progress))
             elif self.last_selected_button == "skeleton":
-                self.create_rig()
+                QTimer.singleShot(1000, lambda: self.create_rig())
             elif self.last_selected_button == "polish":
                 cmds.warning("Rig has been polished past data has been deleted")
 
@@ -406,7 +428,6 @@ class Interface(QWidget):
 
 
 def start_interface():
-    # if __name__ == "__main__":
     ui = Interface()
     ui.show()
     return ui
