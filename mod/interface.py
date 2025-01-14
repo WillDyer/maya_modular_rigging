@@ -175,7 +175,7 @@ class Interface(QWidget):
         module_path = importlib.import_module(f"mod.modules.{module}")
         importlib.reload(module_path)
         if module_path.is_preset is True:
-            progressbar = progress_bar.ProgressBar(range=len(module_path.module_to_be_made))
+            progressbar = progress_bar.ProgressBar(range=len(module_path.module_to_be_made), parent_widget=self)
             progressbar.start_progress()
             QTimer.singleShot(1000, lambda: self.add_module_presets(module_path, progressbar))
         else:
@@ -410,14 +410,14 @@ class Interface(QWidget):
                 self.create_joints()
 
         elif button == "rig":
-            progress = progress_bar.ProgressBar(range=len(self.systems_to_be_made))
+            progress = progress_bar.ProgressBar(range=len(self.systems_to_be_made), parent_widget=self)
             progress.start_progress()
             if self.last_selected_button == "guides":
                 QTimer.singleShot(100, lambda: self.create_joints())
                 QTimer.singleShot(100, lambda: utils.hide_guides(self.systems_to_be_made, self.created_guides, module_widget=self.module_widget, hidden=True))
                 QTimer.singleShot(800, lambda: self.create_rig(progressbar=progress))
             elif self.last_selected_button == "skeleton":
-                QTimer.singleShot(1000, lambda: self.create_rig())
+                QTimer.singleShot(1000, lambda: self.create_rig(progressbar=progress))
             elif self.last_selected_button == "polish":
                 cmds.warning("Rig has been polished past data has been deleted")
 

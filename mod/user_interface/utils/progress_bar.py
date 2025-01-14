@@ -1,10 +1,11 @@
 import os
 from maya import OpenMayaUI as omui
+import maya.cmds as cmds
 
 from mod.user_interface.utils import qtpyside
 PySide, wrapInstance = qtpyside.get_version()
 
-from PySide.QtCore import Qt, QTimer
+from PySide.QtCore import Qt, QTimer, QElapsedTimer
 from PySide.QtWidgets import (
         QWidget,
         QProgressBar,
@@ -13,29 +14,37 @@ from PySide.QtWidgets import (
         )
 
 class ProgressBar(QWidget):
-    def __init__(self, range=None):
-        super().__init__()
-        mayaMainWindowPtr = omui.MQtUtil.mainWindow()
-        mayaMainWindow = wrapInstance(int(mayaMainWindowPtr), QWidget)
-        self.setParent(mayaMainWindow)
-        self.setWindowFlags(Qt.Window)
+    def __init__(self, range=None, parent_widget=None):
+        super().__init__(parent_widget)
+        self.delete_old_ui()
+
+        self.setWindowFlags(Qt.Window | Qt.WindowStaysOnTopHint)
         self.setWindowTitle("Progress")
         self.setObjectName("mod_progress")
         self.setAutoFillBackground(True)
         self.range = range*10
-        
+
+        self.init_ui()
+
+    def init_ui(self): 
         self.layout = QVBoxLayout(self)
 
         self.progress_bar = QProgressBar()
         self.progress_bar.setRange(0, self.range)
         self.progress_bar.setValue(0)
         self.layout.addWidget(self.progress_bar)
-        
         self.label = QLabel()
         self.layout.addWidget(self.label)
+        self.elapsed_timer = QElapsedTimer()
 
         self.setLayout(self.layout)
         self.timer = QTimer(self)
+        self.update()
+
+    def delete_old_ui(self):
+        if cmds.window("mod_progress", exists=True):
+            cmds.deleteUI("mod_progress", window=True)
+
     
     def showEvent(self, event):
         super().showEvent(event)
@@ -49,16 +58,22 @@ class ProgressBar(QWidget):
         self.progress_bar.setValue(0)
         self.label.setText("Launching Processes...")
         self.show()
+        self.elapsed_timer.start()
         self.timer.start(100)
         
     def update_progress(self):
         current_value = self.progress_bar.value()
         if current_value < self.range:
             self.progress_bar.setValue(current_value + 10)
+            self.update()
     
     def stop_progress(self):
         self.timer.stop()
-        self.setParent(None)
+        elapsed_time_ms = self.elapsed_timer.elapsed()
+        elapsed_time_sec = elapsed_time_ms / 1000.0
+        print(f"Task completed in {elapsed_time_sec:.2f} seconds")
+
+        self.hide()
         self.close()
         self.deleteLater()
 
