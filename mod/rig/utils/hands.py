@@ -85,10 +85,10 @@ class create_hands():
 
         # Calculate the spacing between the curves
         spacing = 2
-        total_width = (num_curves - 1) * spacing  # Adjust 1.0 to your desired spacing
+        total_width = (num_curves - 1) * spacing
         start_z = - (total_width / 2.0)
 
-        # Distribute the curves along the X-axis
+        # Distribute curves along X-axis
         for i, curve in enumerate(self.hand_master_guides):
             initial_x, initial_y, initial_z = initial_positions[i]
             new_z = start_z + i * spacing
