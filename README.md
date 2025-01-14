@@ -11,9 +11,8 @@
 ### Running The Tool
 
 > [!WARNING]
-> - All tools are designed to be either run through the Maya script editor or a shelf tool and can be ran with a similar code to the below.<br>
-> - See each individual sub-folder for the specific run code.<br>
-> - As I have switched to linux recently you might need to check the pathing if you are running a windows based machine.
+> - This tool was developed alongside a university degree and will likely not be production ready.
+> - Tool is designed to be ran through maya.
 
 ```python
 from importlib import reload
