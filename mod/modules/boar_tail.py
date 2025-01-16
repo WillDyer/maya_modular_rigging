@@ -8,3 +8,4 @@ side = "C"
 guide_scale = 1
 space_swapping = []
 available_rig_types = ["FK"]
+locked_guide_attr = ["translateZ"]

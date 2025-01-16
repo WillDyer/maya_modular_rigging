@@ -18,3 +18,4 @@ available_rig_types = ["FK","IK_Ribbon"]
 default_ctrl_shape = {
     "fk_head": "cube"
 }
+locked_guide_attr = ["translateY"]
