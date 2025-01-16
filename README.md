@@ -36,7 +36,7 @@ maya_modular_rigging.start_interface()
 | `system_pos`          | True        | dictionary  | none        | Dictionary that includes the name as the key and a value that is a list with the XYZ world space location |
 | `system_pos`          | True        | dictionary  | none        | Dictionary that includes the name as the key and a value that is a list with the XYZ world space rotation |
 | `ik_joints`           | False       | dictionary  | none        | Dictionary that includes `'start_joint', 'end_joint', 'pv_joint', 'hock', world_orientation'(bool), 'ik_type'` as keys  and the values include the name of the guide that describes each item |
-| `side`                | True        | string      | 'L'         | Side of rig the module was made on can be custom but recommended use is `'L'`, `'R'`, `'C'` |
+| `side`                | True        | string      | 'L'         | Side of rig options are the following: `'L'`, `'R'`, `'C'`. Others can be tried but will return unexpected outcomes |
 | `space_swapping`      | False       | list        | 'root', 'cog', 'Custom' | list of items that are available space swapping locations |
 | `guide_scale`         | True        | float       | 1           | scale of the guide for display purposes |
 | `available_rig_types` | True        | list        | 'FK'        | Systems that are available to create on the module |
@@ -45,4 +45,5 @@ maya_modular_rigging.start_interface()
 | `twist_joints`        | False       | dictionary  | none        | Dictionary that includes `'start'` & `'end'` which values are a string with the name of the guide |
 | `default_ctrl_shape`  | False       | dictionary  | none        | includes the key as 'rigtype_guidename' example ik_ankle, available shapes are `'cube', 'circle', 'locator'` |
 | `module_to_be_made`   | False       | dictionary  | none        | includes the key as the module name and value as guide to connect to. naming needs to be exact |
+| `locked_guide_attr`   | False       | list        | none        | A list of attributes to lock on guide creation, typically used for central guides locking attrs to stop guides being off centre |
 
