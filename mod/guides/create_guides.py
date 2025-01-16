@@ -76,15 +76,16 @@ class Guides():
         COLOR_CONFIG = {'l': 6, 'r': 13, 'default': 22}
         guide_list = []
         root_exists = False
-
-        if self.module.side == "None":
-            side = ""
-        else:
-            side = self.module.side
-
         number = "0"
         tmp_list = []
         module_list = cmds.ls("data*")
+
+
+        try:
+            side = self.module.side
+        except AttributeError as e:
+            cmds.error(f"create_guides: Missing {e}")
+
         for object in module_list:
             if "Shape" in object:
                 pass
@@ -145,7 +146,7 @@ class Guides():
             except RuntimeError:
                 print("Couldnt load file using basic shapes instead")
                 cmds.spaceLocator(n=x)
-            print(guide_list)
+
             # set location of guide crvs then OPM
             pos = self.module.system_pos[x]
             rot = self.module.system_rot[x]
@@ -173,9 +174,10 @@ class Guides():
             cmds.setAttr("grp_connector_clusters.hiddenInOutliner", True)
 
         # create data guide
-        #if "root" in self.module.system or "proximal" in self.module.system: data_guide_name = f"data_{master_guide}"
-        if "root" in self.module.system or "proximal" in self.module.system: data_guide_name = f"data_{side}{number}_{accessed_module}"
-        else: data_guide_name = master_guide.replace("master_", "data_")
+        if "root" in self.module.system or "proximal" in self.module.system:
+            data_guide_name = f"data_{side}{number}_{accessed_module}"
+        else:
+            data_guide_name = master_guide.replace("master_", "data_")
         cmds.spaceLocator(n=data_guide_name)
         cmds.matchTransform(data_guide_name, master_guide)
         cmds.parent(data_guide_name, master_guide)
@@ -203,6 +205,8 @@ class Guides():
                     control_shape_list = control_shape_instance.return_list()
                     control_shape_en = ":".join(control_shape_list)
                     cmds.addAttr(guide,ln=f"{guide}_{fkik}_control_shape",at="enum",en=control_shape_en,k=1)
+
+                self.lock_movement(obj=guide)
 
         ui_dict = {
             "master_guide": master_guide,
@@ -255,3 +259,12 @@ class Guides():
         else:
             for i in custom_attrs: add_new_attr()
             add_proxy(system[:-1],skip_attr=[],proxy_item=system[-1],add_missing=False)
+
+    def lock_movement(self, obj=None):
+        try:
+            locked_attrs = self.module.locked_guide_attr
+            for attr in locked_attrs:
+                cmds.setAttr(f"{obj}.{attr}", lock=True)
+        except AttributeError:
+            pass
+
