@@ -42,7 +42,7 @@ class Interface(QWidget):
         self.systems_to_be_made = {}
         self.created_guides = []
         self.systems_to_be_deleted_polished = []
-        
+
         self.check_existing_uis(UI_NAME)
         self.setParent(mayaMainWindow)
         self.setWindowFlags(Qt.Window)
@@ -225,6 +225,8 @@ class Interface(QWidget):
 
         mirror_module = mirror_rig.mirror_data(self.systems_to_be_made, orientation)
         self.systems_to_be_made = mirror_module.get_mirror_data()
+        for x in self.systems_to_be_made.values():
+            print(f"post mirror: {x['master_guide']}")
         created_guides = [key["master_guide"] for key in self.systems_to_be_made.values()]
 
         rig_jnt_list = joints.get_joint_list(orientation,created_guides, system="rig")
@@ -414,7 +416,7 @@ class Interface(QWidget):
             progress.start_progress()
             if self.last_selected_button == "guides":
                 QTimer.singleShot(100, lambda: self.create_joints())
-                QTimer.singleShot(100, lambda: utils.hide_guides(self.systems_to_be_made, self.created_guides, module_widget=self.module_widget, hidden=True))
+                QTimer.singleShot(200, lambda: utils.hide_guides(self.systems_to_be_made, self.created_guides, module_widget=self.module_widget, hidden=True))
                 QTimer.singleShot(800, lambda: self.create_rig(progressbar=progress))
             elif self.last_selected_button == "skeleton":
                 QTimer.singleShot(1000, lambda: self.create_rig(progressbar=progress))

@@ -83,8 +83,8 @@ class CreateReverseLocators():
 
 class CreateReverseFootQuadruped():
     def __init__(self, accessed_module, system):
-        self.attr_list = ["Rev_Foot_Dvdr","Roll","Bank","Heel_Twist","Toe_Twist"]
-        self.module = importlib.import_module(f"mod.modules.{accessed_module}")
+        self.accessed_module = accessed_module
+        self.module = importlib.import_module(f"mod.modules.{self.accessed_module}")
         importlib.reload(self.module)
         self.system = system
         self.tmp_locator_list = []
@@ -103,9 +103,11 @@ class CreateReverseFootQuadruped():
         }
 
         self.create_system()
-        self.lock_attr(obj=f"ctrl_{self.reverse_foot_data['bank_in']}", attr_list=["tx","ty","tz","rx","ry"])
-        self.lock_attr(obj=f"ctrl_{self.reverse_foot_data['bank_out']}", attr_list=["tx","ty","tz","rx","ry"])
-        self.lock_attr(obj=f"ctrl_{self.reverse_foot_data['loc_heel']}", attr_list=["tx","ty","tz","rx","rz"])
+        self.lock_attr(obj=f"ctrl_{self.reverse_foot_data['bank_in']}", attr_list=["tx","ty","tz","rx","ry","sx","sy","sz"])
+        self.lock_attr(obj=f"ctrl_{self.reverse_foot_data['bank_out']}", attr_list=["tx","ty","tz","rx","ry","sx","sy","sz"])
+        self.lock_attr(obj=f"ctrl_{self.reverse_foot_data['loc_heel']}", attr_list=["tx","ty","tz","rx","rz","sx","sy","sz"])
+        self.lock_attr(obj=f"ctrl_{self.reverse_foot_data['loc_toe']}", attr_list=["tx","ty","tz","sx","sy","sz"])
+        cmds.hide(self.reverse_foot_data["loc_heel"])
 
     def side(self):
         side = self.system['side']
@@ -168,16 +170,11 @@ class CreateReverseFootQuadruped():
                 for axis in ["X","Y","Z"]:
                     cmds.connectAttr(f"{ctrl}.rotate{axis}", f"{connection_object}.rotate{axis}")
 
-        print(f"LOCATER: ctrl_{self.reverse_foot_data['loc_toe']} to {self.jnt_list[2]}")
-        # cmds.connectAttr(f"ctrl_{self.reverse_foot_data['loc_toe']}.rotateX", f"jnt{self.reverse_foot_data['loc_toe'][3:]}.rotateY",f=1)
-        # cmds.connectAttr(f"ctrl_{self.reverse_foot_data['loc_toe']}.rotateY", f"jnt{self.reverse_foot_data['loc_toe'][3:]}.rotateZ",f=1)
-        # cmds.connectAttr(f"ctrl_{self.reverse_foot_data['loc_toe']}.rotateZ", f"jnt{self.reverse_foot_data['loc_toe'][3:]}.rotateX",f=1)
-
-        '''
-        NOTE:
-            - MAKE REVERSE NODE FOR X AND Z ON TOE
-        '''
-
+        reverse_node = cmds.createNode("reverse", n=f"{self.accessed_module}_revfoot_reverse", ss=True)
+        cmds.connectAttr(f"ctrl_{self.reverse_foot_data['loc_toe']}.rotateX", f"{reverse_node}.inputX", force=True)
+        cmds.connectAttr(f"ctrl_{self.reverse_foot_data['loc_toe']}.rotateZ", f"{reverse_node}.inputZ", force=True)
+        cmds.connectAttr(f"{reverse_node}.outputX", f"jnt{self.reverse_foot_data['loc_toe'][3:]}.rotateX", force=True)
+        cmds.connectAttr(f"{reverse_node}.outputZ", f"jnt{self.reverse_foot_data['loc_toe'][3:]}.rotateZ", force=True)
 
 
         cmds.aimConstraint(f"jnt{self.reverse_foot_data['loc_ball'][3:]}",f"{self.jnt_list[0]}_driver", mo=False, aim=(1.0,0.0,0.0),u=(1.0,0.0,0.0),wu=(0.0,1.0,0.0))
@@ -316,6 +313,8 @@ class CreateReverseFootBiped():
         side = self.side()
         bank_in = self.reverse_foot_data["bank_in"]
         bank_out = self.reverse_foot_data["bank_out"]
+        OPM.offsetParentMatrix(ctrl=bank_in)
+        OPM.offsetParentMatrix(ctrl=bank_out)
 
         # BANK IN OUT
         bank_in_node = self.create_condition_node(f"cond_{bank_in}")
@@ -329,7 +328,7 @@ class CreateReverseFootBiped():
             math_node = cmds.shadingNode("floatMath",au=1,n=f"math_{x}")
 
             cmds.connectAttr(f"{condition_node}.outColorR",f"{math_node}.floatA")
-            cmds.connectAttr(f"{math_node}.outFloat",f"{x}.rotateX")
+            cmds.connectAttr(f"{math_node}.outFloat",f"{x}.rotateZ")
 
             cmds.setAttr(f"{math_node}.operation",2)
             cmds.setAttr(f"{math_node}.floatB",2.5)

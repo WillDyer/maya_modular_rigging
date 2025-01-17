@@ -85,11 +85,9 @@ def colour_controls(ctrl_list,colour_dict):
 
 
 def get_joints_between(start_joint, end_joint):
-    # Ensure both joints exist
     if not cmds.objExists(start_joint) or not cmds.objExists(end_joint):
-        raise ValueError("One or both of the specified joints do not exist.")
+        raise ValueError("utils get_joints_between: One or both of the specified joints do not exist.")
 
-    # Get the full path for both joints
     start_path = cmds.ls(start_joint, long=True)[0]
     end_path = cmds.ls(end_joint, long=True)[0]
 
@@ -123,13 +121,15 @@ def get_joints_between(start_joint, end_joint):
 def hide_guides(systems_to_be_made, created_guides, module_widget, hidden):
     if hidden is True:
         for key in systems_to_be_made.values():
+            print(f"hiding {key['module']}")
             cmds.hide(key["hidden_obj"])
             cmds.setAttr(f"{key['hidden_obj']}.hiddenInOutliner", True)
             try:
                 if key["rev_locators"]:
                     cmds.hide(f"grp_{key['rev_locators'][3]}")
                     cmds.setAttr(f"grp_{key['rev_locators'][3]}.hiddenInOutliner", True)
-            except KeyError: pass
+            except Exception as e:
+                cmds.warning(f"hide_guides: couldnt hide module. {e}")
         cmds.hide("grp_connector_clusters")
     else:
         for key in systems_to_be_made.values():
@@ -139,7 +139,8 @@ def hide_guides(systems_to_be_made, created_guides, module_widget, hidden):
                 if key["rev_locators"]:
                     cmds.showHidden(f"grp_{key['rev_locators'][3]}")
                     cmds.setAttr(f"grp_{key['rev_locators'][3]}.hiddenInOutliner", False)
-            except KeyError: pass
+            except Exception as e:
+                cmds.warning(f"hide_guides: couldnt unhide module. {e}")
         cmds.showHidden("grp_connector_clusters")
         for module in created_guides:
             pushButton = module_widget.findChild(QPushButton, f"button_remove_{module}")
