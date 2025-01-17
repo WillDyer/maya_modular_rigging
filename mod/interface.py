@@ -19,13 +19,13 @@ from PySide.QtWidgets import (QWidget,
 
 from mod.user_interface.pages import module_settings, sidebar, page_utils
 from mod.rig.systems import joints, ik, fk, ribbon
-from mod.rig.sub_systems import reverse_foot, reverse_foot_tmp, twist_joints, squash_and_stretch, space_swap
+from mod.rig.sub_systems import reverse_foot, twist_joints, squash_and_stretch, space_swap
 from mod.rig.utils import connect_modules, system_group, ikfk_switch, utils, hands
 from mod.guides import create_guides, guide_data, mirror_rig
 
 ui_pages = [module_settings, sidebar, page_utils, progress_bar]
 systems = [create_guides, hands, joints, twist_joints, ik, fk, ribbon, squash_and_stretch]
-system_util = [guide_data, mirror_rig, connect_modules, system_group, ikfk_switch, utils, reverse_foot, space_swap, reverse_foot_tmp]
+system_util = [guide_data, mirror_rig, connect_modules, system_group, ikfk_switch, utils, reverse_foot, space_swap]
 for module_list in [ui_pages, systems, system_util]:
     for module in module_list:    
         importlib.reload(module)
@@ -324,9 +324,9 @@ class Interface(QWidget):
                         if key["rev_locators"]:
                             progressbar.update_label(text=f"Making reverse foot for {key['module']}...")
                             if module.ik_joints["ik_type"] == "quadruped":
-                                reverse_foot_instance = reverse_foot_tmp.CreateReverseFootQuadruped(key["module"],key)
+                                reverse_foot_instance = reverse_foot.CreateReverseFootQuadruped(key["module"],key)
                             if module.ik_joints["ik_type"] == "biped":
-                                reverse_foot_instance = reverse_foot_tmp.CreateReverseFootBiped(key["module"],key)
+                                reverse_foot_instance = reverse_foot.CreateReverseFootBiped(key["module"],key)
                     except KeyError:
                         print(f"Didnt find rev_locators in key not making reverse foot for: {key}")
                     squash_stretch_attr = cmds.getAttr(f"{master_guide}.{master_guide}_squash_stretch", asString=True)
