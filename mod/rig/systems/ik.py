@@ -21,6 +21,7 @@ class create_ik():
         cmds.group(ik_joint_list[0],n=f"grp_ik_jnts_{master_guide}",w=1)
         if self.validation_joints["ik_type"] == "quadruped":
             cmds.parent(self.driver_joint_list[-1], f"grp_ik_jnts_{master_guide}")
+            cmds.parent(self.quad_joint_list[-1], f"grp_ik_jnts_{master_guide}")
 
     def ik_system(self, ik_joint_list):
         self.other_joints = []
@@ -46,16 +47,24 @@ class create_ik():
         elif self.validation_joints["ik_type"] == "quadruped":
             self.driver_joint_list = []
             self.quad_joint_list = []
+            hock_joint = [joint for joint in ik_joint_list if self.validation_joints["hock"] in joint][0]
 
             for joint in ik_joint_list:
                 driver_joint = cmds.duplicate(joint, n=f"{joint}_driver", parentOnly=True)[0]
-                try: cmds.parent(driver_joint, w=True)  # catches obj if parented to world already
-                except: pass
+                try:
+                    if not cmds.listRelatives(driver_joint, parent=True):
+                        cmds.parent(driver_joint, w=True)
+                        print(f"parented {driver_joint} to world")
+                except Exception:
+                    pass
                 self.driver_joint_list.append(driver_joint)
 
                 quad_joint = cmds.duplicate(joint, n=f"{joint}_quad", parentOnly=True)[0]
-                try: cmds.parent(driver_joint, w=True) # catches obj if parented to world already
-                except: pass
+                try:
+                    if not cmds.listRelativess(quad_joint, parent=True):
+                        cmds.parent(quad_joint, w=True)
+                except Exception:
+                    pass
                 self.quad_joint_list.append(quad_joint)
 
             cmds.hide(self.driver_joint_list[0])
@@ -71,13 +80,12 @@ class create_ik():
                 try: cmds.parent(self.quad_joint_list[joint], self.quad_joint_list[joint+1])
                 except IndexError: pass
 
-            hock_joint = [joint for joint in self.quad_joint_list if self.validation_joints["hock"] in joint][0]
             self.collect_other_controls(ik_joint_list)
             pv_ctrl = self.create_pv()
 
             root_ctrl = self.create_top_hdl_ctrl()
-            hock_ctrl = self.create_handle(f"{self.start_joint}_quad", hock_joint, solver="ikRPsolver", pv=True, constrain=False)
-            single_chain = cmds.ikHandle(sj=hock_joint, ee=f"{self.end_joint}_quad", solver="ikSCsolver", n=f"ik_hdl_sc_{self.end_joint}")[0]
+            hock_ctrl = self.create_handle(f"{self.start_joint}_quad", f"{hock_joint}_quad", solver="ikRPsolver", pv=True, constrain=False)
+            single_chain = cmds.ikHandle(sj=f"{hock_joint}_quad", ee=f"{self.end_joint}_quad", solver="ikSCsolver", n=f"ik_hdl_sc_{self.end_joint}")[0]
 
             hdl_ctrl = self.create_handle(f"{self.start_joint}_driver", f"{self.end_joint}_driver", solver="ikSpringSolver", pv=False, constrain=True)
             
@@ -91,15 +99,23 @@ class create_ik():
 
             grp = cmds.group(n=f"hdl_ik_{hock_joint[7:]}_offset", em=1, p=f"{hock_joint}_driver")
             cmds.matchTransform(grp, hdl_ctrl)
-            cmds.parent(f"hdl_ik_{hock_joint[7:]}", grp)
-            cmds.parentConstraint(hock_ctrl, grp, mo=1, n=f"pConst_{hock_ctrl}")
+            cmds.parent(f"hdl_ik_{hock_joint[7:]}_quad", grp)
+            cmds.parentConstraint(hock_ctrl, grp, mo=1, n=f"pConst_{hock_ctrl}_quad")
 
             cmds.parent(single_chain, f"{self.end_joint}_driver")
-            cmds.parentConstraint(root_ctrl, self.driver_joint_list[-1], mo=1, n=f"pConst_{self.driver_joint_list[-1]}")
+            cmds.parentConstraint(root_ctrl, self.driver_joint_list[-1], mo=1, n=f"pConst_{self.driver_joint_list[-1]}_quad")
             OPM.offsetParentMatrix(hock_ctrl)
             above_ctrls = self.above_root_ctrl()
+            
             cmds.setAttr(f"{hock_ctrl}.translate", lock=True)
-            for xyz in ["X","Y","Z"]: cmds.setAttr(f"{hock_ctrl}.translate{xyz}", keyable=False, cb=False)
+            for xyz in ["X","Y","Z"]:
+                cmds.setAttr(f"{hock_ctrl}.translate{xyz}", keyable=False, cb=False)
+            
+            parent_list = utils.get_joints_between(start_joint=self.start_joint, end_joint=self.end_joint)
+            parent_list.remove(self.end_joint)
+            for joint in parent_list:
+                cmds.parentConstraint(f"{joint}_quad", joint, n=f"pConst_{joint}_quad", mo=True)
+
             cmds.hide(self.driver_joint_list[-1])
         else:
             cmds.error("ik_type is invalid. Ik rig not made")
