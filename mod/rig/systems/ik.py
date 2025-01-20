@@ -8,8 +8,6 @@ importlib.reload(pole_vector)
 importlib.reload(utils)
 importlib.reload(control_shape)
 
-# CLEAN THIS FILE UP
-
 
 class create_ik():
     def __init__(self, ik_joint_list,master_guide,validation_joints):
@@ -47,9 +45,7 @@ class create_ik():
 
         elif self.validation_joints["ik_type"] == "quadruped":
             self.driver_joint_list = []
-            hock_joint = [joint for joint in ik_joint_list if self.validation_joints["hock"] in joint][0]
-            self.collect_other_controls(ik_joint_list)
-            pv_ctrl = self.create_pv()
+            self.quad_joint_list = []
 
             for joint in ik_joint_list:
                 driver_joint = cmds.duplicate(joint, n=f"{joint}_driver", parentOnly=True)[0]
@@ -57,19 +53,33 @@ class create_ik():
                 except: pass
                 self.driver_joint_list.append(driver_joint)
 
+                quad_joint = cmds.duplicate(joint, n=f"{joint}_quad", parentOnly=True)[0]
+                try: cmds.parent(driver_joint, w=True) # catches obj if parented to world already
+                except: pass
+                self.quad_joint_list.append(quad_joint)
+
             cmds.hide(self.driver_joint_list[0])
+            cmds.hide(self.quad_joint_list[0])
 
             self.driver_joint_list.reverse()
             for joint in range(len(self.driver_joint_list)):
                 try: cmds.parent(self.driver_joint_list[joint], self.driver_joint_list[joint+1])
                 except IndexError: pass
 
+            self.quad_joint_list.reverse()
+            for joint in range(len(self.quad_joint_list)):
+                try: cmds.parent(self.quad_joint_list[joint], self.quad_joint_list[joint+1])
+                except IndexError: pass
+
+            hock_joint = [joint for joint in self.quad_joint_list if self.validation_joints["hock"] in joint][0]
+            self.collect_other_controls(ik_joint_list)
+            pv_ctrl = self.create_pv()
+
             root_ctrl = self.create_top_hdl_ctrl()
-            hock_ctrl = self.create_handle(self.start_joint, hock_joint, solver="ikRPsolver", pv=True, constrain=False)
+            hock_ctrl = self.create_handle(f"{self.start_joint}_quad", hock_joint, solver="ikRPsolver", pv=True, constrain=False)
             single_chain = cmds.ikHandle(sj=hock_joint, ee=self.end_joint, solver="ikSCsolver", n=f"ik_hdl_sc_{self.end_joint}")[0]
 
             hdl_ctrl = self.create_handle(f"{self.start_joint}_driver", f"{self.end_joint}_driver", solver="ikSpringSolver", pv=False, constrain=True)
-            # cmds.parent(hock_ctrl, hdl_ctrl)
             
             hock_grp = cmds.group(n=f"offset_{hock_ctrl}", em=True)
             cmds.matchTransform(hock_grp, hdl_ctrl)
@@ -97,19 +107,20 @@ class create_ik():
         if above_ctrls:
             if hock_grp: self.ik_ctrls = [pv_ctrl, hdl_ctrl, hock_grp, root_ctrl] + above_ctrls
             else: self.ik_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl] + above_ctrls
-            # self.grouped_ctrls = [pv_ctrl, hdl_ctrl, above_ctrls[0]]
             offset = self.ik_ctrls[-1].replace("ctrl_","offset_")
         else:
             if hock_grp: self.ik_ctrls = [pv_ctrl,hdl_ctrl,hock_grp,root_ctrl]
             else: self.ik_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl]
-            # self.grouped_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl]
             offset = self.ik_ctrls[-1].replace("ctrl_","offset_")
 
         self.offset = cmds.group(n=offset, em=1)
         cmds.matchTransform(self.offset, self.ik_ctrls[-1])
         cmds.parent(self.ik_ctrls[-1], self.offset)
-        if hock_grp: self.grouped_ctrls = [pv_ctrl, hdl_ctrl, hock_grp, self.offset]
-        else: self.grouped_ctrls = [pv_ctrl,hdl_ctrl,self.offset]
+
+        if hock_grp:
+            self.grouped_ctrls = [pv_ctrl, hdl_ctrl, hock_grp, self.offset]
+        else:
+            self.grouped_ctrls = [pv_ctrl,hdl_ctrl,self.offset]
         OPM.offsetParentMatrix(self.ik_ctrls)
 
     def create_pv(self):
@@ -121,13 +132,18 @@ class create_ik():
         control_module = control_shape.Controls(scale=[1,1,1],guide=self.end_joint[7:],ctrl_name=f"ctrl_ik_{end_joint[7:]}",rig_type="ik")
         ctrl_crv = control_module.return_ctrl()
         self.handle = cmds.ikHandle(n=f"hdl_ik_{end_joint[7:]}", solver=solver, sj=start_joint, ee=end_joint)
-        if pv: cmds.poleVectorConstraint(f"ctrl_pv_{self.pv_joint[7:]}", f"hdl_ik_{end_joint[7:]}", n=f"pvConst_{self.pv_joint[7:]}")
+
+        if pv:
+            cmds.poleVectorConstraint(f"ctrl_pv_{self.pv_joint[7:]}", f"hdl_ik_{end_joint[7:]}", n=f"pvConst_{self.pv_joint[7:]}")
+
         if self.validation_joints["world_orientation"] is True:
             cmds.matchTransform(ctrl_crv, f"hdl_ik_{end_joint[7:]}")
         else:
             cmds.matchTransform(ctrl_crv, end_joint)
+
         if constrain:
             cmds.parentConstraint(ctrl_crv, f"hdl_ik_{end_joint[7:]}",mo=1,n=f"pConst_hdl_ik_{end_joint[7:]}")
+
         cmds.addAttr(ctrl_crv, ln="handle",at="enum",en="True",k=0)
         return ctrl_crv
 
@@ -138,12 +154,6 @@ class create_ik():
         cmds.matchTransform(self.start_ctrl_crv,self.start_joint)
         cmds.parentConstraint(self.start_ctrl_crv, self.start_joint,mo=1,n=f"pConst_{self.start_joint[7:]}")
         return self.start_ctrl_crv
-
-    def get_ctrls(self):
-        return self.ik_ctrls
-
-    def get_ik_hdl(self):
-        return self.handle
 
     def collect_other_controls(self, ik_joint_list):
         start_index = ik_joint_list.index(self.start_joint)
@@ -169,6 +179,14 @@ class create_ik():
                 if ctrl == 0:
                     pass
                 else:
-                    try: cmds.parent(self.to_be_parented[ctrl],self.to_be_parented[ctrl+1])
-                    except: pass
+                    try:
+                        cmds.parent(self.to_be_parented[ctrl],self.to_be_parented[ctrl+1])
+                    except:
+                        pass
         return self.to_be_parented
+
+    def get_ctrls(self):
+        return self.ik_ctrls
+
+    def get_ik_hdl(self):
+        return self.handle

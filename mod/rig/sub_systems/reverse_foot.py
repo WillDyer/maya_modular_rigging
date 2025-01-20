@@ -137,15 +137,17 @@ class CreateReverseFootQuadruped():
         return jnt_list
 
     def create_rev_controls(self):
-        print("CREATING REVERSE FOOT")
         self.grp_list = []
+
         ball_child = cmds.listRelatives(f"{self.jnt_list[1]}_driver", c=True, type="parentConstraint")
         if ball_child: cmds.delete(ball_child)
         toe_child = cmds.listRelatives(f"{self.jnt_list[2]}_driver", c=True, type="parentConstraint")
         if toe_child: cmds.delete(toe_child)
         ankle_child = cmds.listRelatives(f"{self.jnt_list[0]}_driver", c=True, type="parentConstraint")
+
         cmds.makeIdentity(f"{self.jnt_list[1]}_driver", apply=True, t=False, r=True, s=False)
         cmds.makeIdentity(f"{self.jnt_list[2]}_driver", apply=True, t=False, r=True, s=False)
+
         for rev_loc in self.reverse_foot_data.keys():
             ctrl = cmds.circle(n=f"ctrl_{self.reverse_foot_data[rev_loc]}", nr=(0,1,0))[0]
             cmds.matchTransform(ctrl, self.reverse_foot_data[rev_loc])
@@ -176,9 +178,8 @@ class CreateReverseFootQuadruped():
         cmds.connectAttr(f"{reverse_node}.outputX", f"jnt{self.reverse_foot_data['loc_toe'][3:]}.rotateX", force=True)
         cmds.connectAttr(f"{reverse_node}.outputZ", f"jnt{self.reverse_foot_data['loc_toe'][3:]}.rotateZ", force=True)
 
-
         cmds.aimConstraint(f"jnt{self.reverse_foot_data['loc_ball'][3:]}",f"{self.jnt_list[0]}_driver", mo=False, aim=(1.0,0.0,0.0),u=(1.0,0.0,0.0),wu=(0.0,1.0,0.0))
-        
+
         cmds.parentConstraint(self.jnt_list[2],f"{self.jnt_list[2]}_driver", mo=True)
         cmds.parentConstraint(self.jnt_list[1],f"{self.jnt_list[1]}_driver", mo=True)
 
