@@ -5,9 +5,6 @@ import maya.cmds as cmds
 
 
 def offsetParentMatrix(ctrl):
-    object = ctrl
-    cmds.select(object)
-
     TRANSFORM_NODETYPES = ["transform", "joint"]
 
     def has_non_default_locked_attributes(node):
@@ -47,5 +44,20 @@ def offsetParentMatrix(ctrl):
     def bake_transform_to_offset_parent_matrix_selection():
         for node in cmds.ls(sl=True):
             bake_transform_to_offset_parent_matrix(node)
-
-    bake_transform_to_offset_parent_matrix_selection()
+    
+    try:
+        if isinstance(ctrl, str):
+            object = ctrl
+            cmds.select(object)
+            bake_transform_to_offset_parent_matrix_selection()
+            cmds.select(clear=True)
+        elif isinstance(ctrl, list):
+            for obj in ctrl:
+                object = obj
+                cmds.select(object)
+                bake_transform_to_offset_parent_matrix_selection()
+            cmds.select(clear=True)
+        else:
+            cmds.warning(f"OPM: Couldnt OPM not correct type supported. Errored obj: {ctrl}")
+    except Exception as e:
+        raise f"OPM: Error couldnt OPM. {e}"
