@@ -151,15 +151,17 @@ class CreateReverseFootQuadruped():
         for rev_loc in self.reverse_foot_data.keys():
             ctrl = cmds.circle(n=f"ctrl_{self.reverse_foot_data[rev_loc]}", nr=(0,1,0))[0]
             cmds.matchTransform(ctrl, self.reverse_foot_data[rev_loc])
-            grp = cmds.group(n=f"offst_{self.reverse_foot_data[rev_loc]}", em=True)
+            grp = cmds.group(n=f"offset_{self.reverse_foot_data[rev_loc]}", em=True)
             self.grp_list.append(grp)
             cmds.matchTransform(grp, self.reverse_foot_data[rev_loc])
             cmds.parent(ctrl, grp)
-            OPM.offsetParentMatrix(ctrl)
-            OPM.offsetParentMatrix(self.reverse_foot_data[rev_loc])
+            OPM.offsetParentMatrix(ctrl=[ctrl, self.reverse_foot_data[rev_loc]])
             if "bank" in self.reverse_foot_data[rev_loc]:
                 cmds.parentConstraint(self.foot_ctrl, grp, mo=True)
                 connection_object = self.reverse_foot_data[rev_loc]
+            elif "ball" in rev_loc:
+                cmds.parentConstraint(f"jnt{self.reverse_foot_data[rev_loc][3:]}", grp, mo=True)
+                connection_object = f"jnt{self.reverse_foot_data[rev_loc][3:]}"
             else:
                 cmds.parentConstraint(self.reverse_foot_data[rev_loc], grp, mo=True)
                 connection_object = f"jnt{self.reverse_foot_data[rev_loc][3:]}"
@@ -172,21 +174,31 @@ class CreateReverseFootQuadruped():
                 for axis in ["X","Y","Z"]:
                     cmds.connectAttr(f"{ctrl}.rotate{axis}", f"{connection_object}.rotate{axis}")
 
-        reverse_node = cmds.createNode("reverse", n=f"{self.accessed_module}_revfoot_reverse", ss=True)
-        cmds.connectAttr(f"ctrl_{self.reverse_foot_data['loc_toe']}.rotateX", f"{reverse_node}.inputX", force=True)
-        cmds.connectAttr(f"ctrl_{self.reverse_foot_data['loc_toe']}.rotateZ", f"{reverse_node}.inputZ", force=True)
-        cmds.connectAttr(f"{reverse_node}.outputX", f"jnt{self.reverse_foot_data['loc_toe'][3:]}.rotateX", force=True)
-        cmds.connectAttr(f"{reverse_node}.outputZ", f"jnt{self.reverse_foot_data['loc_toe'][3:]}.rotateZ", force=True)
+        multi_node_1 = cmds.createNode("multiplyDivide", n=f"{self.reverse_foot_data['loc_toe']}_revfoot_multi", ss=True)
+        cmds.connectAttr(f"ctrl_{self.reverse_foot_data['loc_toe']}.rotateX", f"{multi_node_1}.input1X", force=True)
+        cmds.connectAttr(f"ctrl_{self.reverse_foot_data['loc_toe']}.rotateZ", f"{multi_node_1}.input1Z", force=True)
+        cmds.connectAttr(f"{multi_node_1}.outputX", f"jnt{self.reverse_foot_data['loc_toe'][3:]}.rotateX", force=True)
+        cmds.connectAttr(f"{multi_node_1}.outputZ", f"jnt{self.reverse_foot_data['loc_toe'][3:]}.rotateZ", force=True)
+        
+        multi_node_2 = cmds.createNode("multiplyDivide", n=f"{self.reverse_foot_data['loc_ball']}_revfoot_multi", ss=True)
+        cmds.connectAttr(f"ctrl_{self.reverse_foot_data['loc_toe']}.rotateY", f"{multi_node_2}.input1Y", force=True)
+        cmds.connectAttr(f"{multi_node_2}.outputY", f"jnt{self.reverse_foot_data['loc_ball'][3:]}.rotateY", force=True)
+
+        for xyz in ["X","Y","Z"]:
+            cmds.setAttr(f"{multi_node_1}.input2{xyz}", -1)
+            cmds.setAttr(f"{multi_node_2}.input2{xyz}", -1)
 
         cmds.aimConstraint(f"jnt{self.reverse_foot_data['loc_ball'][3:]}",f"{self.jnt_list[0]}_driver", mo=False, aim=(1.0,0.0,0.0),u=(1.0,0.0,0.0),wu=(0.0,1.0,0.0))
 
         cmds.parentConstraint(self.jnt_list[2],f"{self.jnt_list[2]}_driver", mo=True)
         cmds.parentConstraint(self.jnt_list[1],f"{self.jnt_list[1]}_driver", mo=True)
+        
+        cmds.parentConstraint(f"jnt{self.reverse_foot_data['loc_ankle'][3:]}", self.jnt_list[0], n=f"pConst_{self.reverse_foot_data['loc_ankle']}", mo=True)
+        cmds.parentConstraint(f"jnt{self.reverse_foot_data['loc_ball'][3:]}", self.jnt_list[1], n=f"pConst_{self.reverse_foot_data['loc_ball']}", mo=True)
+        cmds.parentConstraint(f"jnt{self.reverse_foot_data['loc_toe'][3:]}", self.jnt_list[2], n=f"pConst_{self.reverse_foot_data['loc_toe']}", mo=True)
 
-        cmds.parentConstraint(f"jnt{self.reverse_foot_data['loc_ball'][3:]}",self.jnt_list[1], mo=True)
-        cmds.parentConstraint(f"jnt{self.reverse_foot_data['loc_toe'][3:]}",self.jnt_list[2], mo=True)
-
-        cmds.aimConstraint(f"jnt{self.reverse_foot_data['loc_ball'][3:]}", f"{self.jnt_list[0]}", mo=False, aim=(1.0,0.0,0.0), u=(1.0,0.0,0.0), wu=(0.0,1.0,0.0))
+        cmds.hide(f"ctrl_{self.reverse_foot_data['loc_ankle']}")
+        cmds.hide(f"ctrl_{self.reverse_foot_data['loc_ball']}")
 
     def create_system(self):
         side = self.side()
