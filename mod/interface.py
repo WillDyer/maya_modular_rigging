@@ -225,8 +225,6 @@ class Interface(QWidget):
 
         mirror_module = mirror_rig.mirror_data(self.systems_to_be_made, orientation)
         self.systems_to_be_made = mirror_module.get_mirror_data()
-        for x in self.systems_to_be_made.values():
-            print(f"post mirror: {x['master_guide']}")
         created_guides = [key["master_guide"] for key in self.systems_to_be_made.values()]
 
         rig_jnt_list = joints.get_joint_list(orientation,created_guides, system="rig")

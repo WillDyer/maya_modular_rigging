@@ -121,7 +121,6 @@ def get_joints_between(start_joint, end_joint):
 def hide_guides(systems_to_be_made, created_guides, module_widget, hidden):
     if hidden is True:
         for key in systems_to_be_made.values():
-            print(f"hiding {key['module']}")
             cmds.hide(key["hidden_obj"])
             cmds.setAttr(f"{key['hidden_obj']}.hiddenInOutliner", True)
             try:

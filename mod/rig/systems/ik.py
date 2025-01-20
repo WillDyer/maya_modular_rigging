@@ -54,7 +54,6 @@ class create_ik():
                 try:
                     if not cmds.listRelatives(driver_joint, parent=True):
                         cmds.parent(driver_joint, w=True)
-                        print(f"parented {driver_joint} to world")
                 except Exception:
                     pass
                 self.driver_joint_list.append(driver_joint)
