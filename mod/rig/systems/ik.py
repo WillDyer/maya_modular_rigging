@@ -77,7 +77,7 @@ class create_ik():
 
             root_ctrl = self.create_top_hdl_ctrl()
             hock_ctrl = self.create_handle(f"{self.start_joint}_quad", hock_joint, solver="ikRPsolver", pv=True, constrain=False)
-            single_chain = cmds.ikHandle(sj=hock_joint, ee=self.end_joint, solver="ikSCsolver", n=f"ik_hdl_sc_{self.end_joint}")[0]
+            single_chain = cmds.ikHandle(sj=hock_joint, ee=f"{self.end_joint}_quad", solver="ikSCsolver", n=f"ik_hdl_sc_{self.end_joint}")[0]
 
             hdl_ctrl = self.create_handle(f"{self.start_joint}_driver", f"{self.end_joint}_driver", solver="ikSpringSolver", pv=False, constrain=True)
             
