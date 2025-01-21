@@ -145,6 +145,8 @@ def heirachy_parenting(systems_dict):
 
     root_jnt = [item for item in cmds.ls("jnt_rig*") if "root" in item]
     cog_jnt = [item for item in cmds.ls("jnt_rig_*") if "COG" in item]
-
-    cmds.parentConstraint("ctrl_root",root_jnt,mo=1)
-    cmds.parentConstraint("ctrl_COG",cog_jnt,mo=1)
+    if root_jnt and cog_jnt:
+        cmds.parentConstraint("ctrl_root",root_jnt,mo=1)
+        cmds.parentConstraint("ctrl_COG",cog_jnt,mo=1)
+    else:
+        cmds.warning("system_group: No cog or root joint exists not connecting root/cog ctrl to joint.")
