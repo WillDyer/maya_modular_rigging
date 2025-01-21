@@ -25,6 +25,7 @@ class ProgressBar(QWidget):
         self.range = range*10
 
         self.init_ui()
+        self.position_ui(parent_widget)
 
     def init_ui(self): 
         self.layout = QVBoxLayout(self)
@@ -39,12 +40,18 @@ class ProgressBar(QWidget):
 
         self.setLayout(self.layout)
         self.timer = QTimer(self)
+
         self.update()
+
+    def position_ui(self, parent_widget):
+        pos = parent_widget.pos()
+        x = pos.x() + 200
+        y = pos.y() + 350
+        self.move(x, y)
 
     def delete_old_ui(self):
         if cmds.window("mod_progress", exists=True):
             cmds.deleteUI("mod_progress", window=True)
-
     
     def showEvent(self, event):
         super().showEvent(event)
