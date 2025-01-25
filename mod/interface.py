@@ -63,7 +63,7 @@ class Interface(QWidget):
             cmds.setAttr("ui_data.rig_name", "MMR_Rig", type="string")
             cmds.select(clear=True)
             self.last_selected_button = "guides"
-            self.rig_name_str = "MMR_Rig"
+            self.rig_name_str = "MOD_Rig"
 
         # layout
         self.vertical_layout = QVBoxLayout(self)
@@ -335,7 +335,7 @@ class Interface(QWidget):
 
                 if cmds.getAttr(f"{master_guide}.{master_guide}_twist_jnts", asString=True) == "Yes":
                     progressbar.update_label(text=f"Creating twist joints for {key['module']}...")
-                    twist_joints.CreateTweaks(tweak_joint_dict=key["tweak_dict"])
+                    # twist_joints.CreateTweaks(tweak_joint_dict=key["tweak_dict"])
             
             progressbar.update_label(text=f"Completed {key['module']}")
             progressbar.update_progress()
