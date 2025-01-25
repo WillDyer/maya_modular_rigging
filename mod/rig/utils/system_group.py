@@ -25,6 +25,8 @@ def sys_attr():
     for xyz in ["X","Y","Z"]:
         cmds.setAttr(f"ctrl_root.scale{xyz}",k=False,lock=True)
 
+    cmds.setAttr("ctrl_root.skn_system", 1)
+    cmds.setAttr("ctrl_root.ik_hndle_system", 1)
 
 grp_controls = ['ctrl_root','ctrl_COG','ctrl_root_world']
 
@@ -86,6 +88,7 @@ def heirachy_parenting(systems_dict):
             grp_fk_jnts = f"grp_fk_jnts_{master_guide}"
             grp_ik_jnts = f"grp_ik_jnts_{master_guide}"
             grp_tweaks_ctrl = f"grp_tweak_{master_guide}"
+            grp_twisk_jnts = f"grp_twist_jnts_{master_guide}"
 
             if cmds.getAttr(f"{master_guide}.base_module", asString=1) == "hand":
                 master_guide = f"{key['side']}{[key['hand_grp_num']][0]}_{cmds.getAttr(f'{master_guide}.base_module', asString=1)}"
@@ -102,6 +105,10 @@ def heirachy_parenting(systems_dict):
             try:
                 cmds.parent(cmds.listRelatives(grp_ik_jnts,c=1), master_guide)
                 cmds.delete(grp_ik_jnts)
+            except ValueError: pass
+            try:
+                cmds.parent(cmds.listRelatives(grp_twisk_jnts,c=1), master_guide)
+                cmds.delete(grp_twisk_jnts)
             except ValueError: pass
             try: cmds.parent(grp_fk_ctrl, master_guide)
             except ValueError: pass
