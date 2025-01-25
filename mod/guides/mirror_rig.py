@@ -64,6 +64,9 @@ class mirror_data():
         self.master_guide = tmp_guide_list[-1]
         self.guide_list = tmp_guide_list
 
+        # non proxies attrs exclusive to master_guide
+        cmds.addAttr(self.master_guide, ln="is_mirrored", nn="Is Mirrored", at="enum", en="No:Yes")
+
         # create data guide
         if "root" in self.module.system or "proximal" in self.module.system: data_guide_name = f"data_{self.master_guide}"
         else: data_guide_name = self.master_guide.replace("master_", "data_")
@@ -106,7 +109,7 @@ class mirror_data():
                 try:
                     if attr == "master_guide":
                         cmds.addAttr(proxy_obj_list, ln="master_guide",at="enum",en=self.master_guide,k=0)
-                    elif attr not in ['visibility', 'translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']:
+                    elif attr not in ['is_mirrored','visibility', 'translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']:
                         try:
                             # new_attr_name = f"master_{self.side}{attr[8:]}"
                             new_attr_name = attr.replace(f"{self.key['side']}",self.side,1)
@@ -192,6 +195,8 @@ class mirror_data():
                     temp_dict.update({"hand_grp_num": key['hand_grp_num']})
 
                 temp_systems_to_be_made[self.master_guide] = temp_dict
+                cmds.setAttr(f"{self.master_guide}.is_mirrored", 1)
+
 
                 # cmds.setAttr(f"{key['master_guide']}.{key['master_guide']}_mirror_jnts", 0)
                 guide_data.setup(temp_dict, self.data_guide)
