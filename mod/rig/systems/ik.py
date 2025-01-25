@@ -113,18 +113,19 @@ class create_ik():
             parent_list = utils.get_joints_between(start_joint=self.start_joint, end_joint=self.end_joint)
             parent_list.remove(self.end_joint)
             for joint in parent_list:
-                cmds.parentConstraint(f"{joint}_quad", joint, n=f"pConst_{joint}_quad", mo=True)
+                if not cmds.listRelatives(joint, c=True, type="constraint"):
+                    cmds.parentConstraint(f"{joint}_quad", joint, n=f"pConst_{joint}_quad", mo=True)
 
             cmds.hide(self.driver_joint_list[-1])
         else:
             cmds.error("ik_type is invalid. Ik rig not made")
 
         if above_ctrls:
-            if hock_grp: self.ik_ctrls = [pv_ctrl, hdl_ctrl, hock_grp, root_ctrl] + above_ctrls
+            if hock_grp: self.ik_ctrls = [pv_ctrl, hdl_ctrl, hock_ctrl, root_ctrl] + above_ctrls
             else: self.ik_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl] + above_ctrls
             offset = self.ik_ctrls[-1].replace("ctrl_","offset_")
         else:
-            if hock_grp: self.ik_ctrls = [pv_ctrl,hdl_ctrl,hock_grp,root_ctrl]
+            if hock_grp: self.ik_ctrls = [pv_ctrl,hdl_ctrl,hock_ctrl,root_ctrl]
             else: self.ik_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl]
             offset = self.ik_ctrls[-1].replace("ctrl_","offset_")
 
@@ -158,6 +159,7 @@ class create_ik():
 
         if constrain:
             cmds.parentConstraint(ctrl_crv, f"hdl_ik_{end_joint[7:]}",mo=1,n=f"pConst_hdl_ik_{end_joint[7:]}")
+            cmds.parentConstraint(ctrl_crv, end_joint, mo=True, n=f"pConst_{end_joint[7:]}", skipTranslate=("x","y","z"))
 
         cmds.addAttr(ctrl_crv, ln="handle",at="enum",en="True",k=0)
         return ctrl_crv
