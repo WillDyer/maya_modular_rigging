@@ -188,13 +188,21 @@ class CreateReverseFootQuadruped():
             cmds.setAttr(f"{multi_node_1}.input2{xyz}", -1)
             cmds.setAttr(f"{multi_node_2}.input2{xyz}", -1)
 
-        cmds.aimConstraint(f"jnt{self.reverse_foot_data['loc_ball'][3:]}",f"{self.jnt_list[0]}_driver", mo=False, aim=(1.0,0.0,0.0),u=(1.0,0.0,0.0),wu=(0.0,1.0,0.0))
+        # cmds.aimConstraint(f"jnt{self.reverse_foot_data['loc_ball'][3:]}",f"{self.jnt_list[0]}_driver", mo=False, aim=(1.0,0.0,0.0),u=(1.0,0.0,0.0),wu=(0.0,1.0,0.0))
+        
+        multi_node = cmds.createNode('multiplyDivide', name=f"multi_{self.reverse_foot_data['loc_ball']}_revfoot")
+        cmds.connectAttr(f"jnt{self.reverse_foot_data['loc_ball'][3:]}.rotateY", f"{multi_node}.input1Y")
+        cmds.connectAttr(f"{multi_node}.outputY", f"{self.jnt_list[1]}.rotateY")
+        if cmds.getAttr(f"{self.system['master_guide']}.is_mirrored", asString=True) == "Yes":
+            cmds.setAttr(f"{multi_node}.input2Y", 1)
+        else:
+            cmds.setAttr(f"{multi_node}.input2Y", -1)
 
         cmds.parentConstraint(self.jnt_list[2],f"{self.jnt_list[2]}_driver", mo=True)
         cmds.parentConstraint(self.jnt_list[1],f"{self.jnt_list[1]}_driver", mo=True)
         
         cmds.parentConstraint(f"jnt{self.reverse_foot_data['loc_ankle'][3:]}", self.jnt_list[0], n=f"pConst_{self.reverse_foot_data['loc_ankle']}", mo=True)
-        cmds.parentConstraint(f"jnt{self.reverse_foot_data['loc_ball'][3:]}", self.jnt_list[1], n=f"pConst_{self.reverse_foot_data['loc_ball']}", mo=True)
+        # cmds.parentConstraint(f"jnt{self.reverse_foot_data['loc_ball'][3:]}", self.jnt_list[1], n=f"pConst_{self.reverse_foot_data['loc_ball']}", mo=True)
         cmds.parentConstraint(f"jnt{self.reverse_foot_data['loc_toe'][3:]}", self.jnt_list[2], n=f"pConst_{self.reverse_foot_data['loc_toe']}", mo=True)
 
         cmds.hide(f"ctrl_{self.reverse_foot_data['loc_ankle']}")
