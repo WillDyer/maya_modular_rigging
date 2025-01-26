@@ -1,8 +1,19 @@
 import maya.cmds as cmds
+import math
 try:
     from PySide2.QtWidgets import *
 except ModuleNotFoundError:
     from PySide6.QtWidgets import *
+
+def calculate_distance(obj1, obj2):
+    position_1 = cmds.xform(obj1, q=True, translation=True, ws=True)
+    position_2 = cmds.xform(obj2, q=True, translation=True, ws=True)
+
+    distance = math.sqrt((position_2[0] - position_1[0]) ** 2 +
+                         (position_2[1] - position_1[1]) ** 2 +
+                         (position_2[2] - position_1[2]) ** 2)
+    print(f"Distance between objects: {distance}")
+    return distance
 
 
 def create_cube(name, scale):
