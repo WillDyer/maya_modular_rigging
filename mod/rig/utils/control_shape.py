@@ -56,16 +56,20 @@ class ControlTypes():
 
 
 class Controls():
-    def __init__(self,scale,guide,ctrl_name,rig_type):
+    def __init__(self,scale,guide="",ctrl_name="",rig_type="",ctrl_shape=""):
         self.ctrl_name = ctrl_name
 
         self.scale = scale
         if type(self.scale) is int or type(self.scale) is float:
             self.scale = [self.scale,self.scale,self.scale]
 
-        # print(f"{guide}.{guide}_{rig_type}_control_shape")
-        control_type = cmds.getAttr(f"{guide}.{guide}_{rig_type}_control_shape",asString=1)
-        # except ValueError: control_type = "circle"
+        if guide:
+            control_type = cmds.getAttr(f"{guide}.{guide}_{rig_type}_control_shape",asString=1)
+        else:
+            if ctrl_shape:
+                control_type = ctrl_shape
+            else:
+                raise AttributeError("control_shape: error ctrl_shape flag not entered when not using guide flag")
 
         ctrl_shape_instance = ControlShapeList()
         ctrl_list = ctrl_shape_instance.return_list()
