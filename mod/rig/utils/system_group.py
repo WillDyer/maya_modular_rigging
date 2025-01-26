@@ -54,7 +54,7 @@ def grpSetup(rig_name):
     cmds.group(n=rig_name,w=True,em=True)
 
     cmds.group(n="grp_rig", p=rig_name,em=True)
-    cmds.group(n='DO_NOT_TOUCH',p=rig_name,em=True)
+    cmds.group(n='world_space',p=rig_name,em=True)
 
     for x in grpList:
         cmds.group(n=x,p="grp_rig",em=True)
@@ -122,6 +122,12 @@ def heirachy_parenting(systems_dict):
         for hdl in hdl_list:
             parent = cmds.listRelatives(hdl, parent=True)
             if not parent: cmds.parent(hdl,"grp_ik_handles")
+
+    tmp_world_space = cmds.ls("tmp_world_space")[0]
+    if tmp_world_space:
+        children = cmds.listRelatives(tmp_world_space, c=1)
+        cmds.parent(children, "world_space")
+        cmds.delete("tmp_world_space")
 
     ctrl_ribbon_list = cmds.ls("grp_ctrl_ribbon_*")
     if ctrl_ribbon_list:
