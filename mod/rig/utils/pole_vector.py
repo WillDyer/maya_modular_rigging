@@ -1,10 +1,13 @@
+from importlib import reload
 from maya import cmds, OpenMaya
 import math
 
+from mod.rig.utils import utils, control_shape
+reload(utils)
+reload(control_shape)
 
-def create_pv(top_joint, pv_joint, end_joint):  # can pass pv variable to pass existing curve
-    # sel = cmds.ls(sl=1)
 
+def create_pv(top_joint, pv_joint, end_joint, name=""):
     start = cmds.xform(top_joint, q=1,ws=1,t=1)
     mid = cmds.xform(pv_joint, q=1,ws=1,t=1)
     end = cmds.xform(end_joint, q=1,ws=1,t=1)
@@ -45,11 +48,24 @@ def create_pv(top_joint, pv_joint, end_joint):  # can pass pv variable to pass e
 
     rot = matrixFn.eulerRotation()
 
-    loc = cmds.spaceLocator()  # pv
-    cmds.xform(loc, ws=1,t=(finalV.x, finalV.y, finalV.z))
-    cmds.xform(loc, ws=1, rotation=((rot.x/math.pi*180.0),
+    control_module = control_shape.Controls(scale=[0.5,0.5,0.5],ctrl_name=name, ctrl_shape="cube")
+    ctrl_crv = control_module.return_ctrl()
+    cmds.xform(ctrl_crv, ws=1,t=(finalV.x, finalV.y, finalV.z))
+    cmds.xform(ctrl_crv, ws=1, rotation=((rot.x/math.pi*180.0),
                                     (rot.y/math.pi*180.0),
                                     (rot.z/math.pi*180.0)))
+    
+    # extend distance if needed
+    distance = utils.calculate_distance(obj1=ctrl_crv, obj2=pv_joint)
+    if distance < 50:
+        difference = 50 - distance
+        cmds.xform(ctrl_crv, translation=(difference,0,0), r=True, os=True)
 
-    return loc
-# get_pole_vector_position()
+    curve = utils.connector(first_jnt=pv_joint, second_jnt=ctrl_crv)
+    if cmds.ls("tmp_world_space"):
+        cmds.parent(curve, "tmp_world_space")
+    else:
+        cmds.group(curve, n="tmp_world_space", w=1)
+
+    return ctrl_crv
+
