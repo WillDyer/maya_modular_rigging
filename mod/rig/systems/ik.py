@@ -140,9 +140,8 @@ class create_ik():
         OPM.offsetParentMatrix(self.ik_ctrls)
 
     def create_pv(self):
-        pv_ctrl = pole_vector.create_pv(self.start_joint, self.pv_joint, self.end_joint)
-        cmds.rename(pv_ctrl, f"ctrl_pv_{self.pv_joint[7:]}")
-        return f"ctrl_pv_{self.pv_joint[7:]}"
+        pv_ctrl = pole_vector.create_pv(self.start_joint, self.pv_joint, self.end_joint, name=f"ctrl_pv_{self.pv_joint[7:]}")
+        return pv_ctrl
 
     def create_handle(self, start_joint, end_joint, solver, pv, constrain):
         control_module = control_shape.Controls(scale=[1,1,1],guide=self.end_joint[7:],ctrl_name=f"ctrl_ik_{end_joint[7:]}",rig_type="ik")
