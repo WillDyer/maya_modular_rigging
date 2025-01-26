@@ -21,10 +21,10 @@ from mod.user_interface.pages import module_settings, sidebar, page_utils
 from mod.rig.systems import joints, ik, fk, ribbon
 from mod.rig.sub_systems import reverse_foot, twist_joints, squash_and_stretch, space_swap
 from mod.rig.utils import connect_modules, system_group, ikfk_switch, utils, hands
-from mod.guides import create_guides, guide_data, mirror_rig
+from mod.guides import create_guides, update_guides, guide_data, mirror_rig
 
 ui_pages = [module_settings, sidebar, page_utils, progress_bar]
-systems = [create_guides, hands, joints, twist_joints, ik, fk, ribbon, squash_and_stretch]
+systems = [create_guides, update_guides, hands, joints, twist_joints, ik, fk, ribbon, squash_and_stretch]
 system_util = [guide_data, mirror_rig, connect_modules, system_group, ikfk_switch, utils, reverse_foot, space_swap]
 for module_list in [ui_pages, systems, system_util]:
     for module in module_list:    
@@ -393,9 +393,12 @@ class Interface(QWidget):
         rig_name = self.sidebar_widget.findChild(QLineEdit, "rig_name")
         if button == "guides":
             if self.last_selected_button == "skeleton":
+                update_guides.loop_update_guide_position(self.systems_to_be_made)
                 utils.hide_guides(self.systems_to_be_made, self.created_guides, module_widget=self.module_widget, hidden=False)
                 utils.delete_joints(self.systems_to_be_made, self.skn_jnt_list)
             elif self.last_selected_button == "rig":
+                utils.loop_save_controls(self.systems_to_be_made)
+                update_guides.loop_update_guide_position(self.systems_to_be_made)
                 utils.hide_guides(self.systems_to_be_made, self.created_guides, module_widget=self.module_widget, hidden=False)
                 cmds.delete(rig_name.text())
             elif self.last_selected_button == "polish":
@@ -406,6 +409,7 @@ class Interface(QWidget):
                 self.create_joints()
                 utils.hide_guides(self.systems_to_be_made, self.created_guides, module_widget=self.module_widget, hidden=True)
             elif self.last_selected_button == "rig" or self.last_selected_button == "polish":
+                utils.loop_save_controls(self.systems_to_be_made)
                 cmds.delete(rig_name.text())
                 self.create_joints()
 

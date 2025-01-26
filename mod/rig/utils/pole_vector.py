@@ -7,7 +7,7 @@ reload(utils)
 reload(control_shape)
 
 
-def create_pv(top_joint, pv_joint, end_joint, name=""):
+def create_pv(top_joint, pv_joint, end_joint, name="", pv_guide=""):
     start = cmds.xform(top_joint, q=1,ws=1,t=1)
     mid = cmds.xform(pv_joint, q=1,ws=1,t=1)
     end = cmds.xform(end_joint, q=1,ws=1,t=1)
@@ -48,7 +48,7 @@ def create_pv(top_joint, pv_joint, end_joint, name=""):
 
     rot = matrixFn.eulerRotation()
 
-    control_module = control_shape.Controls(scale=[0.5,0.5,0.5],ctrl_name=name, ctrl_shape="cube")
+    control_module = control_shape.Controls(scale=[0.5,0.5,0.5],ctrl_name=name, ctrl_shape="cube", associated_guide=pv_guide)
     ctrl_crv = control_module.return_ctrl()
     cmds.xform(ctrl_crv, ws=1,t=(finalV.x, finalV.y, finalV.z))
     cmds.xform(ctrl_crv, ws=1, rotation=((rot.x/math.pi*180.0),

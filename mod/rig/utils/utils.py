@@ -1,9 +1,14 @@
 import maya.cmds as cmds
+from importlib import reload
 import math
 try:
     from PySide2.QtWidgets import *
 except ModuleNotFoundError:
     from PySide6.QtWidgets import *
+
+from mod.guides import guide_data
+reload(guide_data)
+
 
 def calculate_distance(obj1, obj2):
     position_1 = cmds.xform(obj1, q=True, translation=True, ws=True)
@@ -174,3 +179,24 @@ def delete_joints(systems_to_be_made, skn_jnt_list):
         except: ValueError  # catches if the joints already been deleted
     try: cmds.delete(skn_jnt_list)
     except: ValueError  # catches if the joints already been deleted
+
+def loop_save_controls(systems_to_be_made):
+    common_use_associated = ["_pv_"] # joint tags commonly associated with no joint
+    for key in systems_to_be_made.values():
+        print(key)
+        for ctrl in key["ik_ctrl_list"] + key["fk_ctrl_list"]:
+            print(ctrl)
+
+            if cmds.attributeQuery("associated_guide", node=ctrl, exists=True):
+                guide = cmds.getAttr(f"{ctrl}.associated_guide",asString=True)
+                print(f"GUIDE: {guide}")
+                if any(item in ctrl for item in common_use_associated):
+                    guide_data.capture_control_data(ctrl=ctrl, use_associated=True)
+                    print("capturing associated guide")
+                else:
+                    guide_data.capture_control_data(ctrl=ctrl, guide=guide)
+                    print("capturing normal guide")
+            else:
+                pass
+
+                # pass # catching is no ctrls made or exist in list
