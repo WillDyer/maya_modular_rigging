@@ -7,7 +7,7 @@ importlib.reload(guide_data)
 
 class ControlShapeList():
     def __init__(self):
-        self.ctrl_shape_list = ["circle","cube","locator","custom"]
+        self.ctrl_shape_list = ["circle","cube","locator","load_previous"]
 
     def return_filtered_list(self, type, object):
         module = cmds.getAttr(f"{object}.base_module", asString=True)
@@ -63,10 +63,12 @@ class ControlTypes():
         cmds.delete(self.ctrl_crv, ch=1)
         return self.ctrl_crv
 
-    def create_custom(self):
+    def create_load_previous(self):
         if cmds.attributeQuery("ctrl_data", node=self.guide, exists=True):
             retrieved_data = cmds.getAttr(f"{self.guide}.ctrl_data")
             control_data = json.loads(retrieved_data)
+        else:
+            return
 
         if self.name in control_data.keys():
             key = control_data[self.name]
@@ -132,7 +134,7 @@ class Controls():
         ctrl_list = ctrl_shape_instance.return_list()
 
         if control_type in ctrl_list:
-            if control_type == "custom":
+            if control_type == "load_previous":
                 control_module = ControlTypes(name=self.ctrl_name, control_type=control_type, guide=guide)
             else:
                 control_module = ControlTypes(name=self.ctrl_name, control_type=control_type)
@@ -146,6 +148,7 @@ class Controls():
         elif guide:
             cmds.addAttr(self.ctrl,ln="associated_guide",at="enum",en=guide,k=False)
             # guide_data.capture_control_data(ctrl=self.ctrl, guide=guide)
+            self.set_guide_attr(guide, rig_type)
         else:
             print("control_shape: couldnt find guide or associated_guide")
 
@@ -157,6 +160,15 @@ class Controls():
         cmds.select(self.ctrl)
         cmds.makeIdentity(a=1,t=1,r=1,s=1)
         cmds.delete(self.ctrl, ch=1)
+
+    def set_guide_attr(self, guide=None, rig_type=None):
+        shape_attr = [attr for attr in cmds.listAttr(guide, ud=True) if "_control_shape" in attr]
+        for attr in shape_attr:
+            control_shape_instance = ControlShapeList()
+            control_shape_instance.return_filtered_list(type=rig_type, object=guide)
+            control_shape_list = control_shape_instance.return_list()
+
+            cmds.setAttr(f"{guide}.{attr}", control_shape_list.index("load_previous"))
 
     def set_name(self):
         self.ctrl = cmds.rename(self.ctrl,self.ctrl_name)
