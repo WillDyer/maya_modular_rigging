@@ -68,7 +68,7 @@ class ControlTypes():
             retrieved_data = cmds.getAttr(f"{self.guide}.ctrl_data")
             control_data = json.loads(retrieved_data)
         else:
-            return
+            return None
 
         if self.name in control_data.keys():
             key = control_data[self.name]
@@ -162,12 +162,12 @@ class Controls():
         cmds.delete(self.ctrl, ch=1)
 
     def set_guide_attr(self, guide=None, rig_type=None):
-        shape_attr = [attr for attr in cmds.listAttr(guide, ud=True) if "_control_shape" in attr]
+        shape_attr = [attr for attr in cmds.listAttr(guide, ud=True) if "_control_shape" in attr and rig_type in attr]
         for attr in shape_attr:
             control_shape_instance = ControlShapeList()
             control_shape_instance.return_filtered_list(type=rig_type, object=guide)
             control_shape_list = control_shape_instance.return_list()
-
+            print(f"SETTING {guide}.{attr} to load_previous")
             cmds.setAttr(f"{guide}.{attr}", control_shape_list.index("load_previous"))
 
     def set_name(self):
