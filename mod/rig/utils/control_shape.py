@@ -91,15 +91,13 @@ class ControlTypes():
                 elif shape["type"] == "mesh":
                     new_shape = cmds.polyCreateFacet(p=shape["vertices"])
                 elif shape["type"] == "circle":
-                    center = shape['center']
                     radius = shape['radius']
-                    new_shape = cmds.circle(radius=radius, nr=(1,0,0), ch=False)
+                    new_shape = cmds.circle(radius=radius, nr=(1,0,0), ch=False, sections=shape['sections'])
                     new_shape_node = cmds.listRelatives(new_shape, shapes=True, fullPath=True)[0]
                     new_shape_node = cmds.rename(new_shape_node, f"{ctrl}Shape")
                     cmds.parent(new_shape_node, ctrl, shape=True, relative=True)
                     cmds.delete(new_shape)
                     cvs_new = cmds.ls(f"{new_shape_node}.cv[*]", flatten=True)
-                    print(len(shape['cvs']))
                     if len(cvs_new) != len(shape['cvs']):
                         cmds.error("cvs dont match")
 
@@ -144,10 +142,8 @@ class Controls():
 
         if associated_guide:
             cmds.addAttr(self.ctrl,ln="associated_guide", at="enum",en=associated_guide, k=False)
-            # guide_data.capture_control_data(ctrl=self.ctrl, use_associated=True)
         elif guide:
             cmds.addAttr(self.ctrl,ln="associated_guide",at="enum",en=guide,k=False)
-            # guide_data.capture_control_data(ctrl=self.ctrl, guide=guide)
             self.set_guide_attr(guide, rig_type)
         else:
             print("control_shape: couldnt find guide or associated_guide")
@@ -167,7 +163,6 @@ class Controls():
             control_shape_instance = ControlShapeList()
             control_shape_instance.return_filtered_list(type=rig_type, object=guide)
             control_shape_list = control_shape_instance.return_list()
-            print(f"SETTING {guide}.{attr} to load_previous")
             cmds.setAttr(f"{guide}.{attr}", control_shape_list.index("load_previous"))
 
     def set_name(self):

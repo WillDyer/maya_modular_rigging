@@ -123,7 +123,6 @@ class mirror_data():
                     pass
 
         for guide in self.key["guide_list"]: # non proxy attrs
-            print(cmds.listAttr(guide, ud=1))
             for attr in cmds.listAttr(guide,ud=1):
                 mirrored_guide = f"{self.side}{guide[1:]}"
                 if "_control_shape" in attr:

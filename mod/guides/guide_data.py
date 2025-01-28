@@ -106,13 +106,15 @@ def capture_control_data(ctrl=None, guide=None, use_associated=False):
                 cvs = [cmds.xform(f"{shape}.cv[{i}]", q=True, t=True, os=True)
                        for i in range(len(cmds.ls(f"{shape}.cv[*]", flatten=True)))]
 
+                sections = cmds.getAttr(shape + '.spans')
                 radius = distances[0]
                 shape_data.append({
                     'type': 'circle',
                     'center': center,
                     'radius': radius,
                     'control_points': control_points,
-                    'cvs': cvs
+                    'cvs': cvs,
+                    'sections': sections
                     })
             else:
                 cvs = [cmds.xform(f"{shape}.cv[{i}]", q=True, t=True, os=True)
