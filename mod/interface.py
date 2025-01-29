@@ -20,12 +20,12 @@ from PySide.QtWidgets import (QWidget,
 from mod.user_interface.pages import module_settings, sidebar, page_utils
 from mod.rig.systems import joints, ik, fk, ribbon
 from mod.rig.sub_systems import reverse_foot, twist_joints, squash_and_stretch, space_swap
-from mod.rig.utils import connect_modules, system_group, ikfk_switch, utils, hands
+from mod.rig.utils import connect_modules, system_group, ikfk_switch, utils, hands, control_shape
 from mod.guides import create_guides, update_guides, guide_data, mirror_rig
 
 ui_pages = [module_settings, sidebar, page_utils, progress_bar]
 systems = [create_guides, update_guides, hands, joints, twist_joints, ik, fk, ribbon, squash_and_stretch]
-system_util = [guide_data, mirror_rig, connect_modules, system_group, ikfk_switch, utils, reverse_foot, space_swap]
+system_util = [guide_data, mirror_rig, connect_modules, system_group, ikfk_switch, utils, reverse_foot, space_swap, control_shape]
 for module_list in [ui_pages, systems, system_util]:
     for module in module_list:    
         importlib.reload(module)
@@ -336,6 +336,13 @@ class Interface(QWidget):
                 if cmds.getAttr(f"{master_guide}.{master_guide}_twist_jnts", asString=True) == "Yes":
                     progressbar.update_label(text=f"Creating twist joints for {key['module']}...")
                     # twist_joints.CreateTweaks(tweak_joint_dict=key["tweak_dict"])
+
+                for ctrl in key["fk_ctrl_list"] + key["ik_ctrl_list"]:
+                    if cmds.objExists(ctrl) and cmds.attributeQuery("associated_guide", node=ctrl, exists=True):
+                        if "_ik_" in ctrl:
+                            control_shape.set_guide_attr(guide=cmds.getAttr(f"{ctrl}.associated_guide",asString=1),rig_type="ik")
+                        elif "_fk_" in ctrl:
+                            control_shape.set_guide_attr(guide=cmds.getAttr(f"{ctrl}.associated_guide",asString=1),rig_type="fk")
             
             progressbar.update_label(text=f"Completed {key['module']}")
             progressbar.update_progress()

@@ -187,7 +187,7 @@ def loop_save_controls(systems_to_be_made):
         for ctrl in key["ik_ctrl_list"] + key["fk_ctrl_list"]:
             print(ctrl)
 
-            if cmds.attributeQuery("associated_guide", node=ctrl, exists=True):
+            if cmds.objExists(ctrl) and cmds.attributeQuery("associated_guide", node=ctrl, exists=True):
                 guide = cmds.getAttr(f"{ctrl}.associated_guide",asString=True)
                 print(f"GUIDE: {guide}")
                 if any(item in ctrl for item in common_use_associated):

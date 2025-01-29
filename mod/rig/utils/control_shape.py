@@ -35,6 +35,7 @@ class ControlTypes():
         self.name = name
         self.guide = guide
         module = f"self.create_{control_type}()"
+        print(f"running: {module}")
         eval(module)
 
     def create_circle(self):
@@ -132,7 +133,6 @@ class ControlTypes():
                     for i, cv in enumerate(cvs_new):
                         cmds.xform(cv, translation=shape["cvs"][i], os=True)
 
-
             self.ctrl_crv = ctrl
 
     def return_ctrl(self):
@@ -172,7 +172,7 @@ class Controls():
             cmds.addAttr(self.ctrl,ln="associated_guide", at="enum",en=associated_guide, k=False)
         elif guide:
             cmds.addAttr(self.ctrl,ln="associated_guide",at="enum",en=guide,k=False)
-            self.set_guide_attr(guide, rig_type)
+            # self.set_guide_attr(guide, rig_type)
         else:
             print("control_shape: couldnt find guide or associated_guide")
 
@@ -185,16 +185,17 @@ class Controls():
         cmds.makeIdentity(a=1,t=1,r=1,s=1)
         cmds.delete(self.ctrl, ch=1)
 
-    def set_guide_attr(self, guide=None, rig_type=None):
-        shape_attr = [attr for attr in cmds.listAttr(guide, ud=True) if "_control_shape" in attr and rig_type in attr]
-        for attr in shape_attr:
-            control_shape_instance = ControlShapeList()
-            control_shape_instance.return_filtered_list(type=rig_type, object=guide)
-            control_shape_list = control_shape_instance.return_list()
-            cmds.setAttr(f"{guide}.{attr}", control_shape_list.index("load_previous"))
-
     def set_name(self):
         self.ctrl = cmds.rename(self.ctrl,self.ctrl_name)
 
     def return_ctrl(self):
         return self.ctrl
+
+def set_guide_attr(guide=None, rig_type=None):
+    shape_attr = [attr for attr in cmds.listAttr(guide, ud=True) if "_control_shape" in attr and rig_type in attr]
+    for attr in shape_attr:
+        control_shape_instance = ControlShapeList()
+        control_shape_instance.return_filtered_list(type=rig_type, object=guide)
+        control_shape_list = control_shape_instance.return_list()
+        cmds.setAttr(f"{guide}.{attr}", control_shape_list.index("load_previous"))
+
