@@ -7,7 +7,7 @@ importlib.reload(guide_data)
 
 class ControlShapeList():
     def __init__(self):
-        self.ctrl_shape_list = ["circle","cube","locator","load_previous"]
+        self.ctrl_shape_list = ["circle","cube","locator","square","arrows","load_previous"]
 
     def return_filtered_list(self, type, object):
         module = cmds.getAttr(f"{object}.base_module", asString=True)
@@ -55,12 +55,41 @@ class ControlTypes():
         cmds.delete(self.ctrl_crv, ch=1)
         return self.ctrl_crv
 
+    def create_arrows(self):
+        self.ctrl_crv = cmds.curve(n=self.name,d=1,p=[[-4.440892098500626e-16, -2.0, 2.0], [-4.440892098500626e-16, -2.0, 6.0],
+                                                      [-8.881784197001252e-16, -4.0, 6.0], [0.0, 0.0, 10.0], [8.881784197001252e-16, 4.0, 6.0],
+                                                      [4.440892098500626e-16, 2.0, 6.0], [4.440892098500626e-16, 2.0, 2.0], [8.881784197001252e-16, 6.0, 2.0],
+                                                      [8.881784197001252e-16, 6.0, 4.0], [1.7763568394002505e-15, 10.0, 0.0], [8.881784197001252e-16, 6.0, -4.0],
+                                                      [8.881784197001252e-16, 6.0, -2.0], [4.440892098500626e-16, 2.0, -2.0], [4.440892098500626e-16, 2.0, -6.0],
+                                                      [8.881784197001252e-16, 4.0, -6.0], [0.0, 0.0, -10.0], [-8.881784197001252e-16, -4.0, -6.0], [-4.440892098500626e-16, -2.0, -6.0],
+                                                      [-4.440892098500626e-16, -2.0, -2.0], [-8.881784197001252e-16, -6.0, -2.0], [-8.881784197001252e-16, -6.0, -4.0],
+                                                      [-1.7763568394002505e-15, -10.0, 0.0], [-8.881784197001252e-16, -6.0, 4.0], [-8.881784197001252e-16, -6.0, 2.0],
+                                                      [-4.440892098500626e-16, -2.0, 2.0]])
+        shape = cmds.listRelatives(self.ctrl_crv, shapes=True, fullPath=True)[0]
+        shape = cmds.rename(shape, f"{self.ctrl_crv}Shape")
+        return self.ctrl_crv
+
+
     def create_locator(self):
         self.ctrl_crv = cmds.spaceLocator(n=self.name)
         cmds.xform(self.ctrl_crv,s=[10,10,10])
         cmds.select(self.ctrl_crv)
         cmds.makeIdentity(a=1,t=1,r=1,s=1)
         cmds.delete(self.ctrl_crv, ch=1)
+        return self.ctrl_crv
+
+    def create_square(self):
+        cvs = [[6.968940372718207e-16, 11.381143326500743, -11.381143326500762], [-7.74170920797604e-32, 11.08194187554388, 1.2643170607829326e-15], [-6.968940372718198e-16, 11.38114332650075, 11.38114332650075], [-6.785732323110914e-16, 3.21126950723723e-15, 11.08194187554388], [-6.968940372718203e-16, -11.381143326500748, 11.381143326500753], [-2.044673580108402e-31, -11.081941875543881, 3.3392053635905195e-15], [6.968940372718195e-16, -11.381143326500753, -11.381143326500743], [6.785732323110914e-16, -5.952132599280585e-15, -11.08194187554388]]
+        self.ctrl_crv = cmds.circle(n=self.name,r=10, nr=(0,1,0), ch=False)[0]
+        shape = cmds.listRelatives(self.ctrl_crv, shapes=True, fullPath=True)[0]
+        shape = cmds.rename(shape, f"{self.ctrl_crv}Shape")
+        cvs_new = cmds.ls(f"{shape}.cv[*]", flatten=True)
+        if len(cvs_new) != len(cvs):
+            cmds.error("cvs dont match")
+
+        for i, cv in enumerate(cvs_new):
+            cmds.xform(cv, translation=cvs[i], os=True)
+
         return self.ctrl_crv
 
     def create_load_previous(self):
@@ -82,7 +111,6 @@ class ControlTypes():
 
             # Recreate shapes
             for shape in key["shapes"]:
-                print(shape["type"])
                 if shape["type"] == "nurbsCurve":
                     new_shape = cmds.curve(d=shape["degree"], p=shape["cvs"])
                     new_shape_node = cmds.listRelatives(new_shape, shapes=True, fullPath=True)[0]
