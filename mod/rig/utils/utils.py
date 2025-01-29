@@ -28,7 +28,7 @@ def scale_rig(systems_to_be_made=None):
     cmds.setAttr(f"{root}.scale_divider",lock=True)
     for key in systems_to_be_made.values():
         multi_specific = cmds.createNode("multiplyDivide",n=f"{key['master_guide'].replace('master_','')}_multi")
-        cmds.addAttr(root, sn=f"{key['master_guide']}_scale",at="float",k=True,dv=1)
+        cmds.addAttr(root, sn=f"{key['master_guide'].replace('master_','')}_scale",at="float",k=True,dv=1)
         cmds.connectAttr(f"{multi}.output",f"{multi_specific}.input1")
         for XYZ in ["X","Y","Z"]:
             cmds.connectAttr(f"{root}.{key['master_guide']}_scale", f"{multi_specific}.input2{XYZ}")
