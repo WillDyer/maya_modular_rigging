@@ -3,11 +3,12 @@ import maya.OpenMaya as om
 import importlib
 import math
 
-from mod.rig.utils import OPM, utils
+from mod.rig.utils import OPM, utils, control_shape
 from mod.rig.systems import fk
 
 importlib.reload(OPM)
 importlib.reload(utils)
+importlib.reload(control_shape)
 
 
 class create_ribbon():
@@ -162,9 +163,10 @@ class create_ribbon():
         self.fol_shape_list = []
         self.fol_parent_list = []
         for x in range(spans):
+            print(x)
             fol_shape = cmds.createNode("follicle")
             fol_parent = cmds.listRelatives(fol_shape, p=True)[0]
-            fol_parent = cmds.rename(fol_parent, f"fol{self.joint_chain[spans-1][3:]}")
+            fol_parent = cmds.rename(fol_parent, f"fol{self.joint_chain[x][3:]}")
             fol_shape = cmds.listRelatives(fol_parent, c=True)[0]
             cmds.setAttr(fol_shape + ".visibility", 1)
 
@@ -207,12 +209,20 @@ class create_ribbon():
             self.skn_jnt_list.append(joint)
 
             ctrl = f"ctrl{selected_follicle[3:]}"
-            cmds.circle(n=ctrl, r=self.scale, nr=(0, 1, 0))  # temporary, will make interchangable
-            cmds.matchTransform(ctrl, joint)
-            cmds.parentConstraint(ctrl, joint, mo=1, n=f"pConst_{joint}")
-            cmds.connectAttr(f"{ctrl}.scale", f"{joint}.scale")
-            cmds.select(ctrl)
-            OPM.offsetParentMatrix(ctrl)
+
+            control_module = control_shape.Controls(scale=[1,1,1],guide=ctrl.replace("ctrl_ik_",""),ctrl_name=f"ctrl{selected_follicle[3:]}",rig_type="ik")
+            ctrl_world = control_module.return_ctrl()
+
+            ctrl_obj = cmds.spaceLocator(n=f"ctrl{selected_follicle[3:]}_objSpace")
+            
+            cmds.matchTransform(ctrl_world, joint, pos=True, rot=False)
+            cmds.matchTransform(ctrl_obj, joint, pos=True, rot=True)
+            cmds.parent(ctrl_obj, ctrl_world)
+            cmds.parentConstraint(ctrl_obj, joint, mo=1, n=f"pConst_{joint}")
+
+            cmds.connectAttr(f"{ctrl_world}.scale", f"{joint}.scale")
+            OPM.offsetParentMatrix(ctrl=[ctrl_world, ctrl_obj])
+            cmds.select(clear=True)
             self.ctrl_list.append(ctrl)
 
     def group_setup(self):

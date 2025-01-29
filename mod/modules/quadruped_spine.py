@@ -14,3 +14,8 @@ side = "C"
 space_swapping = []
 guide_scale = 1
 available_rig_types = ["FK","IK_Ribbon"]
+default_ctrl_shape = {
+    "ik_spine_1": "cube",
+    "ik_spine_5": "cube",
+    "ik_spine_10": "cube"
+}
