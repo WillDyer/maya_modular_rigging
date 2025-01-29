@@ -369,6 +369,8 @@ class Interface(QWidget):
                 connect_modules.connect_polished(systems_to_connect)
             if rig_type == "FKIK":
                 space_swap_module = space_swap.SpaceSwapping(key)
+            if twist_joint == "Yes":
+                twist_joints.connect_user_twist()
 
         button_names = ["L_colour","C_colour","R_colour"]
         button_colour_dict = {"L_colour":[],"C_colour":[],"R_colour":[]}

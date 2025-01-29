@@ -31,11 +31,16 @@ def scale_rig(systems_to_be_made=None):
         cmds.addAttr(root, sn=f"{key['master_guide'].replace('master_','')}_scale",at="float",k=True,dv=1)
         cmds.connectAttr(f"{multi}.output",f"{multi_specific}.input1")
         for XYZ in ["X","Y","Z"]:
-            cmds.connectAttr(f"{root}.{key['master_guide']}_scale", f"{multi_specific}.input2{XYZ}")
+            cmds.connectAttr(f"{root}.{key['master_guide'].replace('master_','')}_scale", f"{multi_specific}.input2{XYZ}")
         for i, joint in enumerate(key["joints"]):
             cmds.connectAttr(f"{multi_specific}.output", f"{joint}.scale")
             cmds.connectAttr(f"{joint}.scale", f"{key['skin_joints'][i]}.scale")
-
+        try:
+            for joint in key["twist_dict"]:
+                cmds.connectAttr(f"{multi_specific}.output", f"{joint}.scale")
+                cmds.connectAttr(f"{multi_specific}.output", f"{joint.replace('_rig_','_skn_')}.scale")
+        except KeyError:
+            pass
 
 def create_cube(name, scale):
     ctrlCV = cmds.curve(n=name,d=1,p=[(0,0,0),(1,0,0),(1,0,1),(0,0,1),(0,0,0),
