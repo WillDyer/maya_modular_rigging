@@ -22,8 +22,8 @@ def sys_attr():
             cmds.createNode('reverse', n=f'reverse_{item}')
             cmds.connectAttr(f"ctrl_root.{item}",f"reverse_{item}.inputX")
             cmds.connectAttr(f"reverse_{item}.outputX",attrs[item][4])
-    for xyz in ["X","Y","Z"]:
-        cmds.setAttr(f"ctrl_root.scale{xyz}",k=False,lock=True)
+    # for xyz in ["X","Y","Z"]:
+    #     cmds.setAttr(f"ctrl_root.scale{xyz}",k=False,lock=True)
 
     cmds.setAttr("ctrl_root.skn_system", 1)
     cmds.setAttr("ctrl_root.ik_hndle_system", 1)

@@ -20,6 +20,22 @@ def calculate_distance(obj1, obj2):
     print(f"Distance between objects: {distance}")
     return distance
 
+def scale_rig(systems_to_be_made=None):
+    root = "ctrl_root"
+    multi = cmds.createNode("multiplyDivide",n="scale_multi")
+    cmds.connectAttr(f"{root}.scale", f"{multi}.input1")
+    cmds.addAttr(root,sn="scale_divider",nn="scale_divider",k=True,at="enum",en="------------")
+    cmds.setAttr(f"{root}.scale_divider",lock=True)
+    for key in systems_to_be_made.values():
+        multi_specific = cmds.createNode("multiplyDivide",n=f"{key['master_guide'].replace('master_','')}_multi")
+        cmds.addAttr(root, sn=f"{key['master_guide']}_scale",at="float",k=True,dv=1)
+        cmds.connectAttr(f"{multi}.output",f"{multi_specific}.input1")
+        for XYZ in ["X","Y","Z"]:
+            cmds.connectAttr(f"{root}.{key['master_guide']}_scale", f"{multi_specific}.input2{XYZ}")
+        for i, joint in enumerate(key["joints"]):
+            cmds.connectAttr(f"{multi_specific}.output", f"{joint}.scale")
+            cmds.connectAttr(f"{joint}.scale", f"{key['skin_joints'][i]}.scale")
+
 
 def create_cube(name, scale):
     ctrlCV = cmds.curve(n=name,d=1,p=[(0,0,0),(1,0,0),(1,0,1),(0,0,1),(0,0,0),
