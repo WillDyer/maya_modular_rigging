@@ -24,25 +24,10 @@ dict_var_types = {
 
 
 def setup(temp_dict, data_guide):
-    for key in temp_dict.keys():
-        if temp_dict.keys() == "guide_number":
-            cmds.addAttr(data_guide, ln=key, at="float",k=1)
-            cmds.setAttr(f"{data_guide}.{key}", temp_dict[key])
-        elif isinstance(temp_dict[key], str):
-            cmds.addAttr(data_guide, ln=key, at="enum", en=temp_dict[key], k=1)
-        elif isinstance(temp_dict[key], list):
-            if len(temp_dict[key]) == 0: enum_list = "empty"
-            else: enum_list = ":".join(temp_dict[key])
-            cmds.addAttr(data_guide, ln=key, at="enum", en=enum_list, k=1)
-        elif isinstance(temp_dict[key], float):
-            cmds.addAttr(data_guide, ln=key, at="float",k=1)
-            cmds.setAttr(f"{data_guide}.{key}", temp_dict[key])
-        elif isinstance(temp_dict[key], int):
-            cmds.addAttr(data_guide, ln=key, at="float",k=1)
-            cmds.setAttr(f"{data_guide}.{key}", temp_dict[key])
-
-    # hide in outliner:
-    # cmds.setAttr(f"{data_guide}.hiddenInOutliner", True)
+    if not cmds.attributeQuery("init_Data", node=data_guide, exists=True):
+        cmds.addAttr(data_guide, longName="init_data", dataType='string')
+    serialised_data = json.dumps(temp_dict)
+    cmds.setAttr(f"{data_guide}.init_data", serialised_data, type="string")
 
     for attr in ["tx","ty","tz","rx","ry","rz","sx","sy","sz","v"]:
         cmds.setAttr(f"{data_guide}.{attr}", cb=0,k=0,l=1)
@@ -53,22 +38,13 @@ def init_data():
     data_guides = cmds.ls("data_*",type="transform")
     print(f"Existing Guides Found: {data_guides}")
     for guide in data_guides:
-        temp_dict = {}
-        attr_list = cmds.listAttr(guide, r=1,k=1)
-        for attr in attr_list:
-            if dict_var_types[attr] == "guide_number": pass
-            elif dict_var_types[attr] == "list":
-                value_list = cmds.attributeQuery(attr, node=guide, le=1)
-                value = value_list[0].split(":")
-            elif dict_var_types[attr] == "string":
-                value = cmds.getAttr(f"{guide}.{attr}",asString=True)
-            elif dict_var_types[attr] == "float" or dict_var_types[attr] == "long":
-                value = cmds.getAttr(f"{guide}.{attr}")
+        if cmds.attributeQuery("init_data", node=guide, exists=True):
+            retrieved_data = cmds.getAttr(f"{guide}.init_data")
+            init_data = json.loads(retrieved_data)
+            return_dict[guide] = init_data
+        else:
+            cmds.warning(f"guide_data: couldnt find init_data on {guide} setup wont be the same")
 
-            if isinstance(value, list) and value[0] == "empty": value = []
-
-            temp_dict[attr] = value
-        return_dict[guide] = temp_dict
     return return_dict
 
 
