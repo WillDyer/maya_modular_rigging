@@ -3,10 +3,11 @@ import importlib
 import os
 
 from mod.rig.systems import joints
-from mod.rig.utils import utils
+from mod.rig.utils import utils, control_shape
 from mod.guides import guide_data
 importlib.reload(joints)
 importlib.reload(utils)
+importlib.reload(control_shape)
 
 
 class mirror_data():
@@ -102,7 +103,7 @@ class mirror_data():
     def copy_mirrored_attrs(self):  # Copy attrs accross
         self.non_proxy_attr_list = []
         proxy_obj_list = self.guide_list
-        for attr in cmds.listAttr(self.key["master_guide"], r=1,ud=1):
+        for attr in cmds.listAttr(self.key["master_guide"],ud=1):
             if "_control_shape" in attr:
                 pass
             else:
@@ -121,13 +122,21 @@ class mirror_data():
                 except:
                     pass
 
-        for guide in self.key["guide_list"]:
-            for attr in cmds.listAttr(guide, r=1,ud=1):
+        for guide in self.key["guide_list"]: # non proxy attrs
+            for attr in cmds.listAttr(guide,ud=1):
+                mirrored_guide = f"{self.side}{guide[1:]}"
                 if "_control_shape" in attr:
+                    control_shape_instance = control_shape.ControlShapeList()
+                    control_shape_list = control_shape_instance.return_list()
+                    control_shape_en = ":".join(control_shape_list)
                     new_attr_name = attr.replace(f"{self.key['side']}",self.side,1)
-                    mirrored_guide = f"{self.side}{guide[1:]}"
                     enum_value = cmds.getAttr(f"{guide}.{attr}",asString=1)
-                    cmds.addAttr(mirrored_guide,ln=f"{new_attr_name}",at="enum",en=enum_value)
+                    index = control_shape_list.index(enum_value)
+                    cmds.addAttr(mirrored_guide,ln=f"{new_attr_name}",at="enum",en=control_shape_en, k=1)
+                    cmds.setAttr(f"{mirrored_guide}.{new_attr_name}", index)
+                elif "original_guide" in attr:
+                    en_value = cmds.getAttr(f"{guide}.{attr}",asString=1)
+                    cmds.addAttr(mirrored_guide, ln="original_guide", at="enum", en=en_value, k=1)
 
     def mirror_reverse_foot(self):
         try:

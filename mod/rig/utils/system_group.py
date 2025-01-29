@@ -123,7 +123,7 @@ def heirachy_parenting(systems_dict):
             parent = cmds.listRelatives(hdl, parent=True)
             if not parent: cmds.parent(hdl,"grp_ik_handles")
 
-    tmp_world_space = cmds.ls("tmp_world_space")[0]
+    tmp_world_space = cmds.ls("tmp_world_space")
     if tmp_world_space:
         children = cmds.listRelatives(tmp_world_space, c=1)
         cmds.parent(children, "world_space")
