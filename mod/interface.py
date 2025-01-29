@@ -235,6 +235,11 @@ class Interface(QWidget):
             num = num+1
 
         self.skn_jnt_list = joints.get_joint_list(orientation,created_guides, system="skn")
+        num = 0
+        for dict in self.systems_to_be_made.values():
+            if not dict["skin_joints"]:
+                dict["skin_joints"] = self.skn_jnt_list[num]
+            num = num+1
 
         for key in self.systems_to_be_made.values():
             twist_joint = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_twist_jnts", asString=1)
@@ -252,6 +257,7 @@ class Interface(QWidget):
 
         connect_modules.attach_joints(self.systems_to_be_made,system="rig")
         connect_modules.attach_joints(self.systems_to_be_made,system="skn")
+        
 
         self.skn_jnt_list = [item for sublist in self.skn_jnt_list for item in sublist]
         for joint in self.skn_jnt_list: cmds.parentConstraint(f"jnt_rig{joint[7:]}",joint,mo=1,n=f"pConst_jnt_rig{joint[7:]}")
@@ -346,12 +352,14 @@ class Interface(QWidget):
             
             progressbar.update_label(text=f"Completed {key['module']}")
             progressbar.update_progress()
+        
+        progressbar.update_label(text="Cleaning up...")
 
         rig_name = self.sidebar_widget.findChild(QLineEdit, "rig_name")
         system_group.grpSetup(rig_name.text())
         cmds.setAttr("ui_data.rig_name", str(rig_name.text()), type="string")
         
-        progressbar.stop_progress()
+        utils.scale_rig(self.systems_to_be_made)
 
         for key in self.systems_to_be_made.values():  # seperate loop to be sure systems are made before connecting
             rig_type = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_rig_type", asString=1)
@@ -374,10 +382,12 @@ class Interface(QWidget):
 
         ctrl_list = cmds.ls("ctrl_*",type="transform")
         utils.colour_controls(ctrl_list,button_colour_dict)
-
+        
         system_group.heirachy_parenting(self.systems_to_be_made)
 
         cmds.select(cl=1)
+        progressbar.stop_progress()
+
 
     def remove_module(self, master_guide, settings_page):
         for key in list(self.systems_to_be_made.values()):
