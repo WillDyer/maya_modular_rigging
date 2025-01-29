@@ -221,7 +221,7 @@ class AddModule():
         if preset:
             if preset.module_to_be_made[module] == "world": pass
             else:
-                attach_to = [cmds.ls(f"*{preset.module_to_be_made[module]}*", type="transform")[0]]
+                attach_to = [cmds.ls(f"*{preset.module_to_be_made[module]}", type="transform")[0]]
         
         if module == "hand":
             selection = cmds.ls(sl=1)[0]
