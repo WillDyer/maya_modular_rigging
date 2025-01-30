@@ -184,7 +184,6 @@ class CreateTwist():
                 self.correct_orientation(list=self.tween_joints, target=self.joint2)
                 self.reverse_twist()
                 self.tween_falloff(source_rot=self.joint2_twist)
-                self.scale_integration()
                 self.parent_to_heirachy(parent_type="specific", joint=self.joint1)
             else:
                 cmds.joint(self.joint2_twist, e=True, oj="none",ch=True, zso=True)
@@ -192,7 +191,6 @@ class CreateTwist():
                 self.stable_orientation(top_twist=root_orient, end_twist=end_orient, loc=aim_loc)
                 self.tween_falloff(source_rot=self.joint1)
                 self.parent_to_heirachy(parent_type="parent")
-                self.scale_integration()
                 cmds.group(root_orient, n=f"grp_twist_jnts_{self.key['master_guide']}", w=1)
         elif system == "skn":
             self.parent_to_heirachy()
@@ -287,16 +285,22 @@ class CreateTwist():
 
     def parent_to_heirachy(self, parent_type="", joint=""):
         if parent_type == "parent":
-            parent_joint = cmds.listRelatives(self.joint1, parent=True)[0]
+            parent_joint = cmds.listRelatives(self.joint1, parent=True)
             if parent_joint is None:
                 parent_joint = self.joint1
-            cmds.connectAttr(f"{self.joint1}.translate",f"{self.joint1_twist}.translate")
+            else:
+                parent_joint = parent_joint[0]
+                cmds.connectAttr(f"{self.joint1}.translate",f"{self.joint1_twist}.translate")
             cmds.parent(self.joint1_twist, parent_joint)
+            self.scale_integration(parent_joint=True)
         elif parent_type == "specific":
             cmds.parent(self.joint1_twist, joint)
+            self.scale_integration(parent_joint=False)
 
-    def scale_integration(self):
-        cmds.connectAttr(f"{self.joint2}.translateX",f"{self.joint2_twist}.translateX")
+    def scale_integration(self, parent_joint=None):
+        if parent_joint:
+            # cmds.connectAttr(f"{self.joint2}.translateX",f"{self.joint2_twist}.translateX")
+            cmds.pointConstraint(self.joint2, self.joint2_twist, n=f"pointConst_{self.joint2}")
 
         for tween in self.tween_joints:
             cmds.pointConstraint(self.joint1, self.joint2_twist, tween, n=f"pointConst_{tween}",mo=False)
@@ -328,10 +332,10 @@ def connect_user_twist():
                 for ctrl_type in ["ik", "fk"]:
                     ctrl = f"ctrl_{ctrl_type}_{guide}"
                     if cmds.objExists(ctrl):
-                        attr = f"twist_multi_{guide}_{i}_proxy"
+                        attr = f"twist_multi_{guide}_{i}"
                         if not cmds.attributeQuery(attr, node=ctrl, exists=True):
-                            cmds.addAttr(ctrl, sn=attr, nn=f"Proxy Twist Multi {i}", at="float", k=True, dv=1)
-                        cmds.connectAttr(f"{ctrl}.{attr}", f"{multi}.{input2}", force=True)
+                            # cmds.addAttr(ctrl, sn=attr, nn=f"Proxy Twist Multi {i}", at="float", k=True, dv=1)
+                            proxyAttr = cmds.addAttr(ctrl,nn=f"PROXY Twust Multi {i}", sn=attr, proxy=cmds.listConnections(f'{multi}.{input2}', source=True, plugs=True)[0])
                         break
             else:
                 for ctrl_type in ["ik", "fk"]:
@@ -342,3 +346,10 @@ def connect_user_twist():
                             cmds.addAttr(ctrl, sn=attr, nn=f"Twist Multi {i}", at="float", k=True, dv=1)
                         cmds.connectAttr(f"{ctrl}.{attr}", f"{multi}.{input2}", force=True)
                         break
+
+
+def rig_to_skn(list=None):
+    if list:
+        for joint in list:
+            cmds.parentConstraint(joint, f"jnt_skn{joint[7:]}", n=f"pConst_{joint}")
+
