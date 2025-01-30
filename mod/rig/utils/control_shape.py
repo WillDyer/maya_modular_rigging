@@ -34,6 +34,7 @@ class ControlTypes():
     def __init__(self, name="", control_type="", guide=""):
         self.name = name
         self.guide = guide
+        self.ctrl_crv = None
         module = f"self.create_{control_type}()"
         eval(module)
 
@@ -135,11 +136,10 @@ class ControlTypes():
             self.ctrl_crv = ctrl
 
     def return_ctrl(self):
-        try:
+        if self.ctrl_crv is None:
+            return self.name
+        else:
             return self.ctrl_crv
-        except Exception as e:
-            return self.ctrl_crv
-            cmds.warning(f"self.ctrl_crv is None making default control instead. {e}")
 
 
 class Controls():

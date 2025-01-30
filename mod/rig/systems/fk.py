@@ -20,26 +20,25 @@ class create_fk():
         jnt_ctrls_fk = []
         fk_joint_list.reverse()
         scale = self.scale
-        for i in range(len(fk_joint_list)):
-            # cmds.circle(n=f"ctrl_fk_{fk_joint_list[i][7:]}",
-            #             r=scale, nr=(1, 0, 0))
-            control_module = control_shape.Controls(scale,guide=fk_joint_list[i][7:],ctrl_name=f"ctrl_fk_{fk_joint_list[i][7:]}",rig_type="fk")
+
+        if delete_end is True:
+            loop_list = fk_joint_list
+            loop_list.remove(fk_joint_list[0])
+        else:
+            loop_list = fk_joint_list
+
+        for i in range(len(loop_list)):
+            control_module = control_shape.Controls(scale,guide=loop_list[i][7:],ctrl_name=f"ctrl_fk_{loop_list[i][7:]}",rig_type="fk")
             ctrl_shape = control_module.return_ctrl()
-            cmds.matchTransform(f"ctrl_fk_{fk_joint_list[i][7:]}",
-                                fk_joint_list[i])
+            cmds.matchTransform(ctrl_shape, loop_list[i])
 
-            self.ctrls_fk.append(f"ctrl_fk_{fk_joint_list[i][7:]}")
-            jnt_ctrls_fk.append(fk_joint_list[i])
+            self.ctrls_fk.append(ctrl_shape)
+            jnt_ctrls_fk.append(loop_list[i])
 
-            if delete_end is True:
-                if cmds.listRelatives(fk_joint_list[i], c=True) is None:
-                    cmds.delete(f"ctrl_fk_{fk_joint_list[i][7:]}")
-                    self.ctrls_fk.remove(f"ctrl_fk_{fk_joint_list[i][7:]}")
-                    jnt_ctrls_fk.remove(fk_joint_list[i])
-            elif "root" in fk_joint_list[i]:
-                cmds.delete(f"ctrl_fk_{fk_joint_list[i][7:]}")
-                self.ctrls_fk.remove(f"ctrl_fk_{fk_joint_list[i][7:]}")
-                jnt_ctrls_fk.remove(fk_joint_list[i])
+            if "root" in loop_list[i]:
+                cmds.delete(ctrl_shape)
+                self.ctrls_fk.remove(ctrl_shape)
+                jnt_ctrls_fk.remove(loop_list[i])
 
         for ctrl in range(len(self.ctrls_fk)):
             try:

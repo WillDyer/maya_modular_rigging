@@ -163,7 +163,6 @@ class create_ribbon():
         self.fol_shape_list = []
         self.fol_parent_list = []
         for x in range(spans):
-            print(x)
             fol_shape = cmds.createNode("follicle")
             fol_parent = cmds.listRelatives(fol_shape, p=True)[0]
             fol_parent = cmds.rename(fol_parent, f"fol{self.joint_chain[x][3:]}")

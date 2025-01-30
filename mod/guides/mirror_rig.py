@@ -110,7 +110,7 @@ class mirror_data():
                 try:
                     if attr == "master_guide":
                         cmds.addAttr(proxy_obj_list, ln="master_guide",at="enum",en=self.master_guide,k=0)
-                    elif attr not in ['is_mirrored','visibility', 'translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']:
+                    elif attr not in ['_control_shape','is_mirrored','visibility', 'translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']:
                         try:
                             # new_attr_name = f"master_{self.side}{attr[8:]}"
                             new_attr_name = attr.replace(f"{self.key['side']}",self.side,1)
@@ -126,14 +126,15 @@ class mirror_data():
             for attr in cmds.listAttr(guide,ud=1):
                 mirrored_guide = f"{self.side}{guide[1:]}"
                 if "_control_shape" in attr:
+                    if "_ik_" in attr: fkik = "ik"
+                    elif "_fk_" in attr: fkik = "fk"
                     control_shape_instance = control_shape.ControlShapeList()
+                    control_shape_instance.return_filtered_list(type=fkik, object=guide)
                     control_shape_list = control_shape_instance.return_list()
                     control_shape_en = ":".join(control_shape_list)
                     new_attr_name = attr.replace(f"{self.key['side']}",self.side,1)
-                    enum_value = cmds.getAttr(f"{guide}.{attr}",asString=1)
-                    index = control_shape_list.index(enum_value)
                     cmds.addAttr(mirrored_guide,ln=f"{new_attr_name}",at="enum",en=control_shape_en, k=1)
-                    cmds.setAttr(f"{mirrored_guide}.{new_attr_name}", index)
+
                 elif "original_guide" in attr:
                     en_value = cmds.getAttr(f"{guide}.{attr}",asString=1)
                     cmds.addAttr(mirrored_guide, ln="original_guide", at="enum", en=en_value, k=1)
@@ -171,7 +172,6 @@ class mirror_data():
             importlib.reload(self.module)
             mirror_attribute = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_mirror_jnts", asString=1)
             if mirror_attribute == "Yes":  # YES
-                print(f"mirroing: {key['master_guide']}")
                 self.key = key
                 self.get_mirrored_side()
                 self.create_mirrored_guides()
