@@ -202,11 +202,31 @@ class CreateReverseFootQuadruped():
         cmds.parentConstraint(self.jnt_list[1],f"{self.jnt_list[1]}_driver", mo=True)
         
         cmds.parentConstraint(f"jnt{self.reverse_foot_data['loc_ankle'][3:]}", self.jnt_list[0], n=f"pConst_{self.reverse_foot_data['loc_ankle']}", mo=True)
-        # cmds.parentConstraint(f"jnt{self.reverse_foot_data['loc_ball'][3:]}", self.jnt_list[1], n=f"pConst_{self.reverse_foot_data['loc_ball']}", mo=True)
         cmds.parentConstraint(f"jnt{self.reverse_foot_data['loc_toe'][3:]}", self.jnt_list[2], n=f"pConst_{self.reverse_foot_data['loc_toe']}", mo=True)
+        
+        hock_group = self.hock_rotation()
+        # cmds.parentConstraint(f"jnt{self.reverse_foot_data['loc_ankle'][3:]}", hock_group, n=f"pConst_{self.reverse_foot_data['loc_ankle']}", mo=True)
 
         cmds.hide(f"ctrl_{self.reverse_foot_data['loc_ankle']}")
         cmds.hide(f"ctrl_{self.reverse_foot_data['loc_ball']}")
+
+    def hock_rotation(self):
+        hock_ctrl = next((ctrl for ctrl in self.system['ik_ctrl_list'] if self.module.ik_joints['hock'] in ctrl), None)
+        hock_group = cmds.group(hock_ctrl,n=f"offset_revfoot_{hock_ctrl}",p=cmds.listRelatives(hock_ctrl, p=True)[0])
+        cmds.addAttr(hock_ctrl, ln=f"{self.system['master_guide']}_rev_divider", nn="Hock Rev Foot Orientation", at="enum", enumName="------------", k=True)
+        cmds.setAttr(f"{hock_ctrl}.{self.system['master_guide']}_rev_divider", lock=True)
+
+        const_tra = cmds.parentConstraint(
+                f"jnt{self.reverse_foot_data['loc_ankle'][3:]}", 
+                hock_group, 
+                n=f"pConst_{self.reverse_foot_data['loc_ankle']}", 
+                mo=True)[0]
+        
+        cmds.addAttr(hock_ctrl, ln=f"{self.system['master_guide']}_follow_rev", nn="Follow Rev", at="enum", enumName="Ignore:Follow",k=True)
+        cmds.setAttr(f"{hock_ctrl}.{self.system['master_guide']}_follow_rev", 1)
+        cmds.connectAttr(f"{hock_ctrl}.{self.system['master_guide']}_follow_rev",f"{const_tra}.jnt{self.reverse_foot_data['loc_ankle'][3:]}W0",f=True)
+
+        return hock_group
 
     def create_system(self):
         side = self.side()
