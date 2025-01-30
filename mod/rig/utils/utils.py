@@ -17,7 +17,6 @@ def calculate_distance(obj1, obj2):
     distance = math.sqrt((position_2[0] - position_1[0]) ** 2 +
                          (position_2[1] - position_1[1]) ** 2 +
                          (position_2[2] - position_1[2]) ** 2)
-    print(f"Distance between objects: {distance}")
     return distance
 
 def scale_rig(systems_to_be_made=None):
