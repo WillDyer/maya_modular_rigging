@@ -62,10 +62,10 @@ def create_pv(top_joint, pv_joint, end_joint, name="", pv_guide=""):
         cmds.xform(ctrl_crv, translation=(difference,0,0), r=True, os=True)
 
     curve = utils.connector(first_jnt=pv_joint, second_jnt=ctrl_crv)
+    cmds.connectAttr(f"{ctrl_crv}.visibility",f"{curve}.visibility")
     if cmds.ls("tmp_world_space"):
         cmds.parent(curve, "tmp_world_space")
     else:
         cmds.group(curve, n="tmp_world_space", w=1)
 
     return ctrl_crv
-

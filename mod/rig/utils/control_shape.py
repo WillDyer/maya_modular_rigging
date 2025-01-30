@@ -35,7 +35,6 @@ class ControlTypes():
         self.name = name
         self.guide = guide
         module = f"self.create_{control_type}()"
-        print(f"running: {module}")
         eval(module)
 
     def create_circle(self):
@@ -136,12 +135,15 @@ class ControlTypes():
             self.ctrl_crv = ctrl
 
     def return_ctrl(self):
-        return self.ctrl_crv
-
+        try:
+            return self.ctrl_crv
+        except Exception as e:
+            return self.ctrl_crv
+            cmds.warning(f"self.ctrl_crv is None making default control instead. {e}")
 
 
 class Controls():
-    def __init__(self,scale,guide="",ctrl_name="",rig_type="",ctrl_shape="", associated_guide=None):
+    def __init__(self,scale,guide="",ctrl_name="",rig_type="",ctrl_shape="", associated_guide=None, default_ctrl=False):
         self.ctrl_name = ctrl_name
 
         self.scale = scale
