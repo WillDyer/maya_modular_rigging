@@ -14,6 +14,8 @@ from PySide.QtWidgets import (QWidget,
 import importlib
 import os.path
 import string
+import maya.cmds as cmds
+import json
 
 from mod.user_interface.pages import module_settings
 importlib.reload(module_settings)
@@ -66,7 +68,22 @@ class RigColourWidget(QWidget):
     def __init__(self, sidebar_layout):
         super().__init__()
         self.sidebar_layout = sidebar_layout
+        self.init_colour()
         self.colour_settings()
+
+    def init_colour(self):
+        json_data = cmds.getAttr("ui_data.rig_colour")
+        if json_data:
+            self.colour_dict = json.loads(json_data)
+        else:
+            colour_dict = {
+                "L_colour": {"red": "255", "green": "0", "blue": "0"}, #[255, 0, 0],
+                "C_colour": {"red": "255", "green": "255", "blue": "0"}, #[255, 255, 0],
+                "R_colour": {"red": "0", "green": "0", "blue": "255"} # [0, 0, 255]
+            }
+            serialised_data = json.dumps(colour_dict)
+            cmds.setAttr("ui_data.rig_colour", serialised_data, type="string")
+            self.colour_dict = colour_dict
 
     def colour_settings(self):
         colour_label = QLabel("RIG COLOURS:")
@@ -86,9 +103,9 @@ class RigColourWidget(QWidget):
         R_button = QPushButton()
         R_button.setObjectName("R_colour")
 
-        L_button.setStyleSheet("background-color: red;")
-        C_button.setStyleSheet("background-color: yellow;")
-        R_button.setStyleSheet("background-color: blue;")
+        L_button.setStyleSheet(f"background-color: rgb({self.colour_dict['L_colour']['red']},{self.colour_dict['L_colour']['green']},{self.colour_dict['L_colour']['blue']});")  # red
+        C_button.setStyleSheet(f"background-color: rgb({self.colour_dict['C_colour']['red']},{self.colour_dict['C_colour']['green']},{self.colour_dict['C_colour']['blue']});")  # yellow
+        R_button.setStyleSheet(f"background-color: rgb({self.colour_dict['R_colour']['red']},{self.colour_dict['R_colour']['green']},{self.colour_dict['R_colour']['blue']});")  # blue
 
         L_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         C_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -106,8 +123,18 @@ class RigColourWidget(QWidget):
         QObject.connect(R_button, SIGNAL("clicked()"), lambda: self.colour_button(R_button))
 
     def colour_button(self,button):
+        json_data = cmds.getAttr("ui_data.rig_colour")
+        colour_dict = json.loads(json_data)
         colour = self.get_colour()
-        if colour: button.setStyleSheet(f"background-color: rgb({colour['red']}, {colour['green']}, {colour['blue']});")
+        if colour:
+            button.setStyleSheet(f"background-color: rgb({colour['red']}, {colour['green']}, {colour['blue']});")
+            dict_key = button.objectName()
+            colour_dict[dict_key] = {"red": colour['red'],
+                                     "green": colour['green'],
+                                     "blue": colour['blue']}
+            print(colour_dict)
+            serialised_data = json.dumps(colour_dict)
+            cmds.setAttr("ui_data.rig_colour", serialised_data, type="string")
 
     def get_colour(self):
         colour = QColorDialog.getColor()
@@ -116,7 +143,8 @@ class RigColourWidget(QWidget):
             green = colour.green()
             blue = colour.blue()
             return {"red":red, "green":green, "blue":blue}
-        else: return None
+        else:
+            return None
 
 
 class RigNameWidget(QWidget):
