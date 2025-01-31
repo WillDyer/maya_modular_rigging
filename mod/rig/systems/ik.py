@@ -86,12 +86,12 @@ class create_ik():
             hock_ctrl = self.create_handle(f"{self.start_joint}_quad", f"{hock_joint}_quad", solver="ikRPsolver", pv=True, constrain=False)
             single_chain = cmds.ikHandle(sj=f"{hock_joint}_quad", ee=f"{self.end_joint}_quad", solver="ikSCsolver", n=f"ik_hdl_sc_{self.end_joint}")[0]
 
-            hdl_ctrl = self.create_handle(f"{self.start_joint}_driver", f"{self.end_joint}_driver", solver="ikSpringSolver", pv=False, constrain=True)
+            hdl_ctrl, hdl_offset_ctrl = self.create_handle(f"{self.start_joint}_driver", f"{self.end_joint}_driver", solver="ikSpringSolver", pv=False, constrain=True, offset_ctrl=True)
             
             hock_grp = cmds.group(n=f"offset_{hock_ctrl}", em=True)
             cmds.matchTransform(hock_grp, hdl_ctrl)
             cmds.parent(hock_ctrl, hock_grp)
-            cmds.parentConstraint(hdl_ctrl, hock_grp, mo=True, sr=["x","y","z"]) 
+            cmds.parentConstraint(hdl_ctrl, hock_grp, mo=True, sr=["x","y","z"])
 
             loc = cmds.xform(hdl_ctrl, r=True, ws=True, q=True, t=True)
             cmds.xform(hock_ctrl, pivots=loc, ws=True)
@@ -110,8 +110,11 @@ class create_ik():
             for xyz in ["X","Y","Z"]:
                 cmds.setAttr(f"{hock_ctrl}.translate{xyz}", keyable=False, cb=False)
             
+            cmds.parentConstraint(root_ctrl, self.quad_joint_list[0], n=f"pConst_{root_ctrl}", mo=True)
+            
             parent_list = utils.get_joints_between(start_joint=self.start_joint, end_joint=self.end_joint)
             parent_list.remove(self.end_joint)
+            parent_list.remove(self.pv_joint)
             for joint in parent_list:
                 if not cmds.listRelatives(joint, c=True, type="constraint"):
                     cmds.parentConstraint(f"{joint}_quad", joint, n=f"pConst_{joint}_quad", mo=True)
@@ -121,12 +124,12 @@ class create_ik():
             cmds.error("ik_type is invalid. Ik rig not made")
 
         if above_ctrls:
-            if hock_grp: self.ik_ctrls = [pv_ctrl, hdl_ctrl, hock_ctrl, root_ctrl] + above_ctrls
-            else: self.ik_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl] + above_ctrls
+            if hock_grp: self.ik_ctrls =  [pv_ctrl, hdl_ctrl, hdl_offset_ctrl, hock_ctrl, root_ctrl] + above_ctrls
+            else: self.ik_ctrls = [pv_ctrl,hdl_ctrl, hdl_offset_ctrl,root_ctrl] + above_ctrls
             offset = self.ik_ctrls[-1].replace("ctrl_","offset_")
         else:
-            if hock_grp: self.ik_ctrls = [pv_ctrl,hdl_ctrl,hock_ctrl,root_ctrl]
-            else: self.ik_ctrls = [pv_ctrl,hdl_ctrl,root_ctrl]
+            if hock_grp: self.ik_ctrls = [pv_ctrl,hdl_ctrl, hdl_offset_ctrl,hock_ctrl,root_ctrl]
+            else: self.ik_ctrls = [pv_ctrl,hdl_ctrl, hdl_offset_ctrl,root_ctrl]
             offset = self.ik_ctrls[-1].replace("ctrl_","offset_")
 
         self.offset = cmds.group(n=offset, em=1)
@@ -134,34 +137,45 @@ class create_ik():
         cmds.parent(self.ik_ctrls[-1], self.offset)
 
         if hock_grp:
-            self.grouped_ctrls = [pv_ctrl, hdl_ctrl, hock_grp, self.offset]
+            self.grouped_ctrls = [pv_ctrl, hdl_offset_ctrl, hock_grp, self.offset]
         else:
-            self.grouped_ctrls = [pv_ctrl,hdl_ctrl,self.offset]
+            self.grouped_ctrls = [pv_ctrl,hdl_offset_ctrl,self.offset]
         OPM.offsetParentMatrix(self.ik_ctrls)
 
     def create_pv(self):
         pv_ctrl = pole_vector.create_pv(self.start_joint, self.pv_joint, self.end_joint, name=f"ctrl_pv_{self.pv_joint[7:]}", pv_guide=self.pv_joint.replace("jnt_ik_",""))
         return pv_ctrl
 
-    def create_handle(self, start_joint, end_joint, solver, pv, constrain):
+    def create_handle(self, start_joint, end_joint, solver, pv, constrain, offset_ctrl=None):
         control_module = control_shape.Controls(scale=[1,1,1],guide=self.end_joint[7:],ctrl_name=f"ctrl_ik_{end_joint[7:]}",rig_type="ik")
         ctrl_crv = control_module.return_ctrl()
         self.handle = cmds.ikHandle(n=f"hdl_ik_{end_joint[7:]}", solver=solver, sj=start_joint, ee=end_joint)
+        cmds.addAttr(ctrl_crv, ln="reverse_parent", at="enum",en="True",k=0)
 
         if pv:
             cmds.poleVectorConstraint(f"ctrl_pv_{self.pv_joint[7:]}", f"hdl_ik_{end_joint[7:]}", n=f"pvConst_{self.pv_joint[7:]}")
-
+        
         if self.validation_joints["world_orientation"] is True:
             cmds.matchTransform(ctrl_crv, f"hdl_ik_{end_joint[7:]}")
         else:
             cmds.matchTransform(ctrl_crv, end_joint)
 
+        if offset_ctrl:
+            offset_ctrl_crv = cmds.circle(n=f"ctrl_ik_{end_joint[7:].replace('_driver','')}",r=10, nr=(0,1,0))[0]
+            cmds.matchTransform(offset_ctrl_crv, f"hdl_ik_{end_joint[7:]}")
+            cmds.parent(ctrl_crv, offset_ctrl_crv)
+
         if constrain:
             cmds.parentConstraint(ctrl_crv, f"hdl_ik_{end_joint[7:]}",mo=1,n=f"pConst_hdl_ik_{end_joint[7:]}")
             cmds.parentConstraint(ctrl_crv, end_joint, mo=True, n=f"pConst_{end_joint[7:]}", skipTranslate=("x","y","z"))
+        
+        if offset_ctrl:
+            cmds.addAttr(offset_ctrl_crv, ln="handle",at="enum",en="True",k=0)
+            return ctrl_crv, offset_ctrl_crv
+        else:
+            cmds.addAttr(ctrl_crv, ln="handle",at="enum",en="True",k=0)
 
-        cmds.addAttr(ctrl_crv, ln="handle",at="enum",en="True",k=0)
-        return ctrl_crv
+            return ctrl_crv
 
     def create_top_hdl_ctrl(self):
         cmds.select(clear=1)
