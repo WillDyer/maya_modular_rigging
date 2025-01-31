@@ -60,4 +60,4 @@ def offsetParentMatrix(ctrl):
         else:
             cmds.warning(f"OPM: Couldnt OPM not correct type supported. Errored obj: {ctrl}")
     except Exception as e:
-        raise f"OPM: Error couldnt OPM. {e}"
+        raise Exception(f"OPM: Error couldnt OPM. {e}")
