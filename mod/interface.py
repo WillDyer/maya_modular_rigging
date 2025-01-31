@@ -60,7 +60,8 @@ class Interface(QWidget):
             cmds.spaceLocator(n="ui_data")
             cmds.addAttr("ui_data", ln="ui_status", at="enum", enumName="guides:skeleton:rig:polish", k=True)
             cmds.addAttr("ui_data", ln="rig_name", dt="string", k=True)
-            cmds.setAttr("ui_data.rig_name", "MMR_Rig", type="string")
+            cmds.addAttr("ui_data", ln="rig_colour", dt="string", k=True)
+            cmds.setAttr("ui_data.rig_name", "MMR_Rig", type="string",k=True)
             cmds.select(clear=True)
             self.last_selected_button = "guides"
             self.rig_name_str = "MOD_Rig"
@@ -367,7 +368,7 @@ class Interface(QWidget):
             if key['system_to_connect']:
                 systems_to_connect = key['system_to_connect']
                 connect_modules.connect_polished(systems_to_connect)
-            if rig_type == "FKIK":
+            if rig_type == "FKIK" or rig_type == "IK":
                 space_swap_module = space_swap.SpaceSwapping(key)
             if twist_joint == "Yes":
                 twist_joints.connect_user_twist()
