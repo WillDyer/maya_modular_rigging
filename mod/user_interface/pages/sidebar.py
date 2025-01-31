@@ -132,7 +132,6 @@ class RigColourWidget(QWidget):
             colour_dict[dict_key] = {"red": colour['red'],
                                      "green": colour['green'],
                                      "blue": colour['blue']}
-            print(colour_dict)
             serialised_data = json.dumps(colour_dict)
             cmds.setAttr("ui_data.rig_colour", serialised_data, type="string")
 
