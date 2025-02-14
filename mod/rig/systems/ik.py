@@ -40,7 +40,7 @@ class create_ik():
             self.collect_other_controls(ik_joint_list)
             hock_grp = None
             pv_ctrl = self.create_pv()
-            hdl_ctrl = self.create_handle(self.start_joint, self.end_joint, solver="ikRPsolver", pv=True, constrain=True)
+            hdl_ctrl, hdl_offset_ctrl = self.create_handle(self.start_joint, self.end_joint, solver="ikRPsolver", pv=True, constrain=True, offset_ctrl=True)
             root_ctrl = self.create_top_hdl_ctrl()
             above_ctrls = self.above_root_ctrl()
 

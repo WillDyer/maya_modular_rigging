@@ -110,7 +110,7 @@ class mirror_data():
                 try:
                     if attr == "master_guide":
                         cmds.addAttr(proxy_obj_list, ln="master_guide",at="enum",en=self.master_guide,k=0)
-                    elif attr not in ['_control_shape','is_mirrored','visibility', 'translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']:
+                    elif attr not in ['original_guide','_control_shape','is_mirrored','visibility', 'translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']:
                         try:
                             # new_attr_name = f"master_{self.side}{attr[8:]}"
                             new_attr_name = attr.replace(f"{self.key['side']}",self.side,1)
@@ -125,6 +125,8 @@ class mirror_data():
         for guide in self.key["guide_list"]: # non proxy attrs
             for attr in cmds.listAttr(guide,ud=1):
                 mirrored_guide = f"{self.side}{guide[1:]}"
+                if cmds.ls(mirrored_guide):
+                    print(f"FOUND : {mirrored_guide}")
                 if "_control_shape" in attr:
                     if "_ik_" in attr: fkik = "ik"
                     elif "_fk_" in attr: fkik = "fk"
@@ -137,6 +139,7 @@ class mirror_data():
 
                 elif "original_guide" in attr:
                     en_value = cmds.getAttr(f"{guide}.{attr}",asString=1)
+                    print(mirrored_guide)
                     cmds.addAttr(mirrored_guide, ln="original_guide", at="enum", en=en_value, k=1)
 
     def mirror_reverse_foot(self):

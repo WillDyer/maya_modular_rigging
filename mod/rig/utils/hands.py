@@ -55,6 +55,7 @@ class create_hands():
                     "guide_list": guide_list,
                     "guide_scale": module.guide_scale,
                     "joints": [],
+                    "skin_joints": [],
                     "side": module.side,
                     "connectors": guide_connector_list,
                     "system_to_connect": system_to_connect,

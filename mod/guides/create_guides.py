@@ -126,9 +126,10 @@ class Guides():
                     root_exists = True
                     guide = cmds.rename(imported[0], f"{side}{number}_{x}")
                 else:
+                    print(f"making guide: {x}")
                     imported = cmds.file(ABC_FILE, i=1, namespace="test", rnn=1)
                     cmds.scale(self.module.guide_scale, self.module.guide_scale, self.module.guide_scale, imported)
-                    guide = cmds.rename(imported[0], f"{side}{number}_{x}")
+                    guide = cmds.rename(imported[0], f"{side}{number}_{x}_#")
                 if "root" in x and root_exists is True:
                     master_guide = guide
                 elif "proximal" in x:
@@ -178,7 +179,7 @@ class Guides():
             data_guide_name = f"data_{side}{number}_{accessed_module}"
         else:
             data_guide_name = master_guide.replace("master_", "data_")
-        cmds.spaceLocator(n=data_guide_name)
+        data_guide_name = cmds.spaceLocator(n=f"{data_guide_name}_#")[0]
         cmds.matchTransform(data_guide_name, master_guide)
         cmds.parent(data_guide_name, master_guide)
 
