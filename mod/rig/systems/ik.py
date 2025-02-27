@@ -40,7 +40,7 @@ class create_ik():
             self.collect_other_controls(ik_joint_list)
             hock_grp = None
             pv_ctrl = self.create_pv()
-            hdl_ctrl, hdl_offset_ctrl = self.create_handle(self.start_joint, self.end_joint, solver="ikRPsolver", pv=True, constrain=True, offset_ctrl=True)
+            hdl_ctrl, hdl_offset_ctrl = self.create_handle(self.start_joint, self.end_joint, solver="ikRPsolver", pv=True, constrain=True, offset_ctrl=self.validation_joints["offset_ctrl"])
             root_ctrl = self.create_top_hdl_ctrl()
             above_ctrls = self.above_root_ctrl()
 
@@ -126,11 +126,12 @@ class create_ik():
         if above_ctrls:
             if hock_grp: self.ik_ctrls =  [pv_ctrl, hdl_ctrl, hdl_offset_ctrl, hock_ctrl, root_ctrl] + above_ctrls
             else: self.ik_ctrls = [pv_ctrl,hdl_ctrl, hdl_offset_ctrl,root_ctrl] + above_ctrls
-            offset = self.ik_ctrls[-1].replace("ctrl_","offset_")
         else:
             if hock_grp: self.ik_ctrls = [pv_ctrl,hdl_ctrl, hdl_offset_ctrl,hock_ctrl,root_ctrl]
             else: self.ik_ctrls = [pv_ctrl,hdl_ctrl, hdl_offset_ctrl,root_ctrl]
-            offset = self.ik_ctrls[-1].replace("ctrl_","offset_")
+        
+        self.ik_ctrls = [item for item in self.ik_ctrls if item != []]
+        offset = self.ik_ctrls[-1].replace("ctrl_","offset")
 
         self.offset = cmds.group(n=offset, em=1)
         cmds.matchTransform(self.offset, self.ik_ctrls[-1])
@@ -140,6 +141,7 @@ class create_ik():
             self.grouped_ctrls = [pv_ctrl, hdl_offset_ctrl, hock_grp, self.offset]
         else:
             self.grouped_ctrls = [pv_ctrl,hdl_offset_ctrl,self.offset]
+        self.grouped_ctrls = [item for item in self.grouped_ctrls if item != []]
         OPM.offsetParentMatrix(self.ik_ctrls)
 
     def create_pv(self):
@@ -175,7 +177,7 @@ class create_ik():
         else:
             cmds.addAttr(ctrl_crv, ln="handle",at="enum",en="True",k=0)
 
-            return ctrl_crv
+            return ctrl_crv, []
 
     def create_top_hdl_ctrl(self):
         cmds.select(clear=1)

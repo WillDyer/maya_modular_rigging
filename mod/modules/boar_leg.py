@@ -10,7 +10,8 @@ ik_joints = {
     "pv_joint": "tibia",
     "world_orientation": True,
     "ik_type": "quadruped",
-    "hock": "metatarsus"
+    "hock": "metatarsus",
+    "offset_ctrl": True
 }
 side = "L"
 space_swapping = ["fema","root","COG","Custom"]

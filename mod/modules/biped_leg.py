@@ -9,7 +9,8 @@ ik_joints = {
     "end_joint": "ankle",
     "pv_joint": "knee",
     "world_orientation": True,
-    "ik_type": "biped"
+    "ik_type": "biped",
+    "offset_ctrl": True
 }
 side = "L"
 space_swapping = ["hip","root","COG","Custom"]

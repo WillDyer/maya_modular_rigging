@@ -8,7 +8,8 @@ ik_joints = {
     "start_joint": "spine_1",
     "end_joint": "spine_10",
     "pv_joint": None,
-    "world_orientation": True
+    "world_orientation": True,
+    "offset_ctrl": False
 }
 side = "C"
 space_swapping = []

@@ -10,7 +10,8 @@ ik_joints = {
     "pv_joint": "radius",
     "world_orientation": True,
     "ik_type": "quadruped",
-    "hock": "metacarpal"
+    "hock": "metacarpal",
+    "offset_ctrl": True
 }
 side = "L"
 space_swapping = ["scapula","root","COG","Custom"]
