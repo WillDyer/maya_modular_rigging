@@ -226,13 +226,10 @@ class Interface(QWidget):
 
         mirror_module = mirror_rig.mirror_data(self.systems_to_be_made, orientation)
         self.systems_to_be_made = mirror_module.get_mirror_data()
-        for dict in self.systems_to_be_made.values():
-            print(dict)
         created_guides = [key["master_guide"] for key in self.systems_to_be_made.values()]
 
         rig_jnt_list = joints.get_joint_list(orientation,created_guides, system="rig")
         num = 0
-        print(rig_jnt_list)
         for dict in self.systems_to_be_made.values():
             if not dict["joints"]:
                 dict["joints"] = rig_jnt_list[num]
@@ -241,15 +238,13 @@ class Interface(QWidget):
         self.skn_jnt_list = joints.get_joint_list(orientation,created_guides, system="skn")
         print(self.skn_jnt_list)
         num = 0
-        print(len(self.systems_to_be_made.values()))
-        print(len(self.skn_jnt_list))
+
         for dict in self.systems_to_be_made.values():
             print(dict)
             if not dict["skin_joints"]:
                 dict["skin_joints"] = self.skn_jnt_list[num]
             num = num+1
 
-        print(dict["skin_joints"])
 
         for key in self.systems_to_be_made.values():
             twist_joint = cmds.getAttr(f"{key['master_guide']}.{key['master_guide']}_twist_jnts", asString=1)
