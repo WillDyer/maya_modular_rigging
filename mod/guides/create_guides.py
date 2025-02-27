@@ -1,5 +1,6 @@
 import maya.cmds as cmds
 import importlib
+import json
 import os
 from mod.rig.utils import connect_modules, utils, control_shape
 from mod.rig.sub_systems import reverse_foot
@@ -76,9 +77,9 @@ class Guides():
         COLOR_CONFIG = {'l': 6, 'r': 13, 'default': 22}
         guide_list = []
         root_exists = False
-        number = "0"
+        number = 0
         tmp_list = []
-        module_list = cmds.ls("data*")
+        data_list = cmds.ls("data*")
 
 
         try:
@@ -86,7 +87,7 @@ class Guides():
         except AttributeError as e:
             cmds.error(f"create_guides: Missing {e}")
 
-        for object in module_list:
+        for object in data_list:
             if "Shape" in object:
                 pass
             elif accessed_module in object:
@@ -96,12 +97,12 @@ class Guides():
 
         numbers_unfiltered = []
         for data_guide in tmp_list:
-            if cmds.attributeQuery("guide_number", node=data_guide, exists=True):
-                attr_num = int(cmds.getAttr(f"{data_guide}.guide_number"))
-                numbers_unfiltered.append(attr_num)
+            if cmds.attributeQuery("init_data", node=data_guide, exists=True):
+                init_data = json.loads(cmds.getAttr(f"{data_guide}.init_data"))
+                numbers_unfiltered.append(int(init_data["guide_number"]))
             else:
                 cmds.warning("guide_number attr doesnt exist on this node, guide setup might not work as expected.")
-
+        
         if numbers_unfiltered:
             numbers_unfiltered.sort()
             number = numbers_unfiltered[-1] + 1
@@ -129,7 +130,7 @@ class Guides():
                     print(f"making guide: {x}")
                     imported = cmds.file(ABC_FILE, i=1, namespace="test", rnn=1)
                     cmds.scale(self.module.guide_scale, self.module.guide_scale, self.module.guide_scale, imported)
-                    guide = cmds.rename(imported[0], f"{side}{number}_{x}_#")
+                    guide = cmds.rename(imported[0], f"{side}{number}_{x}")
                 if "root" in x and root_exists is True:
                     master_guide = guide
                 elif "proximal" in x:
@@ -179,7 +180,7 @@ class Guides():
             data_guide_name = f"data_{side}{number}_{accessed_module}"
         else:
             data_guide_name = master_guide.replace("master_", "data_")
-        data_guide_name = cmds.spaceLocator(n=f"{data_guide_name}_#")[0]
+        data_guide_name = cmds.spaceLocator(n=data_guide_name)[0]
         cmds.matchTransform(data_guide_name, master_guide)
         cmds.parent(data_guide_name, master_guide)
 

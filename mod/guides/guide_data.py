@@ -39,8 +39,7 @@ def init_data():
     print(f"Existing Guides Found: {data_guides}")
     for guide in data_guides:
         if cmds.attributeQuery("init_data", node=guide, exists=True):
-            retrieved_data = cmds.getAttr(f"{guide}.init_data")
-            init_data = json.loads(retrieved_data)
+            init_data = json.loads(cmds.getAttr(f"{guide}.init_data"))
             return_dict[guide] = init_data
         else:
             cmds.warning(f"guide_data: couldnt find init_data on {guide} setup wont be the same")
