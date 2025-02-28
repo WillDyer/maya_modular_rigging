@@ -18,13 +18,13 @@ from PySide.QtWidgets import (QWidget,
                                QLineEdit)
 
 from mod.user_interface.pages import module_settings, sidebar, page_utils
-from mod.rig.systems import joints, ik, fk, ribbon
+from mod.rig.systems import joints, ik, fk, ribbon, hybrid_fkik
 from mod.rig.sub_systems import reverse_foot, twist_joints, squash_and_stretch, space_swap
 from mod.rig.utils import connect_modules, system_group, ikfk_switch, utils, hands, control_shape
 from mod.guides import create_guides, update_guides, guide_data, mirror_rig
 
 ui_pages = [module_settings, sidebar, page_utils, progress_bar]
-systems = [create_guides, update_guides, hands, joints, twist_joints, ik, fk, ribbon, squash_and_stretch]
+systems = [create_guides, update_guides, hands, joints, twist_joints, ik, fk, ribbon, hybrid_fkik, squash_and_stretch]
 system_util = [guide_data, mirror_rig, connect_modules, system_group, ikfk_switch, utils, reverse_foot, space_swap, control_shape]
 for module_list in [ui_pages, systems, system_util]:
     for module in module_list:    
@@ -327,6 +327,14 @@ class Interface(QWidget):
 
                     utils.constraint_from_lists_2to1(ik_joint_list, fk_joint_list, key["joints"],maintain_offset=1)
                     ikfk_switch.create_ikfk(key["joints"], fk_ctrls, ik_ctrls,ik_joint_list,fk_joint_list,master_guide)
+                elif rig_type == "Hybrid_FKIK":
+                    progressbar.update_label(text=f"Making Hybrid FKIK {key['module']}...")
+                    ik_joint_list = joints.joint(orientation, master_guide, system="ik", hide=True)
+                    fk_joint_list = joints.joint(orientation, master_guide, system="fk", hide=True)
+                    hybrid_module = hybrid_fkik.create_hybrid(ik_joint_list, fk_joint_list, master_guide, module)
+                    ik_ctrls, fk_ctrls = hybrid_module.get_ctrls()
+                    key.update({"ik_joint_list": ik_joint_list, "ik_ctrls": ik_ctrls, "fk_joint_list": fk_joint_list, "fk_ctrls": fk_ctrls})
+                    utils.constraint_from_lists_1to1(fk_joint_list, key["joints"],maintain_offset=1)
                 else:
                     cmds.error("ERROR: rig_type attribute cannot be found or attribute value cannot be found.")
 

@@ -14,5 +14,5 @@ ik_joints = {
 side = "C"
 space_swapping = []
 guide_scale = 1
-available_rig_types = ["FK","IK_Ribbon"]
+available_rig_types = ["FK","IK_Ribbon","Hybrid_FKIK"]
 locked_guide_attr = ["translateY"]
