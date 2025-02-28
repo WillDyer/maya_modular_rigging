@@ -56,7 +56,8 @@ def connect_polished(systems_to_connect):
         "IK": "offset_ik",
         "FK": "offset_fk",
         "FKIK": ["offset_ik", "offset_fk"],
-        "IK_Ribbon": "jnt_ik"
+        "IK_Ribbon": "jnt_ik",
+        "Hybrid_FKIK": "jnt_fk"
     }
 
     systems_ikfk = []
