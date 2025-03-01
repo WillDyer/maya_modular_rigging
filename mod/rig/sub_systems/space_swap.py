@@ -22,6 +22,9 @@ class SpaceSwapping():
                 for x in self.ik_ctrls:
                     try: OPM.offsetParentMatrix(x)
                     except: pass
+                
+                if any(cmds.getAttr(f"{self.handle_ctrl[0]}.translate{axis}") != 0 for axis in ["X", "Y", "Z"]):
+                    cmds.setAttr(f"{self.handle_ctrl[0]}.translate", 0, 0, 0, type="double3")
 
     def create_locators(self):
         created_locator_list = [cmds.spaceLocator(n=f"loc_space_{x}")[0] for x in self.guide_list for item in self.locator_list if item in x]
