@@ -453,7 +453,7 @@ class CreateReverseFootBiped():
         jnt_verification_values = [self.module.rev_locators["ankle"],self.module.rev_locators["ball"],self.module.rev_locators["toe"]]
         jnt_list = [item for item in self.system["ik_joint_list"] if any(key in item for key in jnt_verification_values)]
 
-        self.foot_ctrl = [x for x in self.system["ik_ctrl_list"] if cmds.attributeQuery("handle", node=x, exists=True) and cmds.getAttr(f"{x}.handle", asString=1) == "True"][0]
+        self.foot_ctrl = [x for x in self.system["ik_ctrl_list"] if cmds.attributeQuery("reverse_parent", node=x, exists=True) and cmds.getAttr(f"{x}.reverse_parent", asString=1) == "True"][0]
         self.foot_attr()
 
         hdl_rev_ball = cmds.ikHandle(n=f"hdl_rev_ball{side}_#",sj=jnt_list[0],ee=jnt_list[1],sol="ikSCsolver")[0]

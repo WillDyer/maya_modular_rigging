@@ -38,6 +38,8 @@ class ControlTypes():
         module = f"self.create_{control_type}()"
         eval(module)
 
+        self.match_scale(guide=self.guide, ctrl=self.ctrl_crv)
+
     def create_circle(self):
         self.ctrl_crv = cmds.circle(n=self.name,r=10, nr=(1, 0, 0), ch=False)[0]
         return self.ctrl_crv
@@ -140,6 +142,13 @@ class ControlTypes():
             return self.name
         else:
             return self.ctrl_crv
+
+    def match_scale(self, guide=None, ctrl=None):
+        if guide:
+            print("MATCHING SCALE")
+            print(guide)
+            print(ctrl)
+            cmds.matchTransform(ctrl, guide,scale=True, rot=False, pos=False)
 
 
 class Controls():

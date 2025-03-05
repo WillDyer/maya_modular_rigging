@@ -163,21 +163,25 @@ class create_ik():
             cmds.matchTransform(ctrl_crv, end_joint)
 
         if offset_ctrl:
-            offset_ctrl_crv = cmds.circle(n=f"ctrl_ik_{end_joint[7:].replace('_driver','')}",r=10, nr=(0,1,0))[0]
+            offset_ctrl_crv = cmds.circle(n=f"ctrl_ik_{end_joint[7:].replace('_driver','')}_offset",r=10, nr=(0,1,0))[0]
             cmds.matchTransform(offset_ctrl_crv, f"hdl_ik_{end_joint[7:]}")
+            cmds.xform(offset_ctrl_crv, worldSpace=True, 
+                       translation=(cmds.xform(offset_ctrl_crv, query=True, worldSpace=True, translation=True)[0],
+                                    0,
+                                    cmds.xform(offset_ctrl_crv, query=True, worldSpace=True, translation=True)[2]))
             cmds.parent(ctrl_crv, offset_ctrl_crv)
 
         if constrain:
             cmds.parentConstraint(ctrl_crv, f"hdl_ik_{end_joint[7:]}",mo=1,n=f"pConst_hdl_ik_{end_joint[7:]}")
             cmds.parentConstraint(ctrl_crv, end_joint, mo=True, n=f"pConst_{end_joint[7:]}", skipTranslate=("x","y","z"))
         
-        cmds.addAttr(ctrl_crv, ln="handle",at="enum",en="True",k=0)
+        # cmds.addAttr(ctrl_crv, ln="handle",at="enum",en="True",k=0)
 
         if offset_ctrl:
-            # cmds.addAttr(offset_ctrl_crv, ln="handle",at="enum",en="True",k=0)
+            cmds.addAttr(offset_ctrl_crv, ln="handle",at="enum",en="True",k=0)
             return ctrl_crv, offset_ctrl_crv
         else:
-            # cmds.addAttr(ctrl_crv, ln="handle",at="enum",en="True",k=0)
+            cmds.addAttr(ctrl_crv, ln="handle",at="enum",en="True",k=0)
 
             return ctrl_crv, []
 
