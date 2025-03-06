@@ -1,4 +1,5 @@
 import maya.cmds as cmds
+import maya.api.OpenMaya as om
 import importlib
 from mod.rig.utils import OPM
 importlib.reload(OPM)
@@ -7,6 +8,7 @@ importlib.reload(OPM)
 class CreateReverseLocators():
     def __init__(self, guides,accessed_module):
         self.guides = guides
+        self.grp_list = []
         self.accessed_module = accessed_module
         self.module = importlib.import_module(f"mod.modules.{accessed_module}")
         importlib.reload(self.module)
@@ -30,7 +32,7 @@ class CreateReverseLocators():
 
         # loc_name = [f"rev_{rev_locators['toe']}{side}",f"rev_{rev_locators['ball']}{side}",f"rev_{rev_locators['ankle']}{side}"]
         locators_keys = rev_locators.values()
-        jnt_name = [item for item in self.guides["ui_guide_list"] if any(key in item for key in locators_keys)]
+        guide_name = [item for item in self.guides["ui_guide_list"] if any(key in item for key in locators_keys)]
         loc_name = [f"rev_{item}" for item in self.guides["ui_guide_list"] if any(key in item for key in locators_keys)]
         # list order needs to be: toe, ball, ankle
         loc_toe = loc_name[0]
@@ -39,17 +41,23 @@ class CreateReverseLocators():
 
         for x in range(len(loc_name)):
             try:
-                cmds.spaceLocator(n=loc_name[x])
-                cmds.matchTransform(loc_name[x],jnt_name[x], rotation=False)
+                loc = cmds.spaceLocator(n=loc_name[x])[0]
+                cmds.matchTransform(loc,guide_name[x], rotation=False)
+                self.follow(locator=loc, guide=loc_name[x].replace("rev_",""))
             except:
                 cmds.error("Error: jnt_name cant be found check backend.")
+
         bank_in = f"rev_{side}_{rev_locators['bank_in']}_#"
         bank_out = f"rev_{side}_{rev_locators['bank_out']}_#"
+        ball_guide = [guide for guide in self.guides["ui_guide_list"] if rev_locators["ball"] in guide][0]
+
         for x in [bank_in,bank_out]:
             tmp = cmds.spaceLocator(n=f"{x}")[0]
+            #self.decompose_matrix(input=ball_guide ,output=tmp)
             cmds.matchTransform(tmp, loc_ball, pos=True, rot=False)
             if x == bank_in: bank_in = tmp
             elif x == bank_out: bank_out = tmp
+
         offset = 7
 
         if "L" in bank_out and "L" in bank_in:
@@ -65,21 +73,30 @@ class CreateReverseLocators():
         else:
             cmds.error("reverse_foot: No matching side suffex")
 
+        for bank in [bank_in, bank_out]:
+            self.follow(locator=bank, guide=ball_guide)
+
         loc_heel = cmds.spaceLocator(n=f"{loc_prefix}_{side}_{rev_locators['heel']}_#")[0]
         cmds.matchTransform(loc_heel,loc_ball, pos=True, rot=False)
-        cmds.move(0,0,-offset,loc_heel,r=1)
+        cmds.matchTransform(loc_heel, loc_ankle, pz=True, rot=False)
         cmds.matchTransform(loc_heel,loc_toe, py=True, rot=False)
+        self.follow(locator=loc_heel, guide=ball_guide)
 
         loc_list = [loc_heel,loc_toe,loc_ball,loc_ankle,bank_in, bank_out]
         ankle_guide = [guide for guide in self.guides["ui_guide_list"] if self.module.rev_locators["ankle"] in guide][0]
-        grp = cmds.group(loc_list, n=f"grp_rev_{ankle_guide}")
-        constraint_name = cmds.parentConstraint(ankle_guide, grp, mo=1, n=f"pConst_{ankle_guide}")[0]
-        cmds.setAttr(f"{constraint_name}.hiddenInOutliner", True)
+        cmds.group(self.grp_list, n=f"grp_rev_{ankle_guide}")
+
         return loc_list
 
     def get_locators(self):
         return self.locator_list
 
+    def follow(self, locator=None, guide=None):
+        grp = cmds.group(n=f"{locator}_follow", w=True, em=True)
+        constraint = cmds.parentConstraint(guide, grp, n=f"pConst_{grp}", mo=True)[0]
+        cmds.parent(locator, grp)
+        cmds.setAttr(f"{constraint}.hiddenInOutliner", True)
+        self.grp_list.append(grp)
 
 class CreateReverseFootQuadruped():
     def __init__(self, accessed_module, system):
