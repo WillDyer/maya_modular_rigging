@@ -154,7 +154,6 @@ class mirror_data():
                 cmds.group(n="tmp_mirror",em=1)
                 cmds.parent(mirrored_rev_locators, "tmp_mirror")
                 cmds.setAttr("tmp_mirror.scaleX",-1)
-                cmds.makeIdentity("tmp_mirror", apply=True, scale=True)
                 cmds.parent(mirrored_rev_locators,w=1)
                 cmds.delete("tmp_mirror")
                 cmds.group(mirrored_rev_locators, n=f"grp_{mirrored_rev_locators[3]}")

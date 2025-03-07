@@ -34,10 +34,20 @@ class CreateReverseLocators():
         locators_keys = rev_locators.values()
         guide_name = [item for item in self.guides["ui_guide_list"] if any(key in item for key in locators_keys)]
         loc_name = [f"rev_{item}" for item in self.guides["ui_guide_list"] if any(key in item for key in locators_keys)]
+        
         # list order needs to be: toe, ball, ankle
         loc_toe = loc_name[0]
         loc_ball = loc_name[1]
         loc_ankle = loc_name[2]
+        offset = 7
+        bank_in = f"rev_{side}_{rev_locators['bank_in']}_#"
+        bank_out = f"rev_{side}_{rev_locators['bank_out']}_#"
+        ball_guide = [guide for guide in self.guides["ui_guide_list"] if rev_locators["ball"] in guide][0]
+        ankle_guide = [guide for guide in self.guides["ui_guide_list"] if self.module.rev_locators["ankle"] in guide][0]
+
+        parent_grp = cmds.group(n=f"grp_rev_{ankle_guide}", w=True, em=True)
+        cmds.matchTransform(parent_grp, ankle_guide, pos=True, rot=False, scale=False)
+        cmds.matchTransform(parent_grp, ball_guide, pos=False, rx=False, ry=True, rz=False, scale=False)
 
         for x in range(len(loc_name)):
             try:
@@ -47,29 +57,28 @@ class CreateReverseLocators():
             except:
                 cmds.error("Error: jnt_name cant be found check backend.")
 
-        bank_in = f"rev_{side}_{rev_locators['bank_in']}_#"
-        bank_out = f"rev_{side}_{rev_locators['bank_out']}_#"
-        ball_guide = [guide for guide in self.guides["ui_guide_list"] if rev_locators["ball"] in guide][0]
-
         for x in [bank_in,bank_out]:
             tmp = cmds.spaceLocator(n=f"{x}")[0]
             #self.decompose_matrix(input=ball_guide ,output=tmp)
             cmds.matchTransform(tmp, loc_ball, pos=True, rot=False)
+            cmds.matchTransform(tmp, loc_ball, pos=False, ry=True, rx=False, rz=False)
             if x == bank_in: bank_in = tmp
             elif x == bank_out: bank_out = tmp
 
-        offset = 7
-
         if "L" in bank_out and "L" in bank_in:
-            cmds.move(offset,0,0,bank_out,r=1)
-            cmds.move(-offset,0,0,bank_in,r=1)
             cmds.matchTransform(bank_in,loc_toe, py=True, rot=False)
             cmds.matchTransform(bank_out,loc_toe, py=True, rot=False)
+            # cmds.move(0,0,offset,bank_out,a=1, r=0)
+            # cmds.move(0,0,-offset,bank_in,a=1, r=0)
+            OPM.offsetParentMatrix(ctrl=[bank_in, bank_out])
+            cmds.setAttr(f"{bank_out}.translateZ", offset)
+            cmds.setAttr(f"{bank_in}.translateZ", -offset)
         elif "R" in bank_out and "R" in bank_in:
-            cmds.move(-offset,0,0,bank_out,r=1)
-            cmds.move(offset,0,0,bank_in,r=1)
             cmds.matchTransform(bank_in,loc_toe, py=True, rot=False)
             cmds.matchTransform(bank_out,loc_toe, py=True, rot=False)
+            OPM.offsetParentMatrix(ctrl=[bank_in, bank_out])
+            cmds.setAttr(f"{bank_out}.translateZ", -offset)
+            cmds.setAttr(f"{bank_in}.translateZ", offset)
         else:
             cmds.error("reverse_foot: No matching side suffex")
 
@@ -83,8 +92,9 @@ class CreateReverseLocators():
         self.follow(locator=loc_heel, guide=ball_guide)
 
         loc_list = [loc_heel,loc_toe,loc_ball,loc_ankle,bank_in, bank_out]
-        ankle_guide = [guide for guide in self.guides["ui_guide_list"] if self.module.rev_locators["ankle"] in guide][0]
-        cmds.group(self.grp_list, n=f"grp_rev_{ankle_guide}")
+
+
+        cmds.parent(self.grp_list, parent_grp)
 
         return loc_list
 
@@ -93,6 +103,7 @@ class CreateReverseLocators():
 
     def follow(self, locator=None, guide=None):
         grp = cmds.group(n=f"{locator}_follow", w=True, em=True)
+        cmds.matchTransform(grp, guide, pos=True, rot=True, scale=False)
         constraint = cmds.parentConstraint(guide, grp, n=f"pConst_{grp}", mo=True)[0]
         cmds.parent(locator, grp)
         cmds.setAttr(f"{constraint}.hiddenInOutliner", True)
@@ -385,12 +396,15 @@ class CreateReverseFootBiped():
             cmds.connectAttr(f"{self.foot_ctrl}.{self.attr_list[2]}",f"{condition_node}.colorIfTrueR")
 
             math_node = cmds.shadingNode("floatMath",au=1,n=f"math_{x}")
+            reverse_node = cmds.createNode("multiplyDivide", n=f"reverse_{x}")
 
             cmds.connectAttr(f"{condition_node}.outColorR",f"{math_node}.floatA")
-            cmds.connectAttr(f"{math_node}.outFloat",f"{x}.rotateZ")
+            cmds.connectAttr(f"{math_node}.outFloat",f"{reverse_node}.input1X")
+            cmds.connectAttr(f"{reverse_node}.outputX",f"{x}.rotateX")
 
             cmds.setAttr(f"{math_node}.operation",2)
             cmds.setAttr(f"{math_node}.floatB",2.5)
+            cmds.setAttr(f"{reverse_node}.input2X", -1)
 
         cmds.setAttr(f"{bank_in_node}.operation",2)
         cmds.setAttr(f"{bank_out_node}.operation",4)
