@@ -9,6 +9,7 @@ ik_joints = {
     "end_joint": "ankle",
     "pv_joint": "knee_1",
     "world_orientation": True,
+    "ball_joint": "ball",
     "ik_type": "biped",
     "offset_ctrl": True
 }

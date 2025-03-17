@@ -9,6 +9,7 @@ ik_joints = {
     "end_joint": "palm",
     "pv_joint": "radius",
     "world_orientation": True,
+    "ball_joint": "sesamoid",
     "ik_type": "quadruped",
     "hock": "metacarpal",
     "offset_ctrl": True

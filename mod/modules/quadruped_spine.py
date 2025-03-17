@@ -9,6 +9,7 @@ ik_joints = {
     "end_joint": "spine_10",
     "pv_joint": None,
     "world_orientation": True,
+    "ball_joint": None,
     "offset_ctrl": False
 }
 side = "C"

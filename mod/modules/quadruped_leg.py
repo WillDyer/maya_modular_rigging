@@ -9,6 +9,7 @@ ik_joints = {
     "end_joint": "ankle",
     "pv_joint": "tibia",
     "world_orientation": True,
+    "ball_joint": "ball",
     "ik_type": "quadruped",
     "hock": "metatarsus",
     "offset_ctrl": True
