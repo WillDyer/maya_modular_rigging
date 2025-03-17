@@ -1,5 +1,9 @@
 import maya.cmds as cmds
+import importlib
+import json
 from mod.rig.utils import OPM
+from mod.rig.utils import utils
+importlib.reload(utils)
 
 
 attrs = {
@@ -65,6 +69,11 @@ def grpSetup(rig_name):
     cmds.parent(new_shape_node, COG, shape=True, relative=True)
     cmds.delete(new_shape)
     cog_jnt = [item for item in cmds.ls("jnt_rig*") if "COG" in item]
+
+    # ctrl_list = cmds.ls(self.ctrl,type="transform")
+    ctrl_list = [root_world, root, COG]
+    button_colour_dict = json.loads(cmds.getAttr("ui_data.colour_dict"))
+    utils.colour_controls(ctrl_list,button_colour_dict)
 
     if cog_jnt:
         cmds.matchTransform("ctrl_COG", cog_jnt[0],pos=1)

@@ -2,6 +2,7 @@ import maya.cmds as cmds
 from maya import OpenMayaUI as omui
 import importlib
 import os.path
+import json
 
 from mod.user_interface.utils import qtpyside, progress_bar
 PySide, wrapInstance = qtpyside.get_version()
@@ -61,6 +62,7 @@ class Interface(QWidget):
             cmds.addAttr("ui_data", ln="ui_status", at="enum", enumName="guides:skeleton:rig:polish", k=True)
             cmds.addAttr("ui_data", ln="rig_name", dt="string", k=True)
             cmds.addAttr("ui_data", ln="rig_colour", dt="string", k=True)
+            cmds.addAttr("ui_data", ln="colour_dict", dt="string", k=True)
             cmds.setAttr("ui_data.rig_name", "MMR_Rig", type="string",k=True)
             cmds.select(clear=True)
             self.last_selected_button = "guides"
@@ -274,6 +276,18 @@ class Interface(QWidget):
         cmds.select(cl=1)
 
     def create_rig(self, progressbar):
+        button_names = ["L_colour","C_colour","R_colour"]
+        button_colour_dict = {"L_colour":[],"C_colour":[],"R_colour":[]}
+        for x in button_names:
+            button_name = self.sidebar_widget.findChild(QPushButton, x)
+            palette = button_name.palette()
+            button_colour = palette.color(button_name.backgroundRole())
+            button_rgb = button_colour.getRgb()
+            button_colour_dict[x] = list(button_rgb)
+        button_colour_dict.update({"root": [0,255,0]})
+        serialised_data = json.dumps(button_colour_dict)
+        cmds.setAttr("ui_data.colour_dict", serialised_data, type="string")
+
         for key in self.systems_to_be_made.values():
             progressbar.update_label(text=f"Making Module: {key['module']}")
             master_guide = key['master_guide']
@@ -371,6 +385,9 @@ class Interface(QWidget):
         rig_name = self.sidebar_widget.findChild(QLineEdit, "rig_name")
         system_group.grpSetup(rig_name.text())
         cmds.setAttr("ui_data.rig_name", str(rig_name.text()), type="string")
+
+        ctrl_list = cmds.ls("ctrl_*",type="transform")
+        utils.colour_controls(ctrl_list,button_colour_dict)
         
         utils.scale_rig(self.systems_to_be_made)
 
@@ -384,19 +401,6 @@ class Interface(QWidget):
                 space_swap_module = space_swap.SpaceSwapping(key)
             if twist_joint == "Yes":
                 twist_joints.connect_user_twist()
-
-        button_names = ["L_colour","C_colour","R_colour"]
-        button_colour_dict = {"L_colour":[],"C_colour":[],"R_colour":[]}
-        for x in button_names:
-            button_name = self.sidebar_widget.findChild(QPushButton, x)
-            palette = button_name.palette()
-            button_colour = palette.color(button_name.backgroundRole())
-            button_rgb = button_colour.getRgb()
-            button_colour_dict[x] = list(button_rgb)
-        button_colour_dict.update({"root": [0,255,0]})
-
-        ctrl_list = cmds.ls("ctrl_*",type="transform")
-        utils.colour_controls(ctrl_list,button_colour_dict)
         
         system_group.heirachy_parenting(self.systems_to_be_made)
 

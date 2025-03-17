@@ -2,8 +2,10 @@ import importlib
 import maya.cmds as cmds
 import json
 
+from mod.rig.utils import utils
 from mod.guides import guide_data
 importlib.reload(guide_data)
+importlib.reload(utils)
 
 class ControlShapeList():
     def __init__(self):
@@ -145,9 +147,6 @@ class ControlTypes():
 
     def match_scale(self, guide=None, ctrl=None):
         if guide:
-            print("MATCHING SCALE")
-            print(guide)
-            print(ctrl)
             cmds.matchTransform(ctrl, guide,scale=True, rot=False, pos=False)
 
 
@@ -186,6 +185,9 @@ class Controls():
             # self.set_guide_attr(guide, rig_type)
         else:
             print("control_shape: couldnt find guide or associated_guide")
+        
+        self.set_colour()
+        cmds.refresh()
 
     def get_bounding_region(self):
         pass
@@ -198,6 +200,11 @@ class Controls():
 
     def set_name(self):
         self.ctrl = cmds.rename(self.ctrl,self.ctrl_name)
+
+    def set_colour(self):
+        button_colour_dict = json.loads(cmds.getAttr("ui_data.colour_dict"))
+        ctrl_list = cmds.ls(self.ctrl,type="transform")
+        utils.colour_controls(ctrl_list,button_colour_dict)
 
     def return_ctrl(self):
         return self.ctrl

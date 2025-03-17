@@ -125,8 +125,8 @@ class mirror_data():
         for guide in self.key["guide_list"]: # non proxy attrs
             for attr in cmds.listAttr(guide,ud=1):
                 mirrored_guide = f"{self.side}{guide[1:]}"
-                if cmds.ls(mirrored_guide):
-                    print(f"FOUND : {mirrored_guide}")
+                # if cmds.ls(mirrored_guide):
+                #     print(f"FOUND : {mirrored_guide}")
                 if "_control_shape" in attr:
                     if "_ik_" in attr: fkik = "ik"
                     elif "_fk_" in attr: fkik = "fk"
