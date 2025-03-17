@@ -25,6 +25,7 @@ class create_ik():
 
     def ik_system(self, ik_joint_list):
         self.other_joints = []
+        self.ball_joint = ""
         for joint in ik_joint_list:
             if self.validation_joints["start_joint"] in joint:
                 self.start_joint = joint
@@ -34,7 +35,10 @@ class create_ik():
                 self.end_joint = joint
             else:
                 self.other_joints.append(joint)
-                pass
+            
+            ball_joint = self.validation_joints.get("ball_joint")
+            if ball_joint and ball_joint in joint:
+                self.ball_joint = joint
 
         if self.validation_joints["ik_type"] == "biped":
             self.collect_other_controls(ik_joint_list)
@@ -148,7 +152,7 @@ class create_ik():
         pv_ctrl = pole_vector.create_pv(self.start_joint, self.pv_joint, self.end_joint, name=f"ctrl_pv_{self.pv_joint[7:]}", pv_guide=self.pv_joint.replace("jnt_ik_",""))
         return pv_ctrl
 
-    def create_handle(self, start_joint, end_joint, solver, pv, constrain, offset_ctrl=None):
+    def create_handle(self, start_joint, end_joint, solver=None, pv=None, constrain=None, offset_ctrl=None):
         control_module = control_shape.Controls(scale=[1,1,1],guide=self.end_joint[7:],ctrl_name=f"ctrl_ik_{end_joint[7:]}",rig_type="ik")
         ctrl_crv = control_module.return_ctrl()
         self.handle = cmds.ikHandle(n=f"hdl_ik_{end_joint[7:]}", solver=solver, sj=start_joint, ee=end_joint)
@@ -156,15 +160,19 @@ class create_ik():
 
         if pv:
             cmds.poleVectorConstraint(f"ctrl_pv_{self.pv_joint[7:]}", f"hdl_ik_{end_joint[7:]}", n=f"pvConst_{self.pv_joint[7:]}")
-        
+
         if self.validation_joints["world_orientation"] is True:
             cmds.matchTransform(ctrl_crv, f"hdl_ik_{end_joint[7:]}")
+            if self.ball_joint:
+                cmds.matchTransform(ctrl_crv, self.ball_joint, pos=False, ry=True, scl=False)
         else:
             cmds.matchTransform(ctrl_crv, end_joint)
 
         if offset_ctrl:
             offset_ctrl_crv = cmds.circle(n=f"ctrl_ik_{end_joint[7:].replace('_driver','')}_offset",r=10, nr=(0,1,0))[0]
             cmds.matchTransform(offset_ctrl_crv, f"hdl_ik_{end_joint[7:]}")
+            if self.ball_joint:
+                cmds.matchTransform(offset_ctrl_crv, self.ball_joint, pos=False, ry=True, scl=False)
             cmds.xform(offset_ctrl_crv, worldSpace=True, 
                        translation=(cmds.xform(offset_ctrl_crv, query=True, worldSpace=True, translation=True)[0],
                                     0,
