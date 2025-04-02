@@ -356,10 +356,10 @@ class Interface(QWidget):
                     try:
                         if key["rev_locators"]:
                             progressbar.update_label(text=f"Making reverse foot for {key['module']}...")
-                            if module.ik_joints["ik_type"] == "quadruped":
-                                reverse_foot_instance = reverse_foot.CreateReverseFootQuadruped(key["module"],key)
-                            if module.ik_joints["ik_type"] == "biped":
-                                reverse_foot_instance = reverse_foot.CreateReverseFootBiped(key["module"],key)
+                            # if module.ik_joints["ik_type"] == "quadruped":
+                            #     reverse_foot_instance = reverse_foot.CreateReverseFootQuadruped(key["module"],key)
+                            # if module.ik_joints["ik_type"] == "biped":
+                            reverse_foot_instance = reverse_foot.CreateReverseFootBiped(key["module"],key)
                     except KeyError:
                         print(f"Didnt find rev_locators in key not making reverse foot for: {key}")
                     squash_stretch_attr = cmds.getAttr(f"{master_guide}.{master_guide}_squash_stretch", asString=True)
