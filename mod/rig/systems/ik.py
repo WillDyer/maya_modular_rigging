@@ -152,7 +152,7 @@ class create_ik():
         pv_ctrl = pole_vector.create_pv(self.start_joint, self.pv_joint, self.end_joint, name=f"ctrl_pv_{self.pv_joint[7:]}", pv_guide=self.pv_joint.replace("jnt_ik_",""))
         return pv_ctrl
 
-    def create_handle(self, start_joint, end_joint, solver=None, pv=None, constrain=None, offset_ctrl=None):
+    def create_handle(self, start_joint, end_joint, solver=None, pv=None, constrain=None, offset_ctrl=False):
         control_module = control_shape.Controls(scale=[1,1,1],guide=self.end_joint[7:],ctrl_name=f"ctrl_ik_{end_joint[7:]}",rig_type="ik")
         ctrl_crv = control_module.return_ctrl()
         self.handle = cmds.ikHandle(n=f"hdl_ik_{end_joint[7:]}", solver=solver, sj=start_joint, ee=end_joint)
@@ -191,7 +191,7 @@ class create_ik():
         else:
             cmds.addAttr(ctrl_crv, ln="handle",at="enum",en="True",k=0)
 
-            return ctrl_crv, []
+            return ctrl_crv
 
     def create_top_hdl_ctrl(self):
         cmds.select(clear=1)
