@@ -24,9 +24,9 @@ class create_hybrid():
         joint_skn_list = []
         other_joints = []
         for joint in ik_joint_list:
-            if validation_joints["start_joint"] in joint:
+            if joint.endswith(validation_joints["start_joint"]):
                 start_joint = joint
-            elif validation_joints["end_joint"] in joint:
+            elif joint.endswith(validation_joints["end_joint"]):
                 end_joint = joint
             else:
                 other_joints.append(joint)
