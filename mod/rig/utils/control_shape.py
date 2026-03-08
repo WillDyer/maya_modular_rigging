@@ -9,7 +9,7 @@ importlib.reload(utils)
 
 class ControlShapeList():
     def __init__(self):
-        self.ctrl_shape_list = ["circle","cube","locator","square","arrows","load_previous"]
+        self.ctrl_shape_list = ["circle","cube","locator","square","arrows","load_previous","sphere"]
 
     def return_filtered_list(self, type, object):
         module = cmds.getAttr(f"{object}.base_module", asString=True)
@@ -95,6 +95,24 @@ class ControlTypes():
         for i, cv in enumerate(cvs_new):
             cmds.xform(cv, translation=cvs[i], os=True)
 
+        return self.ctrl_crv
+
+    def create_sphere(self):
+        hoz_circle = cmds.circle(n="tmp1",r=10, nr=(1, 0, 0), ch=False)[0]
+        ver_circle = cmds.circle(n="tmp2",r=10, nr=(0, 1, 0), ch=False)[0]
+        other_circle = cmds.circle(n="tmp2",r=10, nr=(0, 0, 1), ch=False)[0]
+        
+        circles = [hoz_circle, ver_circle, other_circle]
+        main = hoz_circle
+        for obj in circles[1:]:
+            shapes = cmds.listRelatives(obj, shapes=True)
+            
+            for shape in shapes:
+                cmds.parent(shape, main, shape=True, relative=True)
+            
+            cmds.delete(obj)
+            
+        self.ctrl_crv = cmds.rename(main, self.name)
         return self.ctrl_crv
 
     def create_load_previous(self):
